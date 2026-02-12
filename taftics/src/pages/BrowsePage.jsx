@@ -1,4 +1,6 @@
-import NavBar from '../components/common/NavBar';
+import { Link } from "react-router-dom";
+
+import { Search } from "lucide-react";
 
 const BrowsePage = () => {
   const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness'];
@@ -8,27 +10,14 @@ const BrowsePage = () => {
 
   return (
     <div className="bg-white min-vh-100">
-      <NavBar />
-      
-      {/* Spacer for Fixed Navbar */}
-      <div style={{ height: '90px' }}></div>
-
-      <div className="container-fluid px-5 mt-4">
+      <div className="container-fluid px-5">
         <div className="row">
           
           {/* LEFT SIDEBAR: User Info & Filters */}
-          <aside className="col-lg-3 pe-lg-5">
-            {/* User Profile Summary */}
-            <div className="d-flex align-items-center mb-5">
-              <div className="bg-primary rounded-circle me-3" style={{ width: '60px', height: '60px' }}>
-                {/* Profile Img Placeholder */}
-              </div>
-              <div>
-                <h6 className="fw-bold mb-0">Leelancze Pacomio</h6>
-                <p className="text-muted small mb-0">@leelanczer</p>
-                <span className="badge rounded-pill bg-success px-3">124</span>
-              </div>
-            </div>
+          <aside 
+            className="col-lg-3 pe-lg-5 sticky-top" 
+            style={{ top: '128px', alignSelf: 'start', height: 'fit-content' }}
+          >
 
             {/* Filter Groups */}
             <div className="filter-section mb-4">
@@ -71,50 +60,76 @@ const BrowsePage = () => {
           </aside>
 
           {/* MAIN CONTENT: Search & Results */}
-          <main className="col-lg-9">
+          <main className="col-lg-9" style={{ paddingTop: '48px' }}>
             {/* Search Bar */}
-            <div className="mb-4">
+            <div 
+              className="input-group mb-4 sticky-top"
+              style={{ top: '128px', alignSelf: 'start', width: '800px', height: 'fit-content' }}
+            >
+              <span className="input-group-text bg-light border-0 rounded-start-pill ps-4 py-2">
+                <Search size={20} className="text-muted" />
+              </span>
               <input 
                 type="text" 
-                className="form-control border-0 bg-light rounded-pill py-3 px-4 shadow-sm" 
+                className="form-control border-0 bg-light rounded-end-pill py-3 px-4"
                 placeholder="Search for establishments to fit your needs" 
               />
             </div>
 
-            {/* Establishment Cards */}
-            {[1, 2, 3].map((card) => (
-              <div key={card} className="card border-0 bg-light rounded-5 p-4 mb-4 shadow-sm">
-                <div className="row g-0">
-                  <div className="col-md-5">
+            {/* Establishment Cards Container */}
+            <div style={{ paddingTop: '24px', paddingBottom: '80px'}}>
+              {[1, 2, 3, 4, 5, 6].map((card) => (
+                <div key={card} 
+                  className="border-0 bg-light rounded-5 mb-5 overflow-hidden" 
+                  style={{ width: '800px', height: 'auto' }}
+                >
+                  {/* 1. Full-Width Header Image */}
+                  <div className="mx-auto" style={{ paddingTop: '40px', height: '400px', width: '90%' }}>
                     <img 
-                      src="https://via.placeholder.com/400x250" 
-                      className="img-fluid rounded-4 h-100" 
-                      style={{ objectFit: 'cover' }} 
-                      alt="National Book Store" 
+                      src="https://images.summitmedia-digital.com/spotph/images/2020/08/24/nbs-statement-closure-640-1598256966.jpg" 
+                      className="w-100 h-100" 
+                      style={{ objectFit: 'cover', borderRadius: '20px 20px' }} 
+                      alt="National Book Store"
                     />
                   </div>
-                  <div className="col-md-7 ps-md-4 d-flex flex-column justify-content-between py-2">
-                    <div>
-                      <h2 className="fw-bold mb-1">National Book Store</h2>
-                      <p className="text-muted mb-0">Inside Yuchengco Hall</p>
-                    </div>
-                    
-                    <div className="d-flex justify-content-between align-items-end">
-                      <div className="d-flex align-items-center gap-2">
-                         <span className="text-success fs-3">★</span>
-                         <span className="fw-bold">4.7 • 14 Reviews</span>
+
+                  {/* 2. Content Area */}
+                  <div style={{ padding: '40px', marginBottom: '-8px' }}>
+                    <div className="align-items-start">
+                      {/* Left: Titles */}
+                      <div>
+                        <h1 className="fw-bold fs-2">National Book Store</h1>
+                        <p className="text-muted fs-5">Inside Yuchengco Hall</p>
                       </div>
+                    </div>
+
+                    {/* 3. Rating Row */}
+                    <div className="d-flex justify-content-between align-items-end">
+                      {/* Left: Star Rating */}
+                      <h1 className="fs-4 pt-1 mb-0"> {/* Added mb-0 to prevent default margin from pushing it up */}
+                        <span className="me-2" style={{ color: '#48a868', fontSize: '2.5rem' }}>★</span>
+                        <span className="fw-bold">4.7</span> • 14 Reviews
+                      </h1>
+
+                      {/* Right: Actions */}
                       <div className="text-end">
-                        <a href="#" className="d-block text-dark text-decoration-none fw-bold mb-1">View Establishment ↗</a>
-                        <a href="#" className="d-block text-dark text-decoration-none fw-bold">Write a Review ↗</a>
+                        <Link 
+                          className="d-block text-dark text-decoration-none fw-bold fs-5 mb-2"
+                          to="/">
+                          View establishment ↗
+                        </Link>
+                        <Link 
+                          className="d-block text-dark text-decoration-none fw-bold fs-5"
+                          to="/">
+                          Write a review ↗
+                        </Link>
                       </div>
                     </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </main>
-          
         </div>
       </div>
     </div>

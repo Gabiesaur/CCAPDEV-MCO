@@ -16,8 +16,8 @@ const LandingPage = () => {
         </p>
         <div className="input-group mx-auto mt-5" style={{ maxWidth: "1000px" }}>
           <span className="input-group-text bg-light border-0 rounded-start-pill ps-4 py-2">
-                <Search size={20} className="text-muted" />
-              </span>
+            <Search size={20} className="text-muted" />
+          </span>
           <input
             type="text"
             className="form-control rounded-end-pill py-3 px-4 bg-light border-0"

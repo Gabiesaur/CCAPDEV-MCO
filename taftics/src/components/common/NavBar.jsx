@@ -1,9 +1,10 @@
 import { useLocation, Link } from "react-router-dom";
 import { Search } from "lucide-react";
+import logo from "/logo_white.svg?url";
 
 function NavBar({ user }) {
   const location = useLocation();
-  const isNotLandingPage = location.pathname !== "/";
+  const showSearchBar = location.pathname !== "/" && location.pathname !== "/browse";
 
   return (
     <nav
@@ -16,11 +17,16 @@ function NavBar({ user }) {
       >
         {/* LEFT: Brand Logo */}
         <Link className="navbar-brand text-white fw-bold fs-2" to="/">
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ height: "40px", width: "40px" }}
+          />
           Taftics
         </Link>
 
         {/* CENTER: Search Bar */}
-        {isNotLandingPage && (
+        {showSearchBar && (
           <div
             className="position-absolute start-50 translate-middle-x d-none d-md-flex"
             style={{ width: "450px" }}
