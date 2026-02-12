@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Star, Search } from "lucide-react";
 
 import RatingFilter from "../components/browse/RatingFilter";
 
@@ -26,7 +26,7 @@ const BrowsePage = () => {
           >
             {/* Categories Filter */}
             <div className="filter-section mb-4">
-              <label className="text-muted small fw-bold mb-2 text-uppercase d-block">Categories</label>
+              <label className="small opacity-50 fw-bold mb-2 text-uppercase d-block">Categories</label>
               <div className="d-flex flex-wrap gap-2">
                 {categories.map((item) => (
                   <button 
@@ -48,7 +48,7 @@ const BrowsePage = () => {
 
             {/* Hours Filter */}
             <div className="filter-section mb-4">
-              <label className="text-muted small fw-bold mb-2 text-uppercase d-block">Hours</label>
+              <label className="small opacity-50 fw-bold mb-2 text-uppercase d-block">Hours</label>
               <div className="d-flex gap-2">
                 {hours.map((item) => (
                   <button 
@@ -68,7 +68,7 @@ const BrowsePage = () => {
 
             {/* Prices Filter */}
             <div className="filter-section mb-5">
-              <label className="text-muted small fw-bold mb-2 text-uppercase d-block">Prices</label>
+              <label className="small opacity-50 fw-bold mb-2 text-uppercase d-block">Prices</label>
               <div className="d-flex gap-2">
                 {prices.map((item) => (
                   <button 
@@ -126,16 +126,16 @@ const BrowsePage = () => {
                     <div className="align-items-start">
                       <div>
                         <h1 className="fw-bold fs-2 mb-1">National Book Store</h1>
-                        <p className="text-muted fs-5">Inside Yuchengco Hall</p>
+                        <p className="opacity-50 fs-5">Inside Yuchengco Hall</p>
                       </div>
                     </div>
 
                     {/* 3. Rating Row */}
-                    <div className="d-flex justify-content-between align-items-end mt-4">
-                      <h1 className="fs-4 pt-1 mb-0 d-flex align-items-center">
-                        <span className="me-2" style={{ color: '#48a868', fontSize: '2.5rem', lineHeight: '1' }}>★</span>
-                        <span className="fw-bold">4.7</span> 
-                        <span className="ms-2 text-muted fw-normal">• 14 Reviews</span>
+                    <div className="d-flex justify-content-between align-items-end mt-2">
+                      <h1 className="fs-4 mb-0 d-flex align-items-end">
+                        <Star size={32} fill={"currentColor"} className="text-dlsu-primary me-2"/>
+                        <span className="text-dlsu-primary fw-bold">4.7</span> 
+                        <span className="ms-2 opacity-50 fw-normal">• 14 Reviews</span>
                       </h1>
 
                       <div className="text-end">
