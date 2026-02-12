@@ -16,6 +16,8 @@ import PublicProfilePage from "./pages/PublicProfilePage";
 import LandingPage from "./pages/LandingPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import BrowsePage from "./pages/BrowsePage";
+import ReviewPage from "./pages/ReviewPage";
+import CreateReviewPage from "./pages/CreateReview";
 import LoginPage from "./pages/LoginPage";
 import RegPage from "./pages/RegPage";
 import OwnerAppPage from "./pages/OwnerAppPage";
@@ -149,6 +151,8 @@ function App() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<AboutUsPage />} />
           <Route path="/browse" element={<BrowsePage />} />
+          <Route path="/review" element={<ReviewPage />} />
+          <Route path="/create" element={<CreateReviewPage />} />
 
           {/* Protected Route Check */}
           <Route

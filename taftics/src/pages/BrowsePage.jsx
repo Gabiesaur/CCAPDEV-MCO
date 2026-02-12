@@ -63,7 +63,7 @@ const BrowsePage = () => {
                     className={`btn rounded-pill btn-sm px-3 fw-semibold transition-all ${
                       activeCategory === item 
                         ? 'btn-success border-0 shadow-sm' 
-                        : 'btn-outline-dark border-dark'
+                        : 'btn-outline-dark border-dark opacity-50'
                     }`}
                   >
                     {item}
@@ -85,7 +85,7 @@ const BrowsePage = () => {
                     className={`btn rounded-pill btn-sm px-3 fw-semibold transition-all ${
                       activeHour === item 
                         ? 'btn-success border-0 shadow-sm' 
-                        : 'btn-outline-dark border-dark'
+                        : 'btn-outline-dark border-dark opacity-50'
                     }`}
                   >
                     {item}
@@ -105,7 +105,7 @@ const BrowsePage = () => {
                     className={`btn rounded-pill btn-sm px-3 fw-semibold transition-all ${
                       activePrice === item 
                         ? 'btn-success border-0 shadow-sm' 
-                        : 'btn-outline-dark border-dark'
+                        : 'btn-outline-dark border-dark opacity-50'
                     }`}
                   >
                     {item}
