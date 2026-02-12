@@ -94,11 +94,8 @@ const LoginPage = ({ onLogin }) => {
             </Link>
             <br></br>
             <Link to="/" className="register-link">
-              Home
+              Return to home
             </Link>{" "}
-            <Link to="/login" className="register-link">
-              Login
-            </Link>
           </p>
         </form>
       </div>
