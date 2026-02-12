@@ -23,12 +23,31 @@ import RegPage from "./pages/RegPage";
 const MOCK_DB = [
   {
     username: "leelanczers",
-    password: "password123", // In real life, never store plain text!
+    password: "password123",
     name: "Leelancze Pacomio",
     email: "lee@dlsu.edu.ph",
     idSeries: "124",
+    followers: "67",
+    helpfulCount: "67",
+    contributions: "67",
     avatar:
       "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff",
+    comments: [
+      {
+        postTitle: "Is the library open on Sundays?",
+        postAuthor: "archer_dc",
+        postRating: 3,
+        date: "2 days ago",
+        body: "Yes, until 5pm only.",
+      },
+      {
+        postTitle: "Best place to sleep?",
+        postAuthor: "archer_dc",
+        postRating: 5,
+        date: "5 days ago",
+        body: "Try the bean bags at the 6th floor.",
+      },
+    ],
     isAdmin: true,
   },
   {
@@ -37,20 +56,38 @@ const MOCK_DB = [
     name: "Archer Dela Cruz",
     email: "archer@dlsu.edu.ph",
     idSeries: "121",
+    followers: "67",
+    helpfulCount: "67",
+    contributions: "67",
     avatar:
       "https://ui-avatars.com/api/?name=Archer+Dela+Cruz&background=00441B&color=fff",
+    comments: [
+      {
+        postTitle: "Is the library open on Sundays?",
+        postAuthor: "leelanczers",
+        postRating: 3,
+        date: "2 days ago",
+        body: "Yes, until 5pm only.",
+      },
+      {
+        postTitle: "Best place to sleep?",
+        postAuthor: "leelanczers",
+        postRating: 5,
+        date: "5 days ago",
+        body: "Try the bean bags at the 6th floor.",
+      },
+    ],
   },
 ];
 
 function App() {
-  // 2. GLOBAL USER STATE
+  // GLOBAL USER STATE
   // Check localStorage so user stays logged in if page refreshes
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("currentUser");
     return saved ? JSON.parse(saved) : null;
   });
 
-  // 3. AUTH ACTIONS
   const login = (username, password) => {
     const foundUser = MOCK_DB.find(
       (u) =>
@@ -113,7 +150,10 @@ function App() {
               user ? <MyProfilePage user={user} /> : <Navigate to="/login" />
             }
           />
-          <Route path="/profile/:username" element={<PublicProfilePage />} />
+          <Route
+            path="/profile/:username"
+            element={<PublicProfilePage db={MOCK_DB} />}
+          />
         </Route>
 
         {/* Pass Auth Functions to Login/Reg */}

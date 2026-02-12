@@ -97,7 +97,6 @@ const LoginPage = ({ onLogin }) => {
 
           <p className="register-text">
             Not a member yet?{" "}
-            {/* Changed <a> to <Link> for smoother SPA navigation */}
             <Link to="/register" className="register-link">
               Register now!
             </Link>

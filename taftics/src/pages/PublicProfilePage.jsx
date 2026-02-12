@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Navigate } from "react-router-dom"; // Added these
+import { useParams, Link } from "react-router-dom";
 import { Star, MessageSquare } from "lucide-react";
 
 import ProfileHeader from "../components/profile/ProfileHeader";
@@ -7,47 +7,28 @@ import PublicProfileStatistics from "../components/profile/PublicProfileStatisti
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 
-export default function PublicProfilePage() {
-  const { username } = useParams(); // Grabs "archer_dc" or "frosh123" from URL
+export default function PublicProfilePage({ db }) {
+  const { username } = useParams();
   const [activeTab, setActiveTab] = useState("reviews");
 
-  // --- MOCK DATABASE ---
-  const usersDb = [
-    {
-      name: "Archer Dela Cruz",
-      username: "archer_dc",
-      avatar:
-        "https://ui-avatars.com/api/?name=Archer+Dela+Cruz&background=00441B&color=fff",
-      idSeries: "121",
-      followers: 142,
-      helpfulCount: 532,
-      contributions: 89,
-    },
-    {
-      name: "Froshie Fresh",
-      username: "frosh125",
-      avatar:
-        "https://ui-avatars.com/api/?name=Froshie+Fresh&background=41AB5D&color=fff",
-      idSeries: "125",
-      followers: 12,
-      helpfulCount: 45,
-      contributions: 5,
-    },
-  ];
+  // 1. Find the User
+  const publicUser = db.find((u) => u.username === username);
 
-  // Find the specific user from our "DB" based on the URL
-  const publicUser = usersDb.find((u) => u.username === username);
-
-  // If the user doesn't exist in our list, redirect to 404
   if (!publicUser) {
     return (
       <div className="p-5 text-center">
         <h1>User @{username} not found.</h1>
+        <Link to="/" className="btn btn-dlsu-dark mt-3">
+          Go Home
+        </Link>
       </div>
     );
   }
 
-  // --- MOCK CONTENT ---
+  // 2. Safely access the comments array (Default to empty if missing)
+  const userComments = publicUser.comments || [];
+
+  // MOCK REVIEW (You can also move this to DB later)
   const mockReview = {
     rating: 5,
     date: "1 week ago",
@@ -84,6 +65,7 @@ export default function PublicProfilePage() {
 
       <div className="container mt-4">
         <div className="row g-4">
+          {/* LEFT COLUMN */}
           <div className="col-lg-8">
             <div className="d-flex gap-2 mb-4">
               <TabButton id="reviews" icon={Star} label="Reviews" />
@@ -94,21 +76,31 @@ export default function PublicProfilePage() {
               {activeTab === "reviews" ? (
                 <ProfileReviews review={mockReview} />
               ) : (
-                <ProfileComments
-                  comment={{
-                    postTitle: "Is the library open?",
-                    postAuthor: "Froshie123",
-                    postRating: 3,
-                    date: "2 days ago",
-                    body: "Yes, until 5pm only.",
-                    user: publicUser.name,
-                  }}
-                  isOwnProfile={false}
-                />
+                /* 3. Dynamic Comment Rendering */
+                <div className="d-flex flex-column gap-3">
+                  {userComments.length > 0 ? (
+                    userComments.map((commentData, index) => (
+                      <ProfileComments
+                        key={index}
+                        comment={{
+                          ...commentData,
+                          user: publicUser.username,
+                        }}
+                        isOwnProfile={false}
+                      />
+                    ))
+                  ) : (
+                    <div className="text-center py-5 text-muted border rounded-3 bg-white">
+                      <MessageSquare className="mb-2 opacity-25" size={40} />
+                      <p className="mb-0">No comments yet.</p>
+                    </div>
+                  )}
+                </div>
               )}
             </div>
           </div>
 
+          {/* RIGHT COLUMN */}
           <div className="col-lg-4">
             <PublicProfileStatistics user={publicUser} />
           </div>

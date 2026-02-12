@@ -71,7 +71,7 @@ export default function PublicProfileStatistics({ user }) {
           <div className="col-4">
             <h5 className="fw-bold mb-0">{user.contributions}</h5>
             <small className="text-muted" style={{ fontSize: "0.75rem" }}>
-              Contribs
+              Contributions
             </small>
           </div>
         </div>

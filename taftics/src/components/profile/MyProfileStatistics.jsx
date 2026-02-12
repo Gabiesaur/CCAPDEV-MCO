@@ -2,12 +2,8 @@ import { Share2 } from "lucide-react";
 
 export default function MyProfileStatistics({ user, onShareSuccess }) {
   const handleShare = () => {
-    // 1. Define the link (using current window location or a specific route)
     const profileLink = `${window.location.origin}/profile/${user.username}`;
-
-    // 2. Copy to clipboard
     navigator.clipboard.writeText(profileLink).then(() => {
-      // 3. Trigger the success toast in the parent
       onShareSuccess();
     });
   };
@@ -50,7 +46,7 @@ export default function MyProfileStatistics({ user, onShareSuccess }) {
         <div className="col-4">
           <h5 className="fw-bold mb-0">{user.contributions}</h5>
           <small className="text-muted" style={{ fontSize: "0.75rem" }}>
-            Contribs
+            Contributions
           </small>
         </div>
       </div>
