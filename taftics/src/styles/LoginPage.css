@@ -31,10 +31,7 @@
 }
 
 .logo-circle {
-  background-color: white;
-  width: 250px;
-  height: 250px;
-  border-radius: 50%;
+  width: 300px;
   margin: 0 auto 20px auto;
   display: flex;
   align-items: center;
@@ -80,11 +77,11 @@
   padding: 20px;
 }
 
-.input-group {
+.login-field-group {
   margin-bottom: 25px;
 }
 
-.input-group label {
+.login-field-group label {
   font-family: "Overpass", sans-serif;
   display: block;
   font-size: 1rem;

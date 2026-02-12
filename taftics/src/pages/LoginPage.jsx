@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/LoginPage.css"; // Make sure to import the CSS file
 // TODO: Replace this import with the path to your actual logo file
-import logoImage from "./logo.png";
+import logoImage from "../../public/logo_white.svg";
 
 const LoginPage = () => {
   // State to handle input values
@@ -34,7 +34,7 @@ const LoginPage = () => {
       {/* Right Panel - Form */}
       <div className="right-panel">
         <form className="login-form" onSubmit={handleLogin}>
-          <div className="input-group">
+          <div className="login-field-group">
             <label htmlFor="username">Username or email</label>
             <input
               type="text"
@@ -45,7 +45,7 @@ const LoginPage = () => {
             />
           </div>
 
-          <div className="input-group">
+          <div className="login-field-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
