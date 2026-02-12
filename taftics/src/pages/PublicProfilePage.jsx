@@ -1,32 +1,58 @@
 import { useState } from "react";
+import { useParams, Navigate } from "react-router-dom"; // Added these
 import { Star, MessageSquare } from "lucide-react";
 
-// --- COMPONENT IMPORTS ---
 import ProfileHeader from "../components/profile/ProfileHeader";
 import PublicProfileStatistics from "../components/profile/PublicProfileStatistics";
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 
 export default function PublicProfilePage() {
+  const { username } = useParams(); // Grabs "archer_dc" or "frosh123" from URL
   const [activeTab, setActiveTab] = useState("reviews");
 
-  // --- MOCK DATA (Someone Else's Data) ---
-  const publicUser = {
-    name: "Archer Dela Cruz",
-    username: "archer_dc",
-    avatar:
-      "https://ui-avatars.com/api/?name=Archer+Dela+Cruz&background=00441B&color=fff",
-    idSeries: "121",
-    followers: 142,
-    helpfulCount: 532,
-    contributions: 89,
-  };
+  // --- MOCK DATABASE ---
+  const usersDb = [
+    {
+      name: "Archer Dela Cruz",
+      username: "archer_dc",
+      avatar:
+        "https://ui-avatars.com/api/?name=Archer+Dela+Cruz&background=00441B&color=fff",
+      idSeries: "121",
+      followers: 142,
+      helpfulCount: 532,
+      contributions: 89,
+    },
+    {
+      name: "Froshie Fresh",
+      username: "frosh125",
+      avatar:
+        "https://ui-avatars.com/api/?name=Froshie+Fresh&background=41AB5D&color=fff",
+      idSeries: "125",
+      followers: 12,
+      helpfulCount: 45,
+      contributions: 5,
+    },
+  ];
 
+  // Find the specific user from our "DB" based on the URL
+  const publicUser = usersDb.find((u) => u.username === username);
+
+  // If the user doesn't exist in our list, redirect to 404
+  if (!publicUser) {
+    return (
+      <div className="p-5 text-center">
+        <h1>User @{username} not found.</h1>
+      </div>
+    );
+  }
+
+  // --- MOCK CONTENT ---
   const mockReview = {
     rating: 5,
     date: "1 week ago",
-    title: "Best Sisig in Taft!",
-    body: "Honestly, for the price, you can't beat this. The sauce is perfect.",
+    title: `Best spot for ${publicUser.name}!`,
+    body: "Honestly, for the price, you can't beat this.",
     establishment: {
       name: "Ate Rica's Bacsilog",
       location: "Agno Food Court",
@@ -34,15 +60,6 @@ export default function PublicProfilePage() {
     },
   };
 
-  const mockComment = {
-    postTitle: "Is the library open on Sundays?",
-    postAuthor: "Froshie123",
-    postRating: 3,
-    date: "2 days ago",
-    body: "Yes, until 5pm only.",
-  };
-
-  // Tab Button Helper
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
       className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${
@@ -58,7 +75,6 @@ export default function PublicProfilePage() {
 
   return (
     <div className="min-vh-100 pb-5 bg-light">
-      {/* 1. HEADER (isOwnProfile=FALSE hides the camera icon) */}
       <ProfileHeader
         name={publicUser.name}
         username={publicUser.username}
@@ -68,43 +84,31 @@ export default function PublicProfilePage() {
 
       <div className="container mt-4">
         <div className="row g-4">
-          {/* LEFT COLUMN (Main Content) */}
           <div className="col-lg-8">
             <div className="d-flex gap-2 mb-4">
-              {/* Tabs */}
               <TabButton id="reviews" icon={Star} label="Reviews" />
               <TabButton id="comments" icon={MessageSquare} label="Comments" />
             </div>
 
-            {/* Tab Content Logic */}
             <div>
               {activeTab === "reviews" ? (
-                <>
-                  <ProfileReviews review={mockReview} />
-                  <ProfileReviews
-                    review={{
-                      ...mockReview,
-                      title: "Avoid during lunch",
-                      rating: 3,
-                      body: "Too crowded.",
-                    }}
-                  />
-                </>
+                <ProfileReviews review={mockReview} />
               ) : (
-                <>
-                  <ProfileComments
-                    comment={{
-                      ...mockComment,
-                      user: publicUser.name,
-                    }}
-                    isOwnProfile={false}
-                  />
-                </>
+                <ProfileComments
+                  comment={{
+                    postTitle: "Is the library open?",
+                    postAuthor: "Froshie123",
+                    postRating: 3,
+                    date: "2 days ago",
+                    body: "Yes, until 5pm only.",
+                    user: publicUser.name,
+                  }}
+                  isOwnProfile={false}
+                />
               )}
             </div>
           </div>
 
-          {/* RIGHT COLUMN (Public Stats) */}
           <div className="col-lg-4">
             <PublicProfileStatistics user={publicUser} />
           </div>

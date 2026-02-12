@@ -7,14 +7,10 @@ import MainLayout from "./components/layout/MainLayout";
 import MyProfilePage from "./pages/MyProfilePage";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import LandingPage from "./pages/LandingPage";
+import AboutUsPage from "./pages/AboutUsPage";
 //import LoginPage from './pages/LoginPage';
 
 // Placeholder Pages (So the app doesn't crash while your team builds them)
-const SearchPage = () => (
-  <div className="p-5 text-center">
-    <h1>Search Page (Coming Soon)</h1>
-  </div>
-);
 const LoginPage = () => (
   <div className="p-5 text-center">
     <h1>Login Page (Coming Soon)</h1>
@@ -36,8 +32,9 @@ function App() {
         <Route element={<MainLayout />}>
           {/* --- PUBLIC ROUTES (Accessible to everyone) --- */}
           <Route path="/" element={<LandingPage />} />
-          <Route path="/search" element={<SearchPage />} />
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/register" element={<LoginPage />} />
+          <Route path="/about" element={<AboutUsPage />} />
 
           {/* --- PROFILE ROUTES --- */}
           {/* 1. My Profile (Protected) */}

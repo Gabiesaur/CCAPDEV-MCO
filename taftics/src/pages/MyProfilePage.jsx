@@ -5,6 +5,8 @@ import {
   BookMarked,
   ThumbsUp,
   ThumbsDown,
+  CheckCircle2,
+  Link as LinkIcon,
 } from "lucide-react";
 
 // --- COMPONENT IMPORTS ---
@@ -12,9 +14,31 @@ import ProfileHeader from "../components/profile/ProfileHeader";
 import MyProfileStatistics from "../components/profile/MyProfileStatistics";
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
+import ImageUploadModal from "../components/profile/ImageUploadModal";
 
 export default function MyProfilePage() {
+  // UI State
   const [activeTab, setActiveTab] = useState("reviews");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Toast State
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastIcon, setToastIcon] = useState(null);
+
+  // Dynamic Toast Trigger
+  const triggerToast = (message, iconType) => {
+    setToastMessage(message);
+    setToastIcon(
+      iconType === "success" ? (
+        <CheckCircle2 size={24} />
+      ) : (
+        <LinkIcon size={24} />
+      ),
+    );
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
 
   // --- MOCK DATA ---
   const user = {
@@ -26,7 +50,6 @@ export default function MyProfilePage() {
     followers: 67,
     helpfulCount: 7409,
     contributions: 287,
-    accountAge: "1 y",
   };
 
   const mockReview = {
@@ -65,19 +88,37 @@ export default function MyProfilePage() {
 
   return (
     <div className="min-vh-100 pb-5 bg-light">
-      {/* 1. COMPONENT: Header */}
+      {/* 1. Header Section */}
       <ProfileHeader
         name={user.name}
         username={user.username}
         avatar={user.avatar}
         isOwnProfile={true}
+        onCameraClick={() => setIsModalOpen(true)}
       />
 
+      {/* 2. Modals & Notifications */}
+      <ImageUploadModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        onUploadSuccess={() =>
+          triggerToast("Profile picture updated successfully!", "success")
+        }
+      />
+
+      {showToast && (
+        <div className="toast-success-custom fw-bold" style={{ zIndex: 9999 }}>
+          {toastIcon}
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
+      {/* 3. Main Content Grid */}
       <div className="container mt-4">
         <div className="row g-4">
-          {/* LEFT COLUMN (Main Content) */}
+          {/* LEFT COLUMN: Feed */}
           <div className="col-lg-8">
-            {/* Tabs */}
+            {/* Navigation Tabs */}
             <div className="d-flex flex-wrap gap-2 mb-4">
               <TabButton id="reviews" icon={Star} label="My Reviews" />
               <TabButton
@@ -90,7 +131,7 @@ export default function MyProfilePage() {
               <TabButton id="unhelpful" icon={ThumbsDown} label="Unhelpful" />
             </div>
 
-            {/* Tab Content Logic */}
+            {/* Dynamic Content Rendering */}
             <div>
               {activeTab === "reviews" && (
                 <>
@@ -98,7 +139,7 @@ export default function MyProfilePage() {
                   <ProfileReviews
                     review={{
                       ...mockReview,
-                      title: "Another Review",
+                      title: "Standard Taft Food",
                       rating: 5,
                     }}
                   />
@@ -113,17 +154,24 @@ export default function MyProfilePage() {
               )}
 
               {["saved", "helpful", "unhelpful"].includes(activeTab) && (
-                <div className="text-center py-5 text-muted">
-                  {/* You can reuse ProfileReviews here later */}
+                <div className="py-3">
+                  <h6 className="text-muted mb-4 text-capitalize border-bottom pb-2">
+                    Your {activeTab} posts
+                  </h6>
                   <ProfileReviews review={mockReview} />
                 </div>
               )}
             </div>
           </div>
 
-          {/* RIGHT COLUMN (Own Stats) */}
+          {/* RIGHT COLUMN: Sidebar Stats */}
           <div className="col-lg-4">
-            <MyProfileStatistics user={user} />
+            <MyProfileStatistics
+              user={user}
+              onShareSuccess={() =>
+                triggerToast("Profile link copied to clipboard!", "link")
+              }
+            />
           </div>
         </div>
       </div>

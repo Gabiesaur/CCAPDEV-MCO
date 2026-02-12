@@ -14,11 +14,35 @@ export default function Footer() {
           </div>
           <div className="col-md-4 mb-4 mb-md-0">
             <h6 className="fw-bold small text-uppercase">Quick Links</h6>
-            <ul className="list-unstyled small">
-              <li>Register</li>
-              <li>Establishments</li>
-              <li>Review</li>
-            </ul>
+            <div className="col-lg-3 col-md-6 mb-4 mb-md-0">
+              <ul className="list-unstyled d-flex flex-column gap-2">
+                <li>
+                  <Link
+                    to="/register"
+                    className="text-white text-decoration-none small hover-underline"
+                  >
+                    Register
+                  </Link>
+                </li>
+                <li>
+                  <Link
+                    to="/search"
+                    className="text-white text-decoration-none small hover-underline"
+                  >
+                    Establishments
+                  </Link>
+                </li>
+                <li>
+                  {/* Updated to About Us */}
+                  <Link
+                    to="/about"
+                    className="text-white text-decoration-none small hover-underline"
+                  >
+                    About Us
+                  </Link>
+                </li>
+              </ul>
+            </div>
           </div>
           <div className="col-md-4">
             <h6 className="fw-bold small text-uppercase">Contact Us</h6>

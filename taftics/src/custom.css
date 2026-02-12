@@ -104,6 +104,60 @@ body {
     scrollbar-width: none;  /* Firefox */
 }
 
+/* =========================================
+   5. SPECIFIC COMPONENTS
+   ========================================= */
+
+/* Navbar */
+
 body {
     padding-top: 80px; /* Matches Navbar height */
+}
+
+:root {
+  --nav-height: 80px;
+  --sticky-offset: 100px; /* nav-height + 20px gap */
+}
+
+.sidebar-sticky {
+  position: sticky;
+  top: var(--sticky-offset);
+  z-index: 1020;
+}
+
+/* IMAGE POPUP */
+.glass-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    /* Darker green-tinted transparent base */
+    background: rgba(0, 20, 10, 0.6); 
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    z-index: 1050;
+}
+
+/* Success Toast Animation */
+@keyframes slideInUp {
+    from { transform: translateY(100%); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.toast-success-custom {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    background: #00441B; /* DLSU Dark Green */
+    color: #C7E9C0;    /* DLSU Light Green */
+    padding: 16px 24px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    z-index: 2000;
+    animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid rgba(199, 233, 192, 0.2);
 }

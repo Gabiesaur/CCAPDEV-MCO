@@ -5,6 +5,7 @@ export default function ProfileHeader({
   name,
   username,
   isOwnProfile,
+  onCameraClick, // 1. Add this prop
 }) {
   return (
     <div style={{ width: "100%" }}>
@@ -14,7 +15,7 @@ export default function ProfileHeader({
         style={{ height: "200px" }}
       >
         <div className="container h-100 px-4 d-flex align-items-end pb-3">
-          {/* Avatar Wrapper (Overlaps the banner) */}
+          {/* Avatar Wrapper */}
           <div
             className="position-relative"
             style={{ marginBottom: "-50px", marginRight: "20px" }}
@@ -27,6 +28,7 @@ export default function ProfileHeader({
             />
             {isOwnProfile && (
               <button
+                onClick={onCameraClick}
                 className="btn btn-light border position-absolute bottom-0 end-0 rounded-circle p-2 shadow-sm"
                 style={{ margin: "5px" }}
               >
@@ -35,7 +37,7 @@ export default function ProfileHeader({
             )}
           </div>
 
-          {/* User Info (Now INSIDE the green layer, White Text) */}
+          {/* User Info */}
           <div className="mb-2 text-white" style={{ paddingTop: "10px" }}>
             <h1
               className="fw-bold mb-0"
@@ -48,7 +50,6 @@ export default function ProfileHeader({
         </div>
       </div>
 
-      {/* Spacing for the bottom half of the avatar to breathe */}
       <div style={{ height: "60px" }}></div>
     </div>
   );

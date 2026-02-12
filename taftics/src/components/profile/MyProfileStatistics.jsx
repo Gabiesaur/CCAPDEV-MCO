@@ -1,9 +1,20 @@
-import { Share2, Flame, Activity } from "lucide-react";
+import { Share2 } from "lucide-react";
 
-export default function MyProfileStatistics({ user }) {
+export default function MyProfileStatistics({ user, onShareSuccess }) {
+  const handleShare = () => {
+    // 1. Define the link (using current window location or a specific route)
+    const profileLink = `${window.location.origin}/profile/${user.username}`;
+
+    // 2. Copy to clipboard
+    navigator.clipboard.writeText(profileLink).then(() => {
+      // 3. Trigger the success toast in the parent
+      onShareSuccess();
+    });
+  };
+
   return (
-    <div className="custom-card p-4 sticky-top" style={{ top: "20px" }}>
-      {/* Header*/}
+    <div className="custom-card p-4 sidebar-sticky">
+      {/* Header */}
       <div className="d-flex align-items-center gap-2 mb-3">
         <h5 className="fw-bold text-dlsu-dark mb-0">{user.name}</h5>
         <span
@@ -14,8 +25,11 @@ export default function MyProfileStatistics({ user }) {
         </span>
       </div>
 
-      {/* Share Button */}
-      <button className="btn btn-dark w-100 mb-4 d-flex align-items-center justify-content-center gap-2">
+      {/* Share Button - Updated with handleShare */}
+      <button
+        className="btn btn-dark w-100 mb-4 d-flex align-items-center justify-content-center gap-2"
+        onClick={handleShare}
+      >
         <Share2 size={16} /> Share Profile
       </button>
 
@@ -36,7 +50,7 @@ export default function MyProfileStatistics({ user }) {
         <div className="col-4">
           <h5 className="fw-bold mb-0">{user.contributions}</h5>
           <small className="text-muted" style={{ fontSize: "0.75rem" }}>
-            Contributions
+            Contribs
           </small>
         </div>
       </div>
