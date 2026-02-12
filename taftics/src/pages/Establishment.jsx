@@ -1,5 +1,4 @@
 import { Link } from "react-router-dom";
-
 import { Bold } from "lucide-react";
 import React, { use } from "react";
 import { 
@@ -25,7 +24,7 @@ function Establishment() {
         phone: "091-234-5678",
         email: "dlsu@laundry.com",
         address: "2401 Taft Ave, Malate, Manila, 1004 Metro Manila",
-        description: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        description: "Our laundry service offers quick turnaround times, competitive pricing, and exceptional customer service. Experience the convenience of our laundry service today!",
         website: "www.dlsu-laundry.com",
     };
 
@@ -188,7 +187,7 @@ function Establishment() {
                                                     <div className="d-flex flex-row align-items-center gap-3">
                                                         <img src={rev.avatar} alt="avatar" style={{width: "50px", height: "50px", borderRadius: "50%", objectFit: "cover"}} />
                                                         <div className="d-flex flex-column">
-                                                            <p className="mb-0" style={{color: "#444646", fontWeight: "bold"}}>{rev.user}</p>
+                                                            <Link to="/profile/me" className="mb-0 text-decoration-none" style={{color: "#444646", fontWeight: "bold"}}>{rev.user}</Link>
                                                             <div className="d-flex flex-row gap-1">
                                                                 {[...Array(5)].map((_, i) => (
                                                                     <Star
@@ -203,10 +202,10 @@ function Establishment() {
                                                         <p className="mb-0 mt-2" style={{color: "#9ca3af", fontSize: "12px"}}>{rev.date}</p>
                                                     </div>
 
-                                                    <p className="mb-0 mt-2" style={{color: "#000000", fontSize: "16px"}}>{rev.title}</p>
-                                                    <p className="mb-0 mt-2" style={{color: "#444646", fontSize: "14px"}}>{rev.comment}</p>
-                                                    
-                                                    <a href="#" className="mb-0 mt-1" style={{color: "#0b08bd", fontSize: "12px"}}>See more</a>
+                                                    <Link to="/review" className="text-decoration-none" style={{color: "inherit"}}>
+                                                        <p className="mb-0 mt-2" style={{color: "#000000", fontSize: "16px"}}>{rev.title}</p>
+                                                        <p className="mb-0 mt-2" style={{color: "#444646", fontSize: "14px", overflow: "hidden", textOverflow: "ellipsis", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical"}}>{rev.comment}</p>
+                                                    </Link>
 
                                                     <div className="d-flex flex-row gap-3 mt-3">
                                                         <button 
