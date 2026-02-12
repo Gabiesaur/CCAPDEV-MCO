@@ -1,7 +1,38 @@
 import { Link } from "react-router-dom";
 import { Search } from "lucide-react";
 
+import EstablishmentCardSmall from "../components/landing/EstablishmentCardSmall";
+
 const LandingPage = () => {
+  const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
+  
+  const establishments = [
+    {
+      name: "National Book Store",
+      category: categories[1],
+      location: "Inside Yuchengco Hall",
+      rating: 4.7,
+      reviewCount: 14,
+      image: "https://images.summitmedia-digital.com/spotph/images/2020/08/24/nbs-statement-closure-640-1598256966.jpg"
+    },
+    {
+      name: "Anytime Fitness",
+      category: categories[7],
+      location: "Inside R Square",
+      rating: 4.2,
+      reviewCount: 9,
+      image: "https://classpass-res.cloudinary.com/image/upload/f_auto/q_auto,w_1125/media_venue/a84kycuvqo9jblnfro8r.jpg"
+    },
+    {
+      name: "Ate Rica's Bacsilog",
+      category: categories[8],
+      location: "Agno Food Court",
+      rating: 4.8,
+      reviewCount: 16,
+      image: "https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg"
+    }
+  ];
+
   return (
     <div className="min-vh-100 bg-white">
       {/* Hero Section */}
@@ -32,18 +63,10 @@ const LandingPage = () => {
           Browse reviews by <span style={{ color: "#003e1c" }}>category</span>
         </h2>
         <div className="row g-3 justify-content-center">
-          {[
-            "School Supplies",
-            "Laundry",
-            "Printing",
-            "Groceries",
-            "Dorms",
-            "Repairs",
-          ].map((cat) => (
+          {categories.map((cat) => (
             <div key={cat} className="col-6 col-md-4 col-lg-2">
               <Link
-                className="btn w-100 text-white py-2 rounded-pill fw-semibold"
-                style={{ backgroundColor: "#48a868" }}
+                className="btn bg-dlsu-primary w-100 text-white py-2 rounded-pill fw-semibold"
                 to="/browse"
               >
                 {cat}
@@ -60,32 +83,16 @@ const LandingPage = () => {
           establishments
         </h2>
         <div className="row g-4">
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="col-md-4">
-              <div className="card border-0 shadow-sm rounded-4 p-3 bg-light">
-                <img
-                  src="https://images.summitmedia-digital.com/spotph/images/2020/08/24/nbs-statement-closure-640-1598256966.jpg"
-                  className="card-img-top rounded-3 w-100"
-                  style={{ height: '240px', objectFit: 'cover', borderRadius: '20px' }}
-                  alt="Establishment"
-                />
-                <div className="card-body px-0 pb-0">
-                  <h5 className="fw-bold mb-1">National Book Store</h5>
-                  <p className="text-muted small mb-2">Inside Yuchengco Hall</p>
-                  <div className="d-flex justify-content-between align-items-center">
-                    <span className="fw-bold" style={{ color: "#48a868" }}>
-                      ★ 4.7{" "}
-                      <span className="text-muted fw-normal">• 14 Reviews</span>
-                    </span>
-                    <a
-                      href="#"
-                      className="text-dark text-decoration-none small fw-bold"
-                    >
-                      View ↗
-                    </a>
-                  </div>
-                </div>
-              </div>
+          {establishments.map((store) => (
+            <div key={store.id} className="col-md-4">
+              <EstablishmentCardSmall 
+                name={store.name}
+                category={store.category}
+                location={store.location}
+                rating={store.rating}
+                reviewCount={store.reviewCount}
+                image={store.image}
+              />
             </div>
           ))}
         </div>
@@ -98,7 +105,7 @@ const LandingPage = () => {
           community
         </h2>
         <div
-          className="mx-auto bg-light p-4 rounded-4 shadow-sm text-start"
+          className="mx-auto bg-light p-4 mb-4 rounded-4 shadow-sm text-start"
           style={{ maxWidth: "700px" }}
         >
           <div className="d-flex align-items-center mb-3">
