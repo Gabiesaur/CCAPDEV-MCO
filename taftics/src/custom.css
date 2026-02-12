@@ -103,3 +103,7 @@ body {
     -ms-overflow-style: none;  /* IE and Edge */
     scrollbar-width: none;  /* Firefox */
 }
+
+body {
+    padding-top: 80px; /* Matches Navbar height */
+}

@@ -26,20 +26,26 @@ export default function ProfileReviews({ review }) {
       <h5 className="fw-bold text-dlsu-dark mb-2">{review.title}</h5>
       <p className="text-secondary small mb-3">{review.body}</p>
 
-      {/* Establishment Mini-Card */}
-      <div className="d-flex align-items-center p-3 bg-light rounded border">
+      {/* Establishment */}
+      <div
+        className="d-inline-flex align-items-center bg-light border rounded-pill pe-3 ps-1 py-1"
+        style={{ maxWidth: "100%" }}
+      >
         <img
           src={review.establishment.image}
           alt="shop"
-          className="rounded-circle me-3 object-cover"
-          style={{ width: "40px", height: "40px" }}
+          className="rounded-circle me-2 object-cover"
+          style={{ width: "28px", height: "28px" }}
         />
-        <div>
-          <h6 className="fw-bold mb-0 text-dark">
+        <div className="lh-1">
+          <h6 className="fw-bold mb-0 text-dark" style={{ fontSize: "0.8rem" }}>
             {review.establishment.name}
           </h6>
-          <small className="text-muted d-flex align-items-center gap-1">
-            <MapPin size={12} /> {review.establishment.location}
+          <small
+            className="text-muted d-flex align-items-center gap-1"
+            style={{ fontSize: "0.7rem" }}
+          >
+            <MapPin size={10} /> {review.establishment.location}
           </small>
         </div>
       </div>
