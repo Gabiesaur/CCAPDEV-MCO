@@ -26,14 +26,14 @@ function NavBar({ user }) {
             style={{ width: "450px" }}
           >
             <div className="input-group">
-              <span className="input-group-text bg-white border-0 rounded-start-pill ps-3 py-2">
+              <span className="input-group-text bg-light border-0 rounded-start-pill ps-3 py-2">
                 <Search size={20} className="text-muted" />
               </span>
               <input
                 type="text"
-                className="form-control border-0 rounded-end-pill py-2 fs-6"
+                className="form-control bg-light border-0 rounded-end-pill py-2 fs-6"
                 placeholder="Search Taftics..."
-                style={{ height: "48px" }}
+                style={{ height: "40px" }}
               />
             </div>
           </div>
@@ -44,8 +44,8 @@ function NavBar({ user }) {
           <ul className="navbar-nav flex-row align-items-center gap-3">
             <li className="nav-item">
               <Link
-                className="nav-link text-white fw-semibold px-2 fs-6"
-                to="/search"
+                className="nav-link text-white fw-semibold px-4 fs-6"
+                to="/browse"
               >
                 Browse
               </Link>
@@ -63,7 +63,7 @@ function NavBar({ user }) {
                     </small>
                     <small
                       className="text-dlsu-light"
-                      style={{ fontSize: "0.7rem" }}
+                      style={{ fontSize: "0.8rem" }}
                     >
                       View Profile
                     </small>
@@ -72,7 +72,7 @@ function NavBar({ user }) {
                     src={user.avatar}
                     alt="My Profile"
                     className="rounded-circle border border-2 border-white object-cover shadow-sm"
-                    style={{ width: "45px", height: "45px" }}
+                    style={{ width: "40px", height: "40px" }}
                   />
                 </Link>
               </li>
@@ -80,7 +80,7 @@ function NavBar({ user }) {
               <li className="nav-item">
                 <button
                   className="btn btn-light rounded-pill px-4 py-2 fw-bold fs-6 shadow-sm"
-                  style={{ height: "48px" }}
+                  style={{ height: "40px" }}
                   type="button"
                 >
                   Sign In

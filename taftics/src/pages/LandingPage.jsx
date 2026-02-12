@@ -1,28 +1,33 @@
+import { Link } from "react-router-dom";
+import { Search } from "lucide-react";
+
 const LandingPage = () => {
   return (
     <div className="min-vh-100 bg-white">
       {/* Hero Section */}
       {/* We use pt-5 and mt-5 to prevent the fixed navbar from overlapping the text */}
-      <header className="container text-center pt-5 mt-5 mb-5">
+      <header className="container text-center" style={{ paddingTop: '100px', paddingBottom: '80px' }}>
         <h1 className="fw-bold display-4 mt-5">
-          Every <span style={{ color: "#003e1c" }}>Archer</span> needs a
-          strategy.
+          Every <span style={{ color: "#003e1c" }}>Archer</span> needs a strategy.
         </h1>
         <p className="text-muted fs-5">
           Find the best services and essentials around Taft with peer-verified
           reviews.
         </p>
-        <div className="mx-auto mt-4" style={{ maxWidth: "600px" }}>
+        <div className="input-group mx-auto mt-5" style={{ maxWidth: "1000px" }}>
+          <span className="input-group-text bg-light border-0 rounded-start-pill ps-4 py-2">
+                <Search size={20} className="text-muted" />
+              </span>
           <input
             type="text"
-            className="form-control rounded-pill py-3 px-4 bg-light border-0 shadow-sm"
+            className="form-control rounded-end-pill py-3 px-4 bg-light border-0"
             placeholder="Search for laundry, printing, groceries..."
           />
         </div>
       </header>
 
       {/* Category Section */}
-      <section className="container text-center my-5">
+      <section className="container text-center" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
         <h2 className="fw-bold mb-4">
           Browse reviews by <span style={{ color: "#003e1c" }}>category</span>
         </h2>
@@ -36,19 +41,20 @@ const LandingPage = () => {
             "Repairs",
           ].map((cat) => (
             <div key={cat} className="col-6 col-md-4 col-lg-2">
-              <button
+              <Link
                 className="btn w-100 text-white py-2 rounded-pill fw-semibold"
                 style={{ backgroundColor: "#48a868" }}
+                to="/browse"
               >
                 {cat}
-              </button>
+              </Link>
             </div>
           ))}
         </div>
       </section>
 
       {/* Top Rated Section */}
-      <section className="container my-5 py-5">
+      <section className="container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
         <h2 className="fw-bold text-center mb-5">
           See the <span style={{ color: "#003e1c" }}>top rated</span>{" "}
           establishments
@@ -85,7 +91,7 @@ const LandingPage = () => {
       </section>
 
       {/* Community Review Section */}
-      <section className="container text-center my-5 py-5">
+      <section className="container text-center" style={{ paddingTop: '80px', paddingBottom: '160px' }}>
         <h2 className="fw-bold mb-5">
           Help others in the <span style={{ color: "#003e1c" }}>DLSU</span>{" "}
           community
