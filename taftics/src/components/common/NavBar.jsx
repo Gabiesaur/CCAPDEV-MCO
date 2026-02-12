@@ -1,5 +1,6 @@
 import { useLocation, Link } from "react-router-dom";
 import { Search } from "lucide-react";
+import logo from "/logo_white.svg?url";
 
 function NavBar({ user }) {
   const location = useLocation();
@@ -16,6 +17,11 @@ function NavBar({ user }) {
       >
         {/* LEFT: Brand Logo */}
         <Link className="navbar-brand text-white fw-bold fs-2" to="/">
+          <img
+            src={logo}
+            alt="Logo"
+            style={{ height: "40px", width: "40px" }}
+          />
           Taftics
         </Link>
 
