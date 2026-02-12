@@ -1,17 +1,36 @@
 import React, { useState } from "react";
-import "../styles/LoginPage.css"; // Make sure to import the CSS file
-// TODO: Replace this import with the path to your actual logo file
+import { useNavigate, Link } from "react-router-dom";
+import "../styles/LoginPage.css";
+// Ensure this path matches where your actual logo is
 import logoImage from "/logo_white.svg?url";
 
-const LoginPage = () => {
-  // State to handle input values
+const LoginPage = ({ onLogin }) => {
+  const navigate = useNavigate();
+
+  // State for inputs and feedback
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
-    console.log("Logging in with:", username, password);
-    // Add your login logic here (API calls, etc.)
+    setError(""); // Clear previous errors
+
+    // 1. Basic Validation
+    if (!username || !password) {
+      setError("Please fill in both username and password.");
+      return;
+    }
+
+    // 2. Call the Mock Login function passed from App.jsx
+    const result = onLogin(username, password);
+
+    // 3. Handle Result
+    if (result.success) {
+      navigate("/"); // Redirect to Landing Page
+    } else {
+      setError(result.message); // Show error message from mock DB
+    }
   };
 
   return (
@@ -34,6 +53,20 @@ const LoginPage = () => {
       {/* Right Panel - Form */}
       <div className="right-panel">
         <form className="login-form" onSubmit={handleLogin}>
+          {/* Error Alert Box */}
+          {error && (
+            <div
+              className="alert alert-danger text-center p-2 mb-4 small rounded-3"
+              style={{
+                backgroundColor: "#f8d7da",
+                color: "#842029",
+                border: "1px solid #f5c2c7",
+              }}
+            >
+              {error}
+            </div>
+          )}
+
           <div className="login-field-group">
             <label htmlFor="username">Username or email</label>
             <input
@@ -42,6 +75,7 @@ const LoginPage = () => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="styled-input"
+              placeholder="e.g. leelanczerscx"
             />
           </div>
 
@@ -53,6 +87,7 @@ const LoginPage = () => {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               className="styled-input"
+              placeholder="••••••••"
             />
           </div>
 
@@ -62,9 +97,10 @@ const LoginPage = () => {
 
           <p className="register-text">
             Not a member yet?{" "}
-            <a href="/register" className="register-link">
+            {/* Changed <a> to <Link> for smoother SPA navigation */}
+            <Link to="/register" className="register-link">
               Register now!
-            </a>
+            </Link>
           </p>
         </form>
       </div>

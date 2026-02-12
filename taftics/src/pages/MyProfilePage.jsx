@@ -16,7 +16,7 @@ import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 import ImageUploadModal from "../components/profile/ImageUploadModal";
 
-export default function MyProfilePage() {
+export default function MyProfilePage({ user }) {
   // UI State
   const [activeTab, setActiveTab] = useState("reviews");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -41,17 +41,6 @@ export default function MyProfilePage() {
   };
 
   // --- MOCK DATA ---
-  const user = {
-    name: "Leelancze Pacomio",
-    username: "leelanczerscx",
-    avatar:
-      "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff",
-    idSeries: "124",
-    followers: 67,
-    helpfulCount: 7409,
-    contributions: 287,
-  };
-
   const mockReview = {
     rating: 4,
     date: "3 days ago",

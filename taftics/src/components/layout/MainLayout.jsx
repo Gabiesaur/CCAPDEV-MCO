@@ -1,27 +1,22 @@
+// components/layout/MainLayout.jsx
 import { useState } from "react";
 import { Outlet, useNavigate } from "react-router-dom";
 import NavBar from "../common/NavBar";
 import Footer from "../common/Footer";
 import { LogOut, X } from "lucide-react";
 
-export default function MainLayout() {
+// ACCEPT PROPS HERE
+export default function MainLayout({ user, onLogout }) {
   const navigate = useNavigate();
   const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-  // Mock logged-in user
-  const [user, setUser] = useState({
-    username: "leelanczerscx",
-    avatar:
-      "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff",
-  });
+  // REMOVE THE LOCALLY DEFINED "const [user, setUser]..."
+  // We use the 'user' prop instead.
 
-  const handleLogout = () => {
-    // 1. Clear user session/state
-    setUser(null);
+  const handleLogoutConfirm = () => {
+    onLogout(); // Call the App.jsx function
     setShowLogoutConfirm(false);
-    // 2. Refresh and redirect to Landing Page
     navigate("/");
-    window.location.reload();
   };
 
   return (
@@ -29,6 +24,7 @@ export default function MainLayout() {
       className="d-flex flex-column min-vh-100"
       style={{ paddingTop: "80px" }}
     >
+      {/* Pass the dynamic user prop to NavBar */}
       <NavBar user={user} onLogoutClick={() => setShowLogoutConfirm(true)} />
 
       <main className="flex-grow-1">
@@ -37,7 +33,7 @@ export default function MainLayout() {
 
       <Footer />
 
-      {/* Logout Confirmation Modal (Glass Blur) */}
+      {/* Logout Modal */}
       {showLogoutConfirm && (
         <>
           <div
@@ -54,13 +50,13 @@ export default function MainLayout() {
                   </div>
                   <h5 className="fw-bold text-dlsu-dark">Logging Out?</h5>
                   <p className="text-muted small">
-                    Are you sure you want to log out of your Taftics account?
+                    Are you sure you want to log out?
                   </p>
 
                   <div className="d-flex flex-column gap-2 mt-4">
                     <button
                       className="btn btn-danger rounded-pill fw-bold py-2"
-                      onClick={handleLogout}
+                      onClick={handleLogoutConfirm}
                     >
                       Yes, Logout
                     </button>
