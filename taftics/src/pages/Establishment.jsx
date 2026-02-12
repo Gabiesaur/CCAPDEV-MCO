@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 import { Bold } from "lucide-react";
 import React, { use } from "react";
 import { 
@@ -279,14 +281,14 @@ function Establishment() {
                             <img src={addressIcon} alt="address" style={{width: "100%", height: "40%", borderRadius: "5px", objectFit: "cover", marginTop: "10px"}} />
                             <p className="mb-0 mt-2" style={{color: "#444646", fontSize: "14px", fontWeight: "bold"}}>{establishment.address}</p>
                             <a href={establishment.website} className="mb-0 mt-2" style={{color: "#0b08bd", fontSize: "14px"}}>{establishment.website}</a>
-                            <button className="button btn btn-primary mt-3" style={{background: "#7f8c8d", border: "none"}}>
+                            <Link to="/create" className="button btn btn-primary mt-3" style={{background: "#7f8c8d", border: "none"}}>
                                 <Star
                                     size={20}
                                     fill="#41AB5D"
                                     style={{ color: "#41AB5D" }}
                                 />
                                 <span className="ms-2">Create a review</span>
-                            </button>
+                            </Link>
                         </div>
                     </div>
                 </div>

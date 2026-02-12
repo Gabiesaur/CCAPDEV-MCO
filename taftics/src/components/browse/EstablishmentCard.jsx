@@ -42,7 +42,7 @@ const EstablishmentCard = ({
           </h1>
 
           <div className="text-end">
-            <Link to="/" className="d-block text-dark text-decoration-none fw-bold fs-5 mb-2">
+            <Link to="/establishment" className="d-block text-dark text-decoration-none fw-bold fs-5 mb-2">
               View establishment ↗
             </Link>
             <Link to="/create" className="d-block text-dark text-decoration-none fw-bold fs-5">

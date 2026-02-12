@@ -21,6 +21,7 @@ import CreateReviewPage from "./pages/CreateReview";
 import LoginPage from "./pages/LoginPage";
 import RegPage from "./pages/RegPage";
 import OwnerAppPage from "./pages/OwnerAppPage";
+import EstablishmentPage from "./pages/Establishment";
 
 // 1. MOCK DATABASE (The "Backend")
 const MOCK_DB = [
@@ -153,6 +154,7 @@ function App() {
           <Route path="/browse" element={<BrowsePage />} />
           <Route path="/review" element={<ReviewPage />} />
           <Route path="/create" element={<CreateReviewPage />} />
+          <Route path="/establishment" element={<EstablishmentPage />} />
 
           {/* Protected Route Check */}
           <Route
