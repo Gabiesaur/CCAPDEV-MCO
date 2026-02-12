@@ -11,11 +11,11 @@ const EstablishmentCard = ({
 }) => {
   return (
     <div 
-      className="border-0 bg-light rounded-5 mb-5 overflow-hidden shadow-sm mx-auto" 
-      style={{ width: '100%', height: 'auto' }}
+      className="border-0 bg-light rounded-5 p-4 mb-5 overflow-hidden shadow-sm mx-auto" 
+      style={{ width: '800px', height: 'auto' }}
     >
       {/* 1. Full-Width Header Image Wrapper */}
-      <div className="mx-auto" style={{ paddingTop: '40px', height: '400px', width: '90%' }}>
+      <div className="mx-auto mb-4" style={{ height: '400px' }}>
         <img 
           src={image} 
           className="w-100 h-100" 
@@ -25,18 +25,18 @@ const EstablishmentCard = ({
       </div>
 
       {/* 2. Content Area */}
-      <div style={{ padding: '40px', marginBottom: '-8px' }}>
+      <div style={{ padding: '4px', marginBottom: '-8px' }}>
         <div className="align-items-start">
           <div>
-            <h1 className="fw-bold fs-2 mb-1">{name}</h1>
+            <h1 className="fw-bold fs-3 mb-1">{name}</h1>
             <p className="opacity-50 fs-5">{category} • {location}</p>
           </div>
         </div>
 
         {/* 3. Rating Row */}
-        <div className="d-flex justify-content-between align-items-end mt-2">
-          <h1 className="fs-4 mb-0 d-flex align-items-end">
-            <Star size={32} fill={"currentColor"} className="text-success me-2"/>
+        <div className="d-flex justify-content-between align-items-end mt-1 mb-1">
+          <h1 className="fs-4 mb-0 d-flex align-items-start">
+            <Star size={24} fill={"currentColor"} className="text-success me-2"/>
             <span className="text-success fw-bold">{rating}</span> 
             <span className="ms-2 opacity-50 fw-normal">• {reviewCount} Reviews</span>
           </h1>
@@ -45,7 +45,7 @@ const EstablishmentCard = ({
             <Link to="/" className="d-block text-dark text-decoration-none fw-bold fs-5 mb-2">
               View establishment ↗
             </Link>
-            <Link to="/review" className="d-block text-dark text-decoration-none fw-bold fs-5">
+            <Link to="/create" className="d-block text-dark text-decoration-none fw-bold fs-5">
               Write a review ↗
             </Link>
           </div>

@@ -39,6 +39,14 @@ const BrowsePage = () => {
       rating: 4.8,
       reviewCount: 16,
       image: "https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg"
+    },
+    {
+      name: "Green Residences",
+      category: categories[4],
+      location: "Right beside DLSU",
+      rating: 4.4,
+      reviewCount: 12,
+      image: "https://www.preselling.com.ph/wp-content/uploads/2017/05/Green-Residences-Facade.jpg"
     }
   ];
 
@@ -120,7 +128,7 @@ const BrowsePage = () => {
             {/* Search Bar */}
             <div 
               className="input-group mb-4 sticky-top"
-              style={{ top: '128px', zIndex: 1020, width: '100%', maxWidth: '800px', height: 'fit-content' }}
+              style={{ top: '128px', zIndex: 1020, width: '800px', height: 'fit-content' }}
             >
               <span className="input-group-text bg-light border-0 rounded-start-pill ps-4 py-2">
                 <Search size={20} className="text-muted" />
@@ -133,7 +141,7 @@ const BrowsePage = () => {
             </div>
 
             {/* Establishment Cards Container */}
-            <div style={{ paddingTop: '24px', paddingBottom: '80px', width: '100%', maxWidth: '800px' }}>
+            <div style={{ paddingTop: '24px', paddingBottom: '80px', width: '800px' }}>
               {establishments.map((store) => (
                 <EstablishmentCard 
                   key={store.id}
