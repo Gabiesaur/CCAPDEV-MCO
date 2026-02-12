@@ -26,9 +26,9 @@ const EstablishmentCard = ({
 
       {/* 2. Content Area */}
       <div style={{ padding: '4px', marginBottom: '-8px' }}>
-        <div className="align-items-start">
+        <div className="align-items-start mb-4">
           <div>
-            <h1 className="fw-bold fs-3 mb-1">{name}</h1>
+            <Link to="/establishment" className="d-block text-dark text-decoration-none fw-bold fs-2">{name}</Link>
             <p className="opacity-50 fs-5">{category} • {location}</p>
           </div>
         </div>
@@ -42,9 +42,6 @@ const EstablishmentCard = ({
           </h1>
 
           <div className="text-end">
-            <Link to="/establishment" className="d-block text-dark text-decoration-none fw-bold fs-5 mb-2">
-              View establishment ↗
-            </Link>
             <Link to="/create" className="d-block text-dark text-decoration-none fw-bold fs-5">
               Write a review ↗
             </Link>

@@ -47,6 +47,14 @@ const BrowsePage = () => {
       rating: 4.4,
       reviewCount: 12,
       image: "https://www.preselling.com.ph/wp-content/uploads/2017/05/Green-Residences-Facade.jpg"
+    },
+    {
+      name: "ZUS Coffee",
+      category: categories[9],
+      location: "Inside Green Mall",
+      ratings: 4.9,
+      reviewCount: 17,
+      image: "https://www.sunwayvelocitymall.com/static/shops/21a1980b9e338ce99e2c272e85b548c5/w768.jpg"
     }
   ];
 
