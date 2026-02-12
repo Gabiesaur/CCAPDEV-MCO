@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import "../styles/LoginPage.css"; // Make sure to import the CSS file
 // TODO: Replace this import with the path to your actual logo file
-import logoImage from "../../public/logo_white.svg";
+import logoImage from "/logo_white.svg?url";
 
 const LoginPage = () => {
   // State to handle input values
