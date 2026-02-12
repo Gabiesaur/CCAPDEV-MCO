@@ -26,7 +26,7 @@ export default function Footer() {
                 </li>
                 <li>
                   <Link
-                    to="/search"
+                    to="/browse"
                     className="text-white text-decoration-none small hover-underline"
                   >
                     Establishments

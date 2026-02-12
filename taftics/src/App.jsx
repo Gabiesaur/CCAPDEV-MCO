@@ -8,6 +8,7 @@ import MyProfilePage from "./pages/MyProfilePage";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import LandingPage from "./pages/LandingPage";
 import AboutUsPage from "./pages/AboutUsPage";
+import BrowsePage from "./pages/BrowsePage";
 //import LoginPage from './pages/LoginPage';
 
 // Placeholder Pages (So the app doesn't crash while your team builds them)
@@ -35,6 +36,7 @@ function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<LoginPage />} />
           <Route path="/about" element={<AboutUsPage />} />
+          <Route path="/browse" element={<BrowsePage />} />
 
           {/* --- PROFILE ROUTES --- */}
           {/* 1. My Profile (Protected) */}
