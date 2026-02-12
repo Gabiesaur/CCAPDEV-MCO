@@ -132,6 +132,13 @@ const RegPage = () => {
             <button type="submit" className="reg-submit-btn">
               Register
             </button>
+
+            <p className="switch-account-text">
+              Owning an establishment?{" "}
+              <a href="/register-student" className="switch-link">
+                Apply here.
+              </a>
+            </p>
           </div>
         </form>
       </div>
