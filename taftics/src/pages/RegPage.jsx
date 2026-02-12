@@ -143,6 +143,13 @@ const RegPage = () => {
               <Link to="/apply" className="switch-link">
                 Apply here.
               </Link>
+              <br></br>
+              <Link to="/" className="register-link">
+                Home
+              </Link>{" "}
+              <Link to="/login" className="register-link">
+                Login
+              </Link>
             </p>
           </div>
         </form>

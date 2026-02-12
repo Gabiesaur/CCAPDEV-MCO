@@ -92,6 +92,13 @@ const LoginPage = ({ onLogin }) => {
             <Link to="/register" className="register-link">
               Register now!
             </Link>
+            <br></br>
+            <Link to="/" className="register-link">
+              Home
+            </Link>{" "}
+            <Link to="/login" className="register-link">
+              Login
+            </Link>
           </p>
         </form>
       </div>

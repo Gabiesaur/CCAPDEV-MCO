@@ -130,6 +130,13 @@ const OwnerAppPage = () => {
               <Link to="/register" className="switch-link">
                 Register as a student.
               </Link>
+              <br></br>
+              <Link to="/" className="register-link">
+                Home
+              </Link>{" "}
+              <Link to="/login" className="register-link">
+                Login
+              </Link>
             </p>
           </div>
         </form>

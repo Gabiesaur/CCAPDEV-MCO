@@ -124,6 +124,7 @@ select.styled-input {
 .switch-account-text {
   font-size: 0.9rem;
   color: #333;
+  text-align: center;
 }
 
 .switch-link {
