@@ -19,7 +19,6 @@ const OwnerAppPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Owner Application:", formData);
-    // Add logic here
   };
 
   return (
@@ -34,9 +33,7 @@ const OwnerAppPage = () => {
         </div>
 
         <form className="owner-reg-form" onSubmit={handleSubmit}>
-          {/* Grid Layout: 2 Columns, 3 Rows */}
           <div className="form-grid-2x3">
-            {/* 1. Establishment Name (Row 1, Left) */}
             <div className="field-group">
               <label htmlFor="establishmentName">Establishment Name</label>
               <input
@@ -46,10 +43,10 @@ const OwnerAppPage = () => {
                 className="styled-input"
                 value={formData.establishmentName}
                 onChange={handleChange}
+                placeholder="Title of establishment"
               />
             </div>
 
-            {/* 2. Address (Row 1, Right) */}
             <div className="field-group">
               <label htmlFor="address">Address</label>
               <input
@@ -59,10 +56,10 @@ const OwnerAppPage = () => {
                 className="styled-input"
                 value={formData.address}
                 onChange={handleChange}
+                placeholder="e.g. 2401 Taft Avenue, Malate, Manila"
               />
             </div>
 
-            {/* 3. Establishment Type (Row 2, Left) - Dropdown */}
             <div className="field-group">
               <label htmlFor="establishmentType">Establishment Type</label>
               <select
@@ -82,7 +79,6 @@ const OwnerAppPage = () => {
               </select>
             </div>
 
-            {/* 4. Email (Row 2, Right) */}
             <div className="field-group">
               <label htmlFor="email">Email</label>
               <input
@@ -92,10 +88,10 @@ const OwnerAppPage = () => {
                 className="styled-input"
                 value={formData.email}
                 onChange={handleChange}
+                placeholder="Business or owner's email"
               />
             </div>
 
-            {/* 5. Contact Info (Row 3, Left) */}
             <div className="field-group">
               <label htmlFor="contactInfo">Contact Number</label>
               <input
@@ -105,10 +101,10 @@ const OwnerAppPage = () => {
                 className="styled-input"
                 value={formData.contactInfo}
                 onChange={handleChange}
+                placeholder="09XX-XXX-XXXX"
               />
             </div>
 
-            {/* 6. Contact Name (Row 3, Right) */}
             <div className="field-group">
               <label htmlFor="contactName">Contact Name</label>
               <input
@@ -118,11 +114,11 @@ const OwnerAppPage = () => {
                 className="styled-input"
                 value={formData.contactName}
                 onChange={handleChange}
+                placeholder="Name of person from given contact number"
               />
             </div>
           </div>
 
-          {/* Submit Button & Link */}
           <div className="submit-section-column">
             <button type="submit" className="black-btn submit-btn">
               Submit

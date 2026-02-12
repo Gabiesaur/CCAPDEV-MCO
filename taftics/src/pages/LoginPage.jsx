@@ -1,41 +1,35 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import "../styles/LoginPage.css";
-// Ensure this path matches where your actual logo is
 import logoImage from "/logo_white.svg?url";
 
 const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
 
-  // State for inputs and feedback
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
   const handleLogin = (e) => {
     e.preventDefault();
-    setError(""); // Clear previous errors
+    setError("");
 
-    // 1. Basic Validation
     if (!username || !password) {
       setError("Please fill in both username and password.");
       return;
     }
 
-    // 2. Call the Mock Login function passed from App.jsx
     const result = onLogin(username, password);
 
-    // 3. Handle Result
     if (result.success) {
-      navigate("/"); // Redirect to Landing Page
+      navigate("/");
     } else {
-      setError(result.message); // Show error message from mock DB
+      setError(result.message);
     }
   };
 
   return (
     <div className="login-container">
-      {/* Left Panel - Branding */}
       <div className="left-panel">
         <div className="content-wrapper">
           <div className="logo-circle">
@@ -50,10 +44,8 @@ const LoginPage = ({ onLogin }) => {
         </div>
       </div>
 
-      {/* Right Panel - Form */}
       <div className="right-panel">
         <form className="login-form" onSubmit={handleLogin}>
-          {/* Error Alert Box */}
           {error && (
             <div
               className="alert alert-danger text-center p-2 mb-4 small rounded-3"

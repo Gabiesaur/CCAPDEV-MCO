@@ -19,7 +19,7 @@ const RegPage = () => {
   };
 
   const handleFileClick = (e) => {
-    e.preventDefault(); // Prevent form submission
+    e.preventDefault();
     fileInputRef.current.click();
   };
 
@@ -33,7 +33,6 @@ const RegPage = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Registration Data:", formData);
-    // Add registration logic here
   };
 
   return (
@@ -57,6 +56,7 @@ const RegPage = () => {
                   className="reg-styled-input"
                   value={formData.username}
                   onChange={handleChange}
+                  placeholder="Can contain letters, numbers and symbols: - _ ."
                 />
               </div>
 
@@ -69,6 +69,7 @@ const RegPage = () => {
                   className="reg-styled-input"
                   value={formData.password}
                   onChange={handleChange}
+                  placeholder="Must be at least 8 characters long"
                 />
               </div>
 
@@ -81,6 +82,7 @@ const RegPage = () => {
                   className="reg-styled-input"
                   value={formData.confirmPassword}
                   onChange={handleChange}
+                  placeholder="Re-enter your password above"
                 />
               </div>
             </div>
@@ -96,11 +98,12 @@ const RegPage = () => {
                   className="reg-styled-input"
                   value={formData.email}
                   onChange={handleChange}
+                  placeholder="Active DLSU (@dlsu.edu.ph) email"
                 />
               </div>
 
               <div className="reg-field-group">
-                <label htmlFor="dlsuId">First 3 digits of DLSU ID#</label>
+                <label htmlFor="dlsuId">First 3 digits of DLSU ID Number</label>
                 <input
                   type="text"
                   name="dlsuId"
@@ -109,6 +112,7 @@ const RegPage = () => {
                   className="reg-styled-input"
                   value={formData.dlsuId}
                   onChange={handleChange}
+                  placeholder="e.g. 12x, 11x"
                 />
               </div>
 
