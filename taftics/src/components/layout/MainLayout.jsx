@@ -25,7 +25,10 @@ export default function MainLayout() {
   };
 
   return (
-    <div className="d-flex flex-column min-vh-100">
+    <div
+      className="d-flex flex-column min-vh-100"
+      style={{ paddingTop: "80px" }}
+    >
       <NavBar user={user} onLogoutClick={() => setShowLogoutConfirm(true)} />
 
       <main className="flex-grow-1">

@@ -110,10 +110,6 @@ body {
 
 /* Navbar */
 
-body {
-    padding-top: 80px; /* Matches Navbar height */
-}
-
 :root {
   --nav-height: 80px;
   --sticky-offset: 100px; /* nav-height + 20px gap */
