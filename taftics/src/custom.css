@@ -68,7 +68,7 @@ body {
 
 /* Custom Card: Adds the rounded corners and shadow from the design */
 .custom-card {
-    background-color: white;
+    background-color: rgb(221, 217, 217);
     border: 1px solid #e9ecef;
     border-radius: 12px; /* Smooth rounded corners */
     box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
@@ -194,4 +194,16 @@ body {
 .button:hover {
     background-color: #41AB5D;
     border-color: #212529;
+}
+
+.establishment-image {
+    background-image: url('/src/assets/campus-manila.jpg');
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.9);
+}
+
+.rating-box {
+    background-color: #C7E9C0;
+    border-radius: 5px;
 }
