@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, MapPin, Star } from "lucide-react";
 
 import EstablishmentCardSmall from "../components/landing/EstablishmentCardSmall";
 
@@ -106,32 +106,70 @@ const LandingPage = () => {
         </h2>
         <div
           className="mx-auto bg-light p-4 mb-4 rounded-4 shadow-sm text-start"
-          style={{ maxWidth: "700px" }}
+          style={{ maxWidth: "800px" }}
         >
           <div className="d-flex align-items-center mb-3">
-            <div
+            <img
+              src="https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff"
               className="bg-secondary rounded-circle me-3"
               style={{ width: "40px", height: "40px" }}
-            ></div>
+            ></img>
             <div>
-              <p className="mb-0 fw-bold">Leelancze Pacomio</p>
+              <p className="fw-bold" style={{ marginBottom: '-4px' }}>Leelancze Pacomio</p>
               <small className="text-muted">2 days ago</small>
             </div>
           </div>
-          <h5 className="fw-bold">Great service, would recommend!</h5>
-          <div className="text-warning mb-2">
-            ★★★★★{" "}
-            <small className="text-muted text-decoration-underline ms-2">
-              National Book Store
-            </small>
+          <div className="d-flex gap-1 text-dlsu-primary">
+            {[...Array(5)].map((_, i) => (
+              <Star
+                key={i}
+                size={16}
+                fill={"currentColor"}
+                className="text-dlsu-primary"
+              />
+            ))}
+          </div>
+          <div className="fw-bold text-dark mt-3 mb-2 fs-5">
+            <Link
+              className="text-dark text-decoration-none"
+              to="/review"  
+            >
+              The best budget friendly meals on campus!
+            </Link>
           </div>
           <p className="text-muted small">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
+            Ate Rica's remains the gold standard for a quick and affordable meal between classes at Andrew. That signature liquid cheese sauce combined with the smoky bacon bits is an elite flavor combination that never misses. Even during the peak 12:00 PM rush, the service is incredibly efficient so you won't be late for your next lecture. It is the perfect comfort food for those long study sessions or stressful midterms week. I always get extra rice whenever I eat here. Every Archer needs to experience this Taft staple at least once before they graduate.
           </p>
+          <div
+            className="d-inline-flex align-items-center bg-light border rounded-pill pe-3 ps-1 py-1"
+            style={{ maxWidth: "100%" }}
+          >
+            <img
+              src="https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg"
+              alt="shop"
+              className="rounded-circle me-2 object-cover"
+              style={{ width: "28px", height: "28px" }}
+            />
+            <div className="lh-1">
+              <h6 className="fw-bold mb-0 text-dark" style={{ fontSize: "0.8rem" }}>
+                Ate Rica's Bacsilog
+              </h6>
+              <small
+                className="text-muted d-flex align-items-center gap-1"
+                style={{ fontSize: "0.7rem" }}
+              >
+                <MapPin size={10} /> Agno Food Court
+              </small>
+            </div>
+          </div>
         </div>
-        <button className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold">
-          Write your own review ↗
-        </button>
+        <div>
+          <Link
+            className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold text-decoration-none"
+            to="/create">
+            Have a spot you love? Write a review ↗
+          </Link>
+        </div>
       </section>
     </div>
   );

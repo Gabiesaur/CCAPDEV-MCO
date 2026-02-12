@@ -45,7 +45,7 @@ const EstablishmentCard = ({
             <Link to="/" className="d-block text-dark text-decoration-none fw-bold fs-5 mb-2">
               View establishment ↗
             </Link>
-            <Link to="/" className="d-block text-dark text-decoration-none fw-bold fs-5">
+            <Link to="/review" className="d-block text-dark text-decoration-none fw-bold fs-5">
               Write a review ↗
             </Link>
           </div>
