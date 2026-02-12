@@ -4,7 +4,7 @@ import logo from "/logo_white.svg?url";
 
 function NavBar({ user }) {
   const location = useLocation();
-  const isNotLandingPage = location.pathname !== "/";
+  const showSearchBar = location.pathname !== "/" && location.pathname !== "/browse";
 
   return (
     <nav
@@ -26,7 +26,7 @@ function NavBar({ user }) {
         </Link>
 
         {/* CENTER: Search Bar */}
-        {isNotLandingPage && (
+        {showSearchBar && (
           <div
             className="position-absolute start-50 translate-middle-x d-none d-md-flex"
             style={{ width: "450px" }}
