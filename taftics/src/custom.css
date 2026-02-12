@@ -1,0 +1,105 @@
+/* =========================================
+   1. FONTS
+   ========================================= */
+/* Import Overpass from Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800&display=swap');
+
+body {
+    font-family: 'Overpass', sans-serif;
+    background-color: #f8f9fa;
+    color: #212529;
+}
+
+/* =========================================
+   2. DLSU BRAND COLORS
+   ========================================= */
+
+/* DARK GREEN (#00441B) - Use for: Navbar, Footers, Headings */
+.bg-dlsu-dark { 
+    background-color: #00441B !important; 
+    color: white;
+}
+.text-dlsu-dark { 
+    color: #00441B !important; 
+}
+.btn-dlsu-dark {
+    background-color: #00441B;
+    color: white;
+    border: 1px solid #00441B;
+}
+.btn-dlsu-dark:hover {
+    background-color: #003314;
+    color: white;
+}
+
+/* PRIMARY GREEN (#41AB5D) - Use for: Main Buttons, Active Stars, Links */
+.bg-dlsu-primary { 
+    background-color: #41AB5D !important; 
+    color: white;
+}
+.text-dlsu-primary { 
+    color: #41AB5D !important; 
+}
+
+/* LIGHT GREEN (#C7E9C0) - Use for: Secondary Buttons, Badges, Background Accents */
+.bg-dlsu-light { 
+    background-color: #C7E9C0 !important; 
+    color: #00441B; /* Dark text for contrast */
+}
+.text-dlsu-light { 
+    color: #C7E9C0 !important; 
+}
+
+/* Custom Button: Light Green Background with Dark Text */
+.btn-dlsu-light {
+    background-color: #C7E9C0;
+    color: #00441B;
+    font-weight: 700;
+    border: none;
+}
+.btn-dlsu-light:hover {
+    background-color: #aed9a5; /* Slightly darker on hover */
+    color: #00441B;
+}
+
+/* =========================================
+   3. COMPONENT STYLES
+   ========================================= */
+
+/* Custom Card: Adds the rounded corners and shadow from the design */
+.custom-card {
+    background-color: white;
+    border: 1px solid #e9ecef;
+    border-radius: 12px; /* Smooth rounded corners */
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
+    transition: transform 0.2s ease-in-out;
+}
+
+/* Optional: Hover effect for cards that are clickable */
+.custom-card.hover-effect:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+/* =========================================
+   4. UTILITIES (Helpers)
+   ========================================= */
+
+/* Makes images fill their container without stretching */
+.object-cover { 
+    object-fit: cover; 
+}
+
+/* Pointer cursor for non-button interactive elements */
+.pointer-cursor { 
+    cursor: pointer; 
+}
+
+/* Hides scrollbar but allows scrolling (Good for horizontal lists) */
+.no-scrollbar::-webkit-scrollbar {
+    display: none;
+}
+.no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+}
