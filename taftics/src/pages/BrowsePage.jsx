@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { Star, Search } from "lucide-react";
 
 import RatingFilter from "../components/browse/RatingFilter";
+import EstablishmentCard from "../components/browse/EstablishmentCard";
 
 const BrowsePage = () => {
   // 1. Initialize states for each filter group
@@ -10,9 +11,36 @@ const BrowsePage = () => {
   const [activeHour, setActiveHour] = useState('Any');
   const [activePrice, setActivePrice] = useState('Any');
 
-  const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness'];
+  const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
   const hours = ['Any', 'Open Now', '24/7'];
   const prices = ['Any', 'P', 'PP', 'PPP'];
+
+  const establishments = [
+    {
+      name: "National Book Store",
+      category: categories[1],
+      location: "Inside Yuchengco Hall",
+      rating: 4.7,
+      reviewCount: 14,
+      image: "https://images.summitmedia-digital.com/spotph/images/2020/08/24/nbs-statement-closure-640-1598256966.jpg"
+    },
+    {
+      name: "Anytime Fitness",
+      category: categories[7],
+      location: "Inside R Square",
+      rating: 4.2,
+      reviewCount: 9,
+      image: "https://classpass-res.cloudinary.com/image/upload/f_auto/q_auto,w_1125/media_venue/a84kycuvqo9jblnfro8r.jpg"
+    },
+    {
+      name: "Ate Rica's Bacsilog",
+      category: categories[8],
+      location: "Agno Food Court",
+      rating: 4.8,
+      reviewCount: 16,
+      image: "https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg"
+    }
+  ];
 
   return (
     <div className="bg-white min-vh-100">
@@ -106,49 +134,16 @@ const BrowsePage = () => {
 
             {/* Establishment Cards Container */}
             <div style={{ paddingTop: '24px', paddingBottom: '80px', width: '100%', maxWidth: '800px' }}>
-              {[1, 2, 3, 4, 5, 6].map((card) => (
-                <div key={card} 
-                  className="border-0 bg-light rounded-5 mb-5 overflow-hidden shadow-sm mx-auto" 
-                  style={{ width: '100%', height: 'auto' }}
-                >
-                  {/* 1. Full-Width Header Image Wrapper */}
-                  <div className="mx-auto" style={{ paddingTop: '40px', height: '400px', width: '90%' }}>
-                    <img 
-                      src="https://images.summitmedia-digital.com/spotph/images/2020/08/24/nbs-statement-closure-640-1598256966.jpg" 
-                      className="w-100 h-100" 
-                      style={{ objectFit: 'cover', borderRadius: '20px' }} 
-                      alt="National Book Store"
-                    />
-                  </div>
-
-                  {/* 2. Content Area */}
-                  <div style={{ padding: '40px', marginBottom: '-8px' }}>
-                    <div className="align-items-start">
-                      <div>
-                        <h1 className="fw-bold fs-2 mb-1">National Book Store</h1>
-                        <p className="opacity-50 fs-5">Inside Yuchengco Hall</p>
-                      </div>
-                    </div>
-
-                    {/* 3. Rating Row */}
-                    <div className="d-flex justify-content-between align-items-end mt-2">
-                      <h1 className="fs-4 mb-0 d-flex align-items-end">
-                        <Star size={32} fill={"currentColor"} className="text-dlsu-primary me-2"/>
-                        <span className="text-dlsu-primary fw-bold">4.7</span> 
-                        <span className="ms-2 opacity-50 fw-normal">• 14 Reviews</span>
-                      </h1>
-
-                      <div className="text-end">
-                        <Link to="/" className="d-block text-dark text-decoration-none fw-bold fs-5 mb-2">
-                          View establishment ↗
-                        </Link>
-                        <Link to="/" className="d-block text-dark text-decoration-none fw-bold fs-5">
-                          Write a review ↗
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+              {establishments.map((store) => (
+                <EstablishmentCard 
+                  key={store.id}
+                  name={store.name}
+                  category={store.category}
+                  location={store.location}
+                  rating={store.rating}
+                  reviewCount={store.reviewCount}
+                  image={store.image}
+                />
               ))}
             </div>
           </main>
