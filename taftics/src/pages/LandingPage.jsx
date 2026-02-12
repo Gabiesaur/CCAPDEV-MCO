@@ -64,8 +64,9 @@ const LandingPage = () => {
             <div key={i} className="col-md-4">
               <div className="card border-0 shadow-sm rounded-4 p-3 bg-light">
                 <img
-                  src="https://via.placeholder.com/300x200"
-                  className="card-img-top rounded-3"
+                  src="https://images.summitmedia-digital.com/spotph/images/2020/08/24/nbs-statement-closure-640-1598256966.jpg"
+                  className="card-img-top rounded-3 w-100"
+                  style={{ height: '240px', objectFit: 'cover', borderRadius: '20px' }}
                   alt="Establishment"
                 />
                 <div className="card-body px-0 pb-0">
@@ -118,8 +119,7 @@ const LandingPage = () => {
             </small>
           </div>
           <p className="text-muted small">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do
-            eiusmod tempor incididunt ut labore et dolore magna aliqua.
+            Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
           </p>
         </div>
         <button className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold">

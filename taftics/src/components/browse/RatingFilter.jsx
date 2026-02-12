@@ -6,7 +6,7 @@ const RatingFilter = () => {
 
   return (
     <div className="filter-section mb-3">
-      <label className="text-muted small fw-bold mb-1 text-uppercase d-block" style={{ letterSpacing: '1px' }}>
+      <label className="small opacity-50 fw-bold mb-1 text-uppercase d-block" style={{ letterSpacing: '1px' }}>
         Rating
       </label>
       
