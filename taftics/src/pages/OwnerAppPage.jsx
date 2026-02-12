@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import "../styles/OwnerAppPage.css";
 
 const OwnerAppPage = () => {
@@ -126,9 +127,9 @@ const OwnerAppPage = () => {
 
             <p className="switch-account-text">
               Not an owner?{" "}
-              <a href="/register-student" className="switch-link">
+              <Link to="/register" className="switch-link">
                 Register as a student.
-              </a>
+              </Link>
             </p>
           </div>
         </form>

@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { Link } from "react-router-dom";
 import "../styles/RegPage.css";
 
 const RegPage = () => {
@@ -139,9 +140,9 @@ const RegPage = () => {
 
             <p className="switch-account-text">
               Owning an establishment?{" "}
-              <a href="/register-student" className="switch-link">
+              <Link to="/apply" className="switch-link">
                 Apply here.
-              </a>
+              </Link>
             </p>
           </div>
         </form>

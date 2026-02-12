@@ -18,6 +18,7 @@ import AboutUsPage from "./pages/AboutUsPage";
 import BrowsePage from "./pages/BrowsePage";
 import LoginPage from "./pages/LoginPage";
 import RegPage from "./pages/RegPage";
+import OwnerAppPage from "./pages/OwnerAppPage";
 
 // 1. MOCK DATABASE (The "Backend")
 const MOCK_DB = [
@@ -129,6 +130,12 @@ function App() {
     return { success: true };
   };
 
+  const apply = (applicant) => {
+    if (MOCK_DB.find((u) => u.email === applicant.email)) {
+      return { success: false, message: "Username already taken." };
+    }
+  };
+
   const logout = () => {
     setUser(null);
     localStorage.removeItem("currentUser");
@@ -159,6 +166,7 @@ function App() {
         {/* Pass Auth Functions to Login/Reg */}
         <Route path="/login" element={<LoginPage onLogin={login} />} />
         <Route path="/register" element={<RegPage onRegister={register} />} />
+        <Route path="/apply" element={<OwnerAppPage onRegister={apply} />} />
       </Routes>
     </BrowserRouter>
   );
