@@ -157,3 +157,41 @@ body {
     animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     border: 1px solid rgba(199, 233, 192, 0.2);
 }
+
+.custom-bg {
+  background-image:
+    linear-gradient(to bottom,
+      rgba(0,0,0,0) 60%,
+      rgba(0,0,0,0.6) 80%,
+      rgba(0,0,0,1) 100%),
+    url('/src/assets/campus-manila.jpg');
+  background-size: cover;
+  background-position: center;
+  border-radius: 12px 12px 0 0;
+}
+
+.textBox {
+    background-color: #d1d2d6;
+    border-radius: 15px;
+}
+
+.category-box {
+    background-color: #41AB5D;
+    border-radius: 5px;
+}
+
+.bar {
+    background-color: #41AB5D;
+    height: 10px;
+    border-radius: 5px;
+}
+
+.button {
+    background-color: #00441B;
+    border-color: #212529;
+}
+
+.button:hover {
+    background-color: #41AB5D;
+    border-color: #212529;
+}
