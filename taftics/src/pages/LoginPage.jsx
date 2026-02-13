@@ -1,11 +1,10 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
-import "../styles/LoginPage.css";
+import "../styles/LoginRegStyles.css";
 import logoImage from "/logo_white.svg?url";
 
 const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
-
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -13,14 +12,11 @@ const LoginPage = ({ onLogin }) => {
   const handleLogin = (e) => {
     e.preventDefault();
     setError("");
-
     if (!username || !password) {
       setError("Please fill in both username and password.");
       return;
     }
-
     const result = onLogin(username, password);
-
     if (result.success) {
       navigate("/");
     } else {
@@ -29,9 +25,9 @@ const LoginPage = ({ onLogin }) => {
   };
 
   return (
-    <div className="login-container">
-      <div className="left-panel">
-        <div className="content-wrapper">
+    <div className="split-screen-container">
+      <div className="brand-panel">
+        <div className="brand-content">
           <div className="logo-circle">
             <img src={logoImage} alt="Taftics Logo" className="logo-img" />
           </div>
@@ -44,8 +40,8 @@ const LoginPage = ({ onLogin }) => {
         </div>
       </div>
 
-      <div className="right-panel">
-        <form className="login-form" onSubmit={handleLogin}>
+      <div className="form-panel">
+        <form className="form-wrapper" onSubmit={handleLogin}>
           {error && (
             <div
               className="alert alert-danger text-center p-2 mb-4 small rounded-3"
@@ -59,7 +55,7 @@ const LoginPage = ({ onLogin }) => {
             </div>
           )}
 
-          <div className="login-field-group">
+          <div className="input-form-group">
             <label htmlFor="username">Username or email</label>
             <input
               type="text"
@@ -71,7 +67,7 @@ const LoginPage = ({ onLogin }) => {
             />
           </div>
 
-          <div className="login-field-group">
+          <div className="input-form-group">
             <label htmlFor="password">Password</label>
             <input
               type="password"
@@ -83,20 +79,22 @@ const LoginPage = ({ onLogin }) => {
             />
           </div>
 
-          <button type="submit" className="login-btn">
-            Login
-          </button>
+          <div className="action-section">
+            <button type="submit" className="primary-btn">
+              Login
+            </button>
 
-          <p className="register-text">
-            Not a member yet?{" "}
-            <Link to="/register" className="register-link">
-              Register now!
-            </Link>
-            <br></br>
-            <Link to="/" className="register-link">
-              Return to home
-            </Link>{" "}
-          </p>
+            <p className="footer-text">
+              Not a member yet?{" "}
+              <Link to="/register" className="text-link">
+                Register now!
+              </Link>
+              <br />
+              <Link to="/" className="text-link">
+                Return to home
+              </Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>

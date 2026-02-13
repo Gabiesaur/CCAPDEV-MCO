@@ -1,6 +1,6 @@
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
-import "../styles/RegPage.css";
+import "../styles/LoginRegStyles.css";
 
 const RegPage = () => {
   const [formData, setFormData] = useState({
@@ -27,7 +27,7 @@ const RegPage = () => {
   const handleFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setFormData((prev) => ({ ...prev, avatar: e.target.files[0] }));
-      alert(`Selected: ${e.target.files[0].name}`); // Just for feedback
+      alert(`Selected: ${e.target.files[0].name}`);
     }
   };
 
@@ -37,89 +37,91 @@ const RegPage = () => {
   };
 
   return (
-    <div className="reg-container">
-      <div className="reg-card">
-        <div className="reg-header">
-          <h1 className="reg-title">Taftics</h1>
-          <h2 className="reg-subtitle">Student Account Registration</h2>
+    <div className="centered-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1 className="auth-title">Taftics</h1>
+          <h2 className="auth-subtitle">Student Account Registration</h2>
         </div>
 
-        <form className="reg-form" onSubmit={handleSubmit}>
+        <form className="form-wrapper wide" onSubmit={handleSubmit}>
           <div className="form-grid">
-            {/* --- Left Column --- */}
+            {/* Left Column */}
             <div className="form-column">
-              <div className="reg-field-group">
+              <div className="input-form-group">
                 <label htmlFor="username">Username</label>
                 <input
                   type="text"
                   name="username"
                   id="username"
-                  className="reg-styled-input"
+                  className="styled-input"
                   value={formData.username}
                   onChange={handleChange}
                   placeholder="Can contain letters, numbers and symbols: - _ ."
                 />
               </div>
 
-              <div className="reg-field-group">
+              <div className="input-form-group">
                 <label htmlFor="password">Password</label>
                 <input
                   type="password"
                   name="password"
                   id="password"
-                  className="reg-styled-input"
+                  className="styled-input"
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="Must be at least 8 characters long"
                 />
               </div>
 
-              <div className="reg-field-group">
+              <div className="input-form-group">
                 <label htmlFor="confirmPassword">Confirm password</label>
                 <input
                   type="password"
                   name="confirmPassword"
                   id="confirmPassword"
-                  className="reg-styled-input"
+                  className="styled-input"
                   value={formData.confirmPassword}
                   onChange={handleChange}
-                  placeholder="Re-enter your password above"
+                  placeholder="Re-enter your password"
                 />
               </div>
             </div>
 
-            {/* --- Right Column --- */}
             <div className="form-column">
-              <div className="reg-field-group">
+              <div className="input-form-group">
                 <label htmlFor="email">Email</label>
                 <input
                   type="email"
                   name="email"
                   id="email"
-                  className="reg-styled-input"
+                  className="styled-input"
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="Active DLSU (@dlsu.edu.ph) email"
                 />
               </div>
 
-              <div className="reg-field-group">
+              <div className="input-form-group">
                 <label htmlFor="dlsuId">First 3 digits of DLSU ID Number</label>
                 <input
                   type="text"
                   name="dlsuId"
                   id="dlsuId"
                   maxLength="3"
-                  className="reg-styled-input"
+                  className="styled-input"
                   value={formData.dlsuId}
                   onChange={handleChange}
                   placeholder="e.g. 12x, 11x"
                 />
               </div>
 
-              <div className="reg-field-group">
-                <label>Avatar</label>
-                <button className="avatar-upload-btn" onClick={handleFileClick}>
+              <div className="input-form-group">
+                <label>Avatar (optional)</label>
+                <button
+                  className="primary-btn full-width"
+                  onClick={handleFileClick}
+                >
                   Upload an avatar
                 </button>
                 <input
@@ -133,21 +135,21 @@ const RegPage = () => {
             </div>
           </div>
 
-          <div className="submit-section">
-            <button type="submit" className="reg-submit-btn">
+          <div className="action-section">
+            <button type="submit" className="primary-btn wide">
               Register
             </button>
 
-            <p className="switch-account-text">
+            <p className="footer-text">
               Owning an establishment?{" "}
-              <Link to="/apply" className="switch-link">
+              <Link to="/apply" className="text-link">
                 Apply here.
               </Link>
-              <br></br>
-              <Link to="/" className="register-link">
+              <br />
+              <Link to="/" className="text-link">
                 Home
               </Link>{" "}
-              <Link to="/login" className="register-link">
+              <Link to="/login" className="text-link">
                 Login
               </Link>
             </p>

@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
-import "../styles/OwnerAppPage.css";
+import "../styles/LoginRegStyles.css";
 
 const OwnerAppPage = () => {
   const [formData, setFormData] = useState({
@@ -23,19 +23,18 @@ const OwnerAppPage = () => {
   };
 
   return (
-    <div className="owner-reg-container">
-      <div className="owner-reg-card">
-        {/* Header */}
-        <div className="owner-reg-header">
-          <h1 className="owner-reg-title">Taftics</h1>
-          <h2 className="owner-reg-subtitle">
+    <div className="centered-container">
+      <div className="auth-card">
+        <div className="auth-header">
+          <h1 className="auth-title">Taftics</h1>
+          <h2 className="auth-subtitle">
             Establishment Owner Account Application
           </h2>
         </div>
 
-        <form className="owner-reg-form" onSubmit={handleSubmit}>
-          <div className="form-grid-2x3">
-            <div className="field-group">
+        <form className="form-wrapper wide" onSubmit={handleSubmit}>
+          <div className="form-grid">
+            <div className="input-form-group">
               <label htmlFor="establishmentName">Establishment Name</label>
               <input
                 type="text"
@@ -48,7 +47,7 @@ const OwnerAppPage = () => {
               />
             </div>
 
-            <div className="field-group">
+            <div className="input-form-group">
               <label htmlFor="address">Address</label>
               <input
                 type="text"
@@ -61,7 +60,7 @@ const OwnerAppPage = () => {
               />
             </div>
 
-            <div className="field-group">
+            <div className="input-form-group">
               <label htmlFor="establishmentType">Establishment Type</label>
               <select
                 name="establishmentType"
@@ -80,7 +79,7 @@ const OwnerAppPage = () => {
               </select>
             </div>
 
-            <div className="field-group">
+            <div className="input-form-group">
               <label htmlFor="email">Email</label>
               <input
                 type="email"
@@ -93,7 +92,7 @@ const OwnerAppPage = () => {
               />
             </div>
 
-            <div className="field-group">
+            <div className="input-form-group">
               <label htmlFor="contactInfo">Contact Number</label>
               <input
                 type="tel"
@@ -106,8 +105,8 @@ const OwnerAppPage = () => {
               />
             </div>
 
-            <div className="field-group">
-              <label htmlFor="contactName">Contact Name</label>
+            <div className="input-form-group">
+              <label htmlFor="contactName">Contact Person</label>
               <input
                 type="text"
                 name="contactName"
@@ -115,26 +114,26 @@ const OwnerAppPage = () => {
                 className="styled-input"
                 value={formData.contactName}
                 onChange={handleChange}
-                placeholder="Name of person from given contact number"
+                placeholder="Name of person to be contacted"
               />
             </div>
           </div>
 
-          <div className="submit-section-column">
-            <button type="submit" className="black-btn submit-btn">
+          <div className="action-section">
+            <button type="submit" className="primary-btn wide">
               Submit
             </button>
 
-            <p className="switch-account-text">
+            <p className="footer-text">
               Not an owner?{" "}
-              <Link to="/register" className="switch-link">
+              <Link to="/register" className="text-link">
                 Register as a student.
               </Link>
-              <br></br>
-              <Link to="/" className="register-link">
+              <br />
+              <Link to="/" className="text-link">
                 Home
               </Link>{" "}
-              <Link to="/login" className="register-link">
+              <Link to="/login" className="text-link">
                 Login
               </Link>
             </p>
