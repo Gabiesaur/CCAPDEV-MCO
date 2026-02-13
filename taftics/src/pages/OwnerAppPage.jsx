@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import "../styles/LoginRegStyles.css";
+import logoImage from "/logo_green.svg?url";
 
 const OwnerAppPage = () => {
   const [formData, setFormData] = useState({
@@ -25,8 +26,19 @@ const OwnerAppPage = () => {
   return (
     <div className="centered-container">
       <div className="auth-card">
+        <Link to="/" className="home-corner-btn">
+          Home
+        </Link>
         <div className="auth-header">
-          <h1 className="auth-title">Taftics</h1>
+          <div class="header-brand-row">
+            <img
+              src={logoImage}
+              alt="Taftics Logo"
+              className="logo-img-small"
+              style={{ paddingBottom: "25px" }}
+            />
+            <h1 className="auth-title">Taftics</h1>
+          </div>
           <h2 className="auth-subtitle">
             Establishment Owner Account Application
           </h2>
@@ -130,11 +142,8 @@ const OwnerAppPage = () => {
                 Register as a student.
               </Link>
               <br />
-              <Link to="/" className="text-link">
-                Home
-              </Link>{" "}
               <Link to="/login" className="text-link">
-                Login
+                Back to login
               </Link>
             </p>
           </div>

@@ -1,6 +1,7 @@
 import React, { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import "../styles/LoginRegStyles.css";
+import logoImage from "/logo_green.svg?url";
 
 const RegPage = () => {
   const [formData, setFormData] = useState({
@@ -39,14 +40,24 @@ const RegPage = () => {
   return (
     <div className="centered-container">
       <div className="auth-card">
+        <Link to="/" className="home-corner-btn">
+          Home
+        </Link>
         <div className="auth-header">
-          <h1 className="auth-title">Taftics</h1>
+          <div class="header-brand-row">
+            <img
+              src={logoImage}
+              alt="Taftics Logo"
+              className="logo-img-small"
+              style={{ paddingBottom: "25px" }}
+            />
+            <h1 className="auth-title">Taftics</h1>
+          </div>
           <h2 className="auth-subtitle">Student Account Registration</h2>
         </div>
 
         <form className="form-wrapper wide" onSubmit={handleSubmit}>
           <div className="form-grid">
-            {/* Left Column */}
             <div className="form-column">
               <div className="input-form-group">
                 <label htmlFor="username">Username</label>
@@ -146,11 +157,8 @@ const RegPage = () => {
                 Apply here.
               </Link>
               <br />
-              <Link to="/" className="text-link">
-                Home
-              </Link>{" "}
               <Link to="/login" className="text-link">
-                Login
+                Back to login
               </Link>
             </p>
           </div>

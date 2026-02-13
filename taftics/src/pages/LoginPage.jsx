@@ -77,6 +77,21 @@ const LoginPage = ({ onLogin }) => {
               className="styled-input"
               placeholder="••••••••"
             />
+            <a
+              className="text-link"
+              style={{ textAlign: "center", paddingTop: "10px" }}
+            >
+              Forgot password?
+            </a>
+          </div>
+
+          <div className="checkbox-group">
+            <input
+              type="checkbox"
+              id="rememberMe"
+              className="styled-checkbox"
+            />
+            <label htmlFor="rememberMe">Remember me</label>
           </div>
 
           <div className="action-section">
