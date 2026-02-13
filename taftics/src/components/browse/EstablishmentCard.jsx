@@ -11,15 +11,15 @@ const EstablishmentCard = ({
 }) => {
   return (
     <div 
-      className="border-0 bg-light rounded-5 p-4 mb-5 overflow-hidden shadow-sm mx-auto" 
-      style={{ width: '800px', height: 'auto' }}
+      className="border-0 bg-light rounded-4 p-3 mb-5 overflow-hidden shadow-sm mx-auto" 
+      style={{ width: '720px', height: 'auto' }}
     >
       {/* 1. Full-Width Header Image Wrapper */}
-      <div className="mx-auto mb-4" style={{ height: '400px' }}>
+      <div className="mx-auto mb-4" style={{ height: '280px' }}>
         <img 
           src={image} 
           className="w-100 h-100" 
-          style={{ objectFit: 'cover', borderRadius: '20px' }} 
+          style={{ objectFit: 'cover', borderRadius: '12px' }} 
           alt={name}
         />
       </div>
@@ -28,15 +28,15 @@ const EstablishmentCard = ({
       <div style={{ padding: '4px', marginBottom: '-8px' }}>
         <div className="align-items-start mb-4">
           <div>
-            <Link to="/establishment" className="d-block text-dark text-decoration-none fw-bold fs-2">{name}</Link>
+            <Link to="/establishment" className="d-block text-dark text-decoration-none fw-bold fs-4">{name}</Link>
             <p className="opacity-50 fs-5">{category} • {location}</p>
           </div>
         </div>
 
         {/* 3. Rating Row */}
         <div className="d-flex justify-content-between align-items-end mt-1 mb-1">
-          <h1 className="fs-4 mb-0 d-flex align-items-start">
-            <Star size={24} fill={"currentColor"} className="text-success me-2"/>
+          <h1 className="fs-5 mb-0 d-flex align-items-start">
+            <Star size={20} fill={"currentColor"} className="text-success me-2"/>
             <span className="text-success fw-bold">{rating}</span> 
             <span className="ms-2 opacity-50 fw-normal">• {reviewCount} Reviews</span>
           </h1>
