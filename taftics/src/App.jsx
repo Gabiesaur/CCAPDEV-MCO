@@ -31,6 +31,7 @@ const MOCK_DB = [
     name: "Leelancze Pacomio",
     email: "lee@dlsu.edu.ph",
     idSeries: "124",
+    bio: "CS Student @ DLSU | Love coffee and coding",
     followers: "67",
     helpfulCount: "67",
     contributions: "67",
@@ -60,6 +61,7 @@ const MOCK_DB = [
     name: "Archer Dela Cruz",
     email: "archer@dlsu.edu.ph",
     idSeries: "121",
+    bio: "Just a regular Archer",
     followers: "67",
     helpfulCount: "67",
     contributions: "67",
@@ -160,12 +162,16 @@ function App() {
           <Route
             path="/profile/me"
             element={
-              user ? <MyProfilePage user={user} /> : <Navigate to="/login" />
+              user ? (
+                <MyProfilePage user={user} setUser={setUser} />
+              ) : (
+                <Navigate to="/login" />
+              )
             }
           />
           <Route
             path="/profile/:username"
-            element={<PublicProfilePage db={MOCK_DB} />}
+            element={<PublicProfilePage db={MOCK_DB} currentUser={user} />}
           />
         </Route>
 

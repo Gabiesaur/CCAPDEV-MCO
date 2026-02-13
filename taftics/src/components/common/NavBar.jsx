@@ -71,9 +71,25 @@ function NavBar({ user, onLogoutClick }) {
               <li className="nav-item">
                 <Link
                   className="nav-link text-white fw-semibold px-4 fs-6"
+                  to="/"
+                >
+                  Home
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  className="nav-link text-white fw-semibold px-4 fs-6"
                   to="/browse"
                 >
                   Browse
+                </Link>
+              </li>
+              <li className="nav-item">
+                <Link
+                  className="nav-link text-white fw-semibold px-4 fs-6"
+                  to="/about"
+                >
+                  About
                 </Link>
               </li>
 
@@ -108,9 +124,8 @@ function NavBar({ user, onLogoutClick }) {
 
                   {/* Dropdown Menu (Conditionally Rendered) */}
                   <ul
-                    className={`dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 rounded-3 p-2 ${
-                      isDropdownOpen ? "show" : ""
-                    }`}
+                    className={`dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 rounded-3 p-2 ${isDropdownOpen ? "show" : ""
+                      }`}
                     style={{
                       position: "absolute",
                       right: 0,

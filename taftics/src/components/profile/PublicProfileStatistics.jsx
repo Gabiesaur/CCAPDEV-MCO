@@ -32,12 +32,18 @@ export default function PublicProfileStatistics({ user }) {
           </span>
         </div>
 
+        {/* Bio Section */}
+        {user.bio && (
+          <div className="mb-4">
+            <p className="small text-muted mb-0 fst-italic">"{user.bio}"</p>
+          </div>
+        )}
+
         {/* Dynamic Follow Button */}
         <div className="mb-4">
           <button
-            className={`btn rounded-pill px-4 d-inline-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm transition-all ${
-              isFollowing ? "btn-outline-secondary" : "btn-dlsu-light"
-            }`}
+            className={`btn rounded-pill px-4 d-inline-flex align-items-center justify-content-center gap-2 fw-bold shadow-sm transition-all ${isFollowing ? "btn-outline-secondary" : "btn-dlsu-light"
+              }`}
             onClick={handleFollowClick}
           >
             {isFollowing ? (

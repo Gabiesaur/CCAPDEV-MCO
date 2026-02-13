@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useParams, Link, Navigate, useNavigate } from "react-router-dom"; // Added Navigate, useNavigate
 import { Star, MessageSquare } from "lucide-react";
 
 import ProfileHeader from "../components/profile/ProfileHeader";
@@ -7,9 +7,15 @@ import PublicProfileStatistics from "../components/profile/PublicProfileStatisti
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 
-export default function PublicProfilePage({ db }) {
+export default function PublicProfilePage({ db, currentUser }) {
   const { username } = useParams();
+  const navigate = useNavigate(); // Added navigate hook
   const [activeTab, setActiveTab] = useState("reviews");
+
+  // 0. Redirect if viewing own profile
+  if (currentUser && currentUser.username === username) {
+    return <Navigate to="/profile/me" replace />;
+  }
 
   // 1. Find the User
   const publicUser = db.find((u) => u.username === username);
@@ -43,11 +49,10 @@ export default function PublicProfilePage({ db }) {
 
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
-      className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${
-        activeTab === id
-          ? "bg-dlsu-light text-dlsu-dark border-0"
-          : "btn-light border text-muted"
-      }`}
+      className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${activeTab === id
+        ? "bg-dlsu-light text-dlsu-dark border-0"
+        : "btn-light border text-muted"
+        }`}
       onClick={() => setActiveTab(id)}
     >
       <Icon size={16} /> {label}

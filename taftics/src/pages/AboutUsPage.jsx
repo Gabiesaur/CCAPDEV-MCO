@@ -68,21 +68,65 @@ export default function AboutUsPage() {
         {/* The Team (Optional placeholder for groupmates) */}
         <div className="text-center mt-5 pt-5 border-top">
           <h3 className="fw-bold text-dlsu-dark mb-4">Meet the Team</h3>
-          <div className="row justify-content-center">
-            <div className="col-md-3 mb-4">
-              <div className="custom-card p-4">
+          <div className="row justify-content-center g-4">
+            {/* Team Member 1 */}
+            <div className="col-md-3">
+              <div className="custom-card p-4 h-100">
                 <img
-                  src="https://ui-avatars.com/api/?name=Carl+Manalo&background=00441B&color=fff"
-                  className="rounded-circle mb-3"
+                  src="https://ui-avatars.com/api/?name=Jose+Gabriel+Espineli&background=00441B&color=fff"
+                  className="rounded-circle mb-3 shadow-sm"
                   width="80"
                   height="80"
-                  alt="Team member"
+                  alt="Jose Gabriel Espineli"
                 />
-                <h6 className="fw-bold mb-1">Carl Martin Manalo</h6>
-                <small className="text-muted">Lead Developer</small>
+                <h6 className="fw-bold mb-1">Jose Gabriel Espineli</h6>
+                <small className="text-muted">Full Stack Developer</small>
               </div>
             </div>
-            {/* Add more team cards as needed */}
+
+            {/* Team Member 2 */}
+            <div className="col-md-3">
+              <div className="custom-card p-4 h-100">
+                <img
+                  src="https://ui-avatars.com/api/?name=Ronald+Gabriel+Leoncio&background=00441B&color=fff"
+                  className="rounded-circle mb-3 shadow-sm"
+                  width="80"
+                  height="80"
+                  alt="Ronald Gabriel Leoncio"
+                />
+                <h6 className="fw-bold mb-1">Ronald Gabriel Leoncio</h6>
+                <small className="text-muted">Full Stack Developer</small>
+              </div>
+            </div>
+
+            {/* Team Member 3 */}
+            <div className="col-md-3">
+              <div className="custom-card p-4 h-100">
+                <img
+                  src="https://ui-avatars.com/api/?name=Leelancze+Naethan+Pacomio&background=00441B&color=fff"
+                  className="rounded-circle mb-3 shadow-sm"
+                  width="80"
+                  height="80"
+                  alt="Leelancze Naethan Pacomio"
+                />
+                <h6 className="fw-bold mb-1">Leelancze Naethan Pacomio</h6>
+                <small className="text-muted">Full Stack Developer</small>
+              </div>
+            </div>
+            {/* Team Member 4 */}
+            <div className="col-md-3">
+              <div className="custom-card p-4 h-100">
+                <img
+                  src="https://ui-avatars.com/api/?name=Carl+Martin+Manalo&background=00441B&color=fff"
+                  className="rounded-circle mb-3 shadow-sm"
+                  width="80"
+                  height="80"
+                  alt="Carl Martin Manalo"
+                />
+                <h6 className="fw-bold mb-1">Carl Martin Manalo</h6>
+                <small className="text-muted">Full Stack Developer</small>
+              </div>
+            </div>
           </div>
         </div>
       </div>

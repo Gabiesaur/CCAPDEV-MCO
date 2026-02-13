@@ -16,7 +16,7 @@ import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 import ImageUploadModal from "../components/profile/ImageUploadModal";
 
-export default function MyProfilePage({ user }) {
+export default function MyProfilePage({ user, setUser }) {
   // UI State
   const [activeTab, setActiveTab] = useState("reviews");
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -64,11 +64,10 @@ export default function MyProfilePage({ user }) {
   // Tab Button Helper
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
-      className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${
-        activeTab === id
-          ? "bg-dlsu-light text-dlsu-dark border-0"
-          : "btn-light border text-muted"
-      }`}
+      className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${activeTab === id
+        ? "bg-dlsu-light text-dlsu-dark border-0"
+        : "btn-light border text-muted"
+        }`}
       onClick={() => setActiveTab(id)}
     >
       <Icon size={16} /> {label}
@@ -157,6 +156,7 @@ export default function MyProfilePage({ user }) {
           <div className="col-lg-4">
             <MyProfileStatistics
               user={user}
+              setUser={setUser}
               onShareSuccess={() =>
                 triggerToast("Profile link copied to clipboard!", "link")
               }
