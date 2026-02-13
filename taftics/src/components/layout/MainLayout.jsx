@@ -28,7 +28,7 @@ export default function MainLayout({ user, onLogout }) {
       <NavBar user={user} onLogoutClick={() => setShowLogoutConfirm(true)} />
 
       <main className="flex-grow-1">
-        <Outlet />
+        <Outlet context={{ user }} />
       </main>
 
       <Footer />

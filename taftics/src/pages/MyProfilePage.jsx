@@ -47,6 +47,7 @@ export default function MyProfilePage({ user, setUser }) {
     title: "Great study spot!",
     body: "Quiet and cold AC. The wifi is decent but sometimes disconnects.",
     establishment: {
+      id: 5,
       name: "Coffee Bean",
       location: "Henry Sy Hall",
       image: "https://ui-avatars.com/api/?name=CB",

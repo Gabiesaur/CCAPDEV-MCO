@@ -7,6 +7,9 @@ import {
   useNavigate,
 } from "react-router-dom";
 
+// --- DATA ---
+import { USERS } from "./data/mockData";
+
 // --- LAYOUTS ---
 import MainLayout from "./components/layout/MainLayout";
 
@@ -23,69 +26,6 @@ import RegPage from "./pages/RegPage";
 import OwnerAppPage from "./pages/OwnerAppPage";
 import EstablishmentPage from "./pages/Establishment";
 
-// 1. MOCK DATABASE (The "Backend")
-const MOCK_DB = [
-  {
-    username: "leelanczers",
-    password: "password123",
-    name: "Leelancze Pacomio",
-    email: "lee@dlsu.edu.ph",
-    idSeries: "124",
-    bio: "CS Student @ DLSU | Love coffee and coding",
-    followers: "67",
-    helpfulCount: "67",
-    contributions: "67",
-    avatar:
-      "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff",
-    comments: [
-      {
-        postTitle: "Is the library open on Sundays?",
-        postAuthor: "archer_dc",
-        postRating: 3,
-        date: "2 days ago",
-        body: "Yes, until 5pm only.",
-      },
-      {
-        postTitle: "Best place to sleep?",
-        postAuthor: "archer_dc",
-        postRating: 5,
-        date: "5 days ago",
-        body: "Try the bean bags at the 6th floor.",
-      },
-    ],
-    isAdmin: true,
-  },
-  {
-    username: "archer_dc",
-    password: "password123",
-    name: "Archer Dela Cruz",
-    email: "archer@dlsu.edu.ph",
-    idSeries: "121",
-    bio: "Just a regular Archer",
-    followers: "67",
-    helpfulCount: "67",
-    contributions: "67",
-    avatar:
-      "https://ui-avatars.com/api/?name=Archer+Dela+Cruz&background=00441B&color=fff",
-    comments: [
-      {
-        postTitle: "Is the library open on Sundays?",
-        postAuthor: "leelanczers",
-        postRating: 3,
-        date: "2 days ago",
-        body: "Yes, until 5pm only.",
-      },
-      {
-        postTitle: "Best place to sleep?",
-        postAuthor: "leelanczers",
-        postRating: 5,
-        date: "5 days ago",
-        body: "Try the bean bags at the 6th floor.",
-      },
-    ],
-  },
-];
-
 function App() {
   // GLOBAL USER STATE
   // Check localStorage so user stays logged in if page refreshes
@@ -94,8 +34,11 @@ function App() {
     return saved ? JSON.parse(saved) : null;
   });
 
+  // Local state for users (to allow new registrations in this session)
+  const [dbUsers, setDbUsers] = useState(USERS);
+
   const login = (username, password) => {
-    const foundUser = MOCK_DB.find(
+    const foundUser = dbUsers.find(
       (u) =>
         (u.username === username || u.email === username) &&
         u.password === password,
@@ -115,19 +58,20 @@ function App() {
 
   const register = (newUser) => {
     // Check if user exists
-    if (MOCK_DB.find((u) => u.username === newUser.username)) {
+    if (dbUsers.find((u) => u.username === newUser.username)) {
       return { success: false, message: "Username already taken." };
     }
 
     // Create new mock user
     const createdUser = {
       ...newUser,
+      id: dbUsers.length + 1,
       idSeries: newUser.dlsuId || "125", // Default if missing
       avatar: `https://ui-avatars.com/api/?name=${newUser.username}&background=random&color=fff`,
     };
 
     // "Save" to DB (In memory only for demo)
-    MOCK_DB.push(createdUser);
+    setDbUsers([...dbUsers, createdUser]);
 
     // Auto-login
     setUser(createdUser);
@@ -136,7 +80,7 @@ function App() {
   };
 
   const apply = (applicant) => {
-    if (MOCK_DB.find((u) => u.email === applicant.email)) {
+    if (dbUsers.find((u) => u.email === applicant.email)) {
       return { success: false, message: "Username already taken." };
     }
   };
@@ -156,6 +100,9 @@ function App() {
           <Route path="/browse" element={<BrowsePage />} />
           <Route path="/review" element={<ReviewPage />} />
           <Route path="/create" element={<CreateReviewPage />} />
+
+          {/* Dynamic Establishment Route */}
+          <Route path="/establishment/:id" element={<EstablishmentPage />} />
           <Route path="/establishment" element={<EstablishmentPage />} />
 
           {/* Protected Route Check */}
@@ -171,7 +118,7 @@ function App() {
           />
           <Route
             path="/profile/:username"
-            element={<PublicProfilePage db={MOCK_DB} currentUser={user} />}
+            element={<PublicProfilePage db={dbUsers} currentUser={user} />}
           />
         </Route>
 

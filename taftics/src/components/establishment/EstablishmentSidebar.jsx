@@ -21,7 +21,7 @@ export default function EstablishmentSidebar({ establishment }) {
                     </p>
                 </div>
                 <p
-                    className="mb-0 ms-3 fw-bold"
+                    className="mb-0 ms-2 fw-bold"
                     style={{ color: "#444646", fontSize: "20px" }}
                 >
                     {establishment.businessHours}

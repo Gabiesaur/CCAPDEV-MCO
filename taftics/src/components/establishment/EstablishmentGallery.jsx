@@ -1,4 +1,4 @@
-export default function EstablishmentGallery() {
+export default function EstablishmentGallery({ image }) {
     return (
         <div className="d-flex flex-row justify-content-between w-75 mt-4">
             {/* Main Image */}
@@ -9,6 +9,7 @@ export default function EstablishmentGallery() {
                     width: "49.5%",
                     borderRadius: "10px 0 0 10px",
                     backgroundColor: "#ccc", // Placeholder color
+                    backgroundImage: `url(${image})`, // Use dynamic image
                     backgroundSize: "cover",
                     backgroundPosition: "center",
                 }}

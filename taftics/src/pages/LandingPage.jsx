@@ -1,37 +1,34 @@
 import { Link } from "react-router-dom";
-import { Search, MapPin, Star } from "lucide-react";
+import { Search } from "lucide-react";
 
 import EstablishmentCardSmall from "../components/landing/EstablishmentCardSmall";
+import ProfileReviews from "../components/profile/ProfileReviews";
+import { ESTABLISHMENTS } from "../data/mockData";
 
 const LandingPage = () => {
   const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
-  
-  const establishments = [
-    {
-      name: "National Book Store",
-      category: categories[1],
-      location: "Inside Yuchengco Hall",
-      rating: 4.7,
-      reviewCount: 14,
-      image: "https://images.summitmedia-digital.com/spotph/images/2020/08/24/nbs-statement-closure-640-1598256966.jpg"
-    },
-    {
-      name: "Anytime Fitness",
-      category: categories[7],
-      location: "Inside R Square",
-      rating: 4.2,
-      reviewCount: 9,
-      image: "https://classpass-res.cloudinary.com/image/upload/f_auto/q_auto,w_1125/media_venue/a84kycuvqo9jblnfro8r.jpg"
-    },
-    {
+
+  // Get top 3 rated establishments
+  const topRatedEstablishments = [...ESTABLISHMENTS]
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 3);
+
+  // Define a mock review object for the landing page showcase
+  const showcaseReview = {
+    rating: 5,
+    date: "2 days ago",
+    title: "The best budget friendly meals on campus!",
+    body: "Ate Rica's remains the gold standard for a quick and affordable meal between classes at Andrew. That signature liquid cheese sauce combined with the smoky bacon bits is an elite flavor combination that never misses. Even during the peak 12:00 PM rush, the service is incredibly efficient so you won't be late for your next lecture. It is the perfect comfort food for those long study sessions or stressful midterms week. I always get extra rice whenever I eat here. Every Archer needs to experience this Taft staple at least once before they graduate.",
+    establishment: {
+      id: 3, // Ate Rica's ID
       name: "Ate Rica's Bacsilog",
-      category: categories[8],
       location: "Agno Food Court",
-      rating: 4.8,
-      reviewCount: 16,
       image: "https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg"
-    }
-  ];
+    },
+    user: "Leelancze Pacomio",
+    avatar: "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff",
+    username: "leelanczers"
+  };
 
   return (
     <div className="min-vh-100 bg-white">
@@ -45,15 +42,37 @@ const LandingPage = () => {
           Find the best services and essentials around Taft with peer-verified
           reviews.
         </p>
-        <div className="input-group mx-auto mt-5" style={{ maxWidth: "1000px" }}>
-          <span className="input-group-text bg-light border-0 rounded-start-pill ps-4 py-2">
-            <Search size={20} className="text-muted" />
-          </span>
-          <input
-            type="text"
-            className="form-control rounded-end-pill py-3 px-4 bg-light border-0"
-            placeholder="Search for laundry, printing, groceries..."
-          />
+        <div className="mx-auto mt-5 px-3" style={{ maxWidth: "800px" }}>
+          <div className="input-group shadow-lg rounded-pill overflow-hidden bg-white p-2 border border-light">
+            <span className="input-group-text bg-white border-0 ps-4">
+              <Search size={22} className="text-dlsu-primary" />
+            </span>
+            <input
+              type="text"
+              className="form-control border-0 py-3 fs-5 bg-white shadow-none"
+              placeholder="Search for laundry, printing, groceries..."
+              style={{ paddingLeft: '10px' }}
+            />
+            <Link to="/browse"
+              className="btn btn-dlsu-dark rounded-pill px-5 fw-bold shadow-sm ms-2 d-flex align-items-center"
+            >
+              Search
+            </Link>
+          </div>
+
+          {/* Quick Shortcuts / Popular Tags */}
+          <div className="d-flex justify-content-center gap-3 mt-3 opacity-75">
+            <span className="small text-muted fw-bold">Try:</span>
+            {['Bacsilog', 'Laundry', 'Printing', 'Coffee'].map(tag => (
+              <Link
+                key={tag}
+                to="/browse"
+                className="small text-dlsu-dark text-decoration-none hover-underline fw-semibold"
+              >
+                {tag}
+              </Link>
+            ))}
+          </div>
         </div>
       </header>
 
@@ -83,9 +102,10 @@ const LandingPage = () => {
           establishments
         </h2>
         <div className="row g-4">
-          {establishments.map((store) => (
+          {topRatedEstablishments.map((store) => (
             <div key={store.id} className="col-md-4">
-              <EstablishmentCardSmall 
+              <EstablishmentCardSmall
+                id={store.id}
                 name={store.name}
                 category={store.category}
                 location={store.location}
@@ -104,65 +124,16 @@ const LandingPage = () => {
           Help others in the <span className="text-dlsu-dark">DLSU</span>{" "}
           community
         </h2>
+
+        {/* Replaced hardcoded card with ProfileReviews component */}
         <div
-          className="mx-auto bg-light p-4 mb-4 rounded-4 shadow-sm text-start"
+          className="mx-auto text-start"
           style={{ maxWidth: "800px" }}
         >
-          <div className="d-flex align-items-center mb-3">
-            <img
-              src="https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff"
-              className="bg-secondary rounded-circle me-3"
-              style={{ width: "40px", height: "40px" }}
-            ></img>
-            <div>
-              <p className="fw-bold" style={{ marginBottom: '-4px' }}>Leelancze Pacomio</p>
-              <small className="text-muted">2 days ago</small>
-            </div>
-          </div>
-          <div className="d-flex gap-1 text-dlsu-primary">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                size={16}
-                fill={"currentColor"}
-                className="text-dlsu-primary"
-              />
-            ))}
-          </div>
-          <div className="fw-bold text-dark mt-3 mb-2 fs-5">
-            <Link
-              className="text-dark text-decoration-none"
-              to="/review"  
-            >
-              The best budget friendly meals on campus!
-            </Link>
-          </div>
-          <p className="text-muted small">
-            Ate Rica's remains the gold standard for a quick and affordable meal between classes at Andrew. That signature liquid cheese sauce combined with the smoky bacon bits is an elite flavor combination that never misses. Even during the peak 12:00 PM rush, the service is incredibly efficient so you won't be late for your next lecture. It is the perfect comfort food for those long study sessions or stressful midterms week. I always get extra rice whenever I eat here. Every Archer needs to experience this Taft staple at least once before they graduate.
-          </p>
-          <div
-            className="d-inline-flex align-items-center bg-light border rounded-pill pe-3 ps-1 py-1"
-            style={{ maxWidth: "100%" }}
-          >
-            <img
-              src="https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg"
-              alt="shop"
-              className="rounded-circle me-2 object-cover"
-              style={{ width: "28px", height: "28px" }}
-            />
-            <div className="lh-1">
-              <h6 className="fw-bold mb-0 text-dark" style={{ fontSize: "0.8rem" }}>
-                Ate Rica's Bacsilog
-              </h6>
-              <small
-                className="text-muted d-flex align-items-center gap-1"
-                style={{ fontSize: "0.7rem" }}
-              >
-                <MapPin size={10} /> Agno Food Court
-              </small>
-            </div>
-          </div>
+          {/* We wrap it in a div to control width, but let ProfileReviews handle internal styling */}
+          <ProfileReviews review={showcaseReview} />
         </div>
+
         <div>
           <Link
             className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold text-decoration-none"

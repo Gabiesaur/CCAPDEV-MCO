@@ -1,13 +1,24 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Star, Send, MapPin, ThumbsUp, ThumbsDown } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Star, Send, MapPin, ThumbsUp, ThumbsDown, CheckCircle2 } from 'lucide-react';
 
 import Comment from "../components/review/Comment";
 
 const ReviewPage = () => {
+  const navigate = useNavigate();
   // 1. STATE FOR VOTING
   const [userVote, setUserVote] = useState(null); // 'up', 'down', or null
   const [counts, setCounts] = useState({ up: 12, down: 2 }); // Initial dummy data
+
+  // Toast State
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+
+  const triggerToast = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
 
   const handleVote = (type) => {
     setCounts((prev) => {
@@ -17,13 +28,13 @@ const ReviewPage = () => {
       if (userVote === type) {
         newCounts[type] -= 1;
         setUserVote(null);
-      } 
+      }
       // Case 2: Switching from one vote to another (e.g., Up -> Down)
       else if (userVote && userVote !== type) {
         newCounts[userVote] -= 1;
         newCounts[type] += 1;
         setUserVote(type);
-      } 
+      }
       // Case 3: First time voting
       else {
         newCounts[type] += 1;
@@ -32,6 +43,14 @@ const ReviewPage = () => {
 
       return newCounts;
     });
+  };
+
+  const handleCommentSubmit = (e) => {
+    e.preventDefault();
+    triggerToast("Comment submitted! Redirecting...");
+    setTimeout(() => {
+      navigate("/");
+    }, 2000);
   };
 
   const comments = [
@@ -43,7 +62,15 @@ const ReviewPage = () => {
   ];
 
   return (
-    <div className="bg-white min-vh-100 d-flex flex-column">
+    <div className="bg-white min-vh-100 d-flex flex-column position-relative">
+      {/* Toast Notification (Matching MyProfilePage style) */}
+      {showToast && (
+        <div className="toast-success-custom fw-bold" style={{ zIndex: 9999 }}>
+          <CheckCircle2 size={24} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       <main className="container flex-grow-1" style={{ paddingTop: '80px', paddingBottom: '100px', maxWidth: '800px' }}>
         <h1 className="fw-bold fs-2 mb-4">Review</h1>
 
@@ -73,7 +100,7 @@ const ReviewPage = () => {
           <h1 className="fw-bold text-dark mb-2 fs-4">
             The best budget friendly meals on campus!
           </h1>
-          
+
           <p className="text-muted lh-base mb-4" style={{ fontSize: '0.95rem' }}>
             Ate Rica's remains the gold standard for a quick and affordable meal between classes at Andrew. That signature liquid cheese sauce combined with the smoky bacon bits is an elite flavor combination that never misses. Even during the peak 12:00 PM rush, the service is incredibly efficient so you won't be late for your next lecture. It is the perfect comfort food for those long study sessions or stressful midterms week. I always get extra rice whenever I eat here. Every Archer needs to experience this Taft staple at least once before they graduate.
           </p>
@@ -97,7 +124,7 @@ const ReviewPage = () => {
 
             {/* Voting Buttons with Counts */}
             <div className="d-flex gap-3 align-items-center px-2">
-              <button 
+              <button
                 className="btn p-0 border-0 shadow-none d-flex align-items-center gap-2 transition-all"
                 onClick={() => handleVote('up')}
                 style={{ color: userVote === 'up' ? '#48a868' : '#adb5bd' }}
@@ -105,8 +132,8 @@ const ReviewPage = () => {
                 <ThumbsUp size={24} fill={userVote === 'up' ? '#48a868' : 'none'} />
                 <span className="fw-bold small">{counts.up}</span>
               </button>
-              
-              <button 
+
+              <button
                 className="btn p-0 border-0 shadow-none d-flex align-items-center gap-2 transition-all"
                 onClick={() => handleVote('down')}
                 style={{ color: userVote === 'down' ? '#dc3545' : '#adb5bd' }}
@@ -127,17 +154,18 @@ const ReviewPage = () => {
             ))}
           </div>
 
-          <div className="position-relative">
-            <input 
-              type="text" 
+          <form onSubmit={handleCommentSubmit} className="position-relative">
+            <input
+              type="text"
               className="form-control border-0 bg-light rounded-4 py-3 px-4 fs-6 shadow-sm"
               placeholder="Leave a comment"
               style={{ paddingRight: '60px' }}
+              required
             />
-            <button className="btn position-absolute top-50 end-0 translate-middle-y me-2 text-success shadow-none">
+            <button type="submit" className="btn position-absolute top-50 end-0 translate-middle-y me-2 text-success shadow-none">
               <Send size={20} />
             </button>
-          </div>
+          </form>
         </div>
       </main>
     </div>

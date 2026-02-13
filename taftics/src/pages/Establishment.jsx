@@ -1,87 +1,64 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useParams, Link, useOutletContext } from "react-router-dom";
 import EstablishmentGallery from "../components/establishment/EstablishmentGallery";
 import EstablishmentHeader from "../components/establishment/EstablishmentHeader";
 import EstablishmentInfo from "../components/establishment/EstablishmentInfo";
 import EstablishmentReviews from "../components/establishment/EstablishmentReviews";
 import EstablishmentSidebar from "../components/establishment/EstablishmentSidebar";
 
+import { ESTABLISHMENTS, REVIEWS, USERS } from "../data/mockData";
+
 function Establishment() {
+    const { id } = useParams();
+    // Use Outlet context to get current user, fallback to empty object if undefined
+    const { user: currentUser } = useOutletContext() || {};
+    const [establishment, setEstablishment] = useState(null);
+    const [reviews, setReviews] = useState([]);
     const [isBookmarked, setIsBookmarked] = React.useState(false);
 
-    const establishment = {
-        name: "De La Salle Laundry",
-        rating: 4.5,
-        reviews: 120,
-        type: "Laundry",
-        businessHours: "8:00 AM - 8:00 PM",
-        phone: "091-234-5678",
-        email: "dlsu@laundry.com",
-        address: "2401 Taft Ave, Malate, Manila, 1004 Metro Manila",
-        description:
-            "Our laundry service offers quick turnaround times, competitive pricing, and exceptional customer service. Experience the convenience of our laundry service today!",
-        website: "www.dlsu-laundry.com",
-    };
+    useEffect(() => {
+        // 1. Resolve ID (default to 6 'De La Salle Laundry' if no ID provided for backward compatibility)
+        const establishmentId = id ? parseInt(id) : 6;
 
-    const reviews = [
-        {
-            avatar: "https://ui-avatars.com/api/?name=ML",
-            user: "Martin Luther",
-            rating: 4,
-            title: "Pretty nice!",
-            comment: "The service was okay but a bit crowded.",
-            date: "2024-05-20",
-            helpfulVotes: 9,
-            unhelpfulVotes: 3,
-        },
-        {
-            avatar: "https://ui-avatars.com/api/?name=JP",
-            user: "Jose Protacio",
-            rating: 2,
-            title: "Bad experience.",
-            comment: "Too many people and slow service. Not recommended.",
-            date: "2024-05-20",
-            helpfulVotes: 3,
-            unhelpfulVotes: 12,
-        },
-        {
-            avatar: "https://ui-avatars.com/api/?name=LP",
-            user: "Leelancze Pacomio",
-            rating: 4,
-            title: "Excellent service!",
-            comment: "Great service and fast turnaround! Highly recommend.",
-            date: "2024-06-01",
-            helpfulVotes: 10,
-            unhelpfulVotes: 2,
-        },
-        {
-            avatar: "https://ui-avatars.com/api/?name=JD",
-            user: "John Doe",
-            rating: 5,
-            title: "Best laundry in town",
-            comment:
-                "Quick service and very friendly staff. Will come back again! Also they have free wifi while you wait which is a huge plus for students.",
-            date: "2024-05-28",
-            helpfulVotes: 8,
-            unhelpfulVotes: 1,
-        },
-        {
-            avatar: "https://ui-avatars.com/api/?name=SM",
-            user: "Sarah Miller",
-            rating: 3,
-            title: "Average experience",
-            comment: "The service was okay but a bit pricey.",
-            date: "2024-05-20",
-            helpfulVotes: 5,
-            unhelpfulVotes: 3,
-        },
-    ];
+        // 2. Fetch Establishment
+        const foundEst = ESTABLISHMENTS.find(e => e.id === establishmentId);
+        setEstablishment(foundEst || null);
+
+        // 3. Fetch Reviews
+        if (foundEst) {
+            const foundReviews = REVIEWS.filter(r => r.establishmentId === establishmentId).map(review => {
+                // Enrich review with user data
+                const reviewAuthor = USERS.find(u => u.id === review.userId);
+                return {
+                    ...review,
+                    // Use user's name if found, otherwise fallback
+                    user: reviewAuthor ? reviewAuthor.name : "Unknown User",
+                    avatar: reviewAuthor ? reviewAuthor.avatar : "https://ui-avatars.com/api/?name=Unknown",
+                    username: reviewAuthor ? reviewAuthor.username : "unknown",
+                    // Check if current user is the author
+                    isOwnReview: currentUser ? currentUser.id === review.userId : false
+                };
+            });
+            setReviews(foundReviews);
+        }
+    }, [id, currentUser]);
+
+    if (!establishment) {
+        return (
+            <div className="min-vh-100 d-flex flex-column align-items-center justify-content-center">
+                <h2>Establishment not found</h2>
+                <Link to="/browse" className="btn btn-primary mt-3">Back to Browse</Link>
+            </div>
+        );
+    }
 
     return (
         <div>
             <div className="d-flex flex-column align-items-center min-vw-100 pb-5">
                 <div className="d-flex flex-column align-items-center w-75">
                     {/* Gallery Section */}
-                    <EstablishmentGallery />
+                    {/* Pass image from establishment data */}
+                    <EstablishmentGallery image={establishment.image} />
 
                     {/* Main Content Row */}
                     <div className="d-flex flex-row justify-content-between align-items-start w-75 mt-4 gap-4">
