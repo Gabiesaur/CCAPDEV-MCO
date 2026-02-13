@@ -52,7 +52,7 @@ const BrowsePage = () => {
       name: "ZUS Coffee",
       category: categories[9],
       location: "Inside Green Mall",
-      ratings: 4.9,
+      rating: 4.9,
       reviewCount: 17,
       image: "https://www.sunwayvelocitymall.com/static/shops/21a1980b9e338ce99e2c272e85b548c5/w768.jpg"
     }
@@ -136,20 +136,20 @@ const BrowsePage = () => {
             {/* Search Bar */}
             <div 
               className="input-group mb-4 sticky-top"
-              style={{ top: '128px', zIndex: 1020, width: '800px', height: 'fit-content' }}
+              style={{ top: '128px', zIndex: 1020, width: '720px', height: 'fit-content' }}
             >
-              <span className="input-group-text bg-light border-0 rounded-start-pill ps-4 py-2">
+              <span className="input-group-text bg-light border-0 rounded-start-4 ps-4 py-2">
                 <Search size={20} className="text-muted" />
               </span>
               <input 
                 type="text" 
-                className="form-control border-0 bg-light rounded-end-pill py-3 px-4"
+                className="form-control border-0 bg-light rounded-end-4 py-3 px-4"
                 placeholder="Search for establishments to fit your needs" 
               />
             </div>
 
             {/* Establishment Cards Container */}
-            <div style={{ paddingTop: '24px', paddingBottom: '80px', width: '800px' }}>
+            <div style={{ paddingTop: '24px', paddingBottom: '80px', width: '720px' }}>
               {establishments.map((store) => (
                 <EstablishmentCard 
                   key={store.id}
