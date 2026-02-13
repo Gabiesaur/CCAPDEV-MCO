@@ -8,7 +8,7 @@ export default function EstablishmentSidebar({ establishment }) {
             className="custom-card d-flex flex-column p-4"
             style={{ width: "100%", minHeight: "500px" }}
         >
-            <div className="d-flex flex-row align-items-center justify-content-center mb-3">
+            <div className="d-flex flex-row align-items-center mb-3">
                 <div
                     className="rating-box p-1 d-flex align-items-center justify-content-center"
                     style={{ width: "70px", height: "30px" }}
@@ -21,8 +21,8 @@ export default function EstablishmentSidebar({ establishment }) {
                     </p>
                 </div>
                 <p
-                    className="mb-0 ms-2 fw-bold"
-                    style={{ color: "#444646", fontSize: "20px" }}
+                    className="mb-0 ms-1 fw-bold"
+                    style={{ color: "#444646", fontSize: "16px" }}
                 >
                     {establishment.businessHours}
                 </p>

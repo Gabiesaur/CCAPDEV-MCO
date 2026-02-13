@@ -20,7 +20,7 @@
 }
 
 .brand-panel {
-  flex: 1;
+  flex-grow: 1;
   background-color: var(--brand-green);
   display: flex;
   flex-direction: column;

@@ -189,7 +189,7 @@ function CreateReview() {
                                 <h3 className="text-white fw-bold mb-3">{dummyData.name}</h3>
                             </div>
                         </div>
-                        <div className="p-4 d-flex flex-column gap-3">
+                        <div className="p-4 d-flex flex-column gap-3 sticky-top">
                             <div className="d-flex align-items-center gap-3">
                                 <div className="d-flex flex-row align-items-center gap-2">
                                     <div className="fw-bold fs-3 text-dlsu-dark">{average.toFixed(1)}</div>

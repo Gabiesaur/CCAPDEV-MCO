@@ -65,6 +65,32 @@ export const USERS = [
         helpfulCount: 20,
         contributions: 10,
         avatar: "https://ui-avatars.com/api/?name=Sam+Smith&background=900C3F&color=fff",
+    },
+    {
+        id: 6,
+        username: "tech_wiz",
+        password: "password123",
+        name: "Nikolai Tesla",
+        email: "nik@dlsu.edu.ph",
+        idSeries: "119",
+        bio: "Building the future, one line at a time.",
+        followers: 55,
+        helpfulCount: 30,
+        contributions: 12,
+        avatar: "https://ui-avatars.com/api/?name=Nikolai+Tesla&background=2C3E50&color=fff",
+    },
+    {
+        id: 7,
+        username: "coffee_lover",
+        password: "password123",
+        name: "Isabella Garcia",
+        email: "isabella@dlsu.edu.ph",
+        idSeries: "125",
+        bio: "Lover of all things caffeine.",
+        followers: 88,
+        helpfulCount: 60,
+        contributions: 20,
+        avatar: "https://ui-avatars.com/api/?name=Isabella+Garcia&background=795548&color=fff",
     }
 ];
 
@@ -162,7 +188,6 @@ export const ESTABLISHMENTS = [
 ];
 
 // Helper to get relative date from ISO string
-// We will implement the actual logic in the components, stored as ISO strings here for portability
 const getPastDate = (daysAgo) => {
     const date = new Date();
     date.setDate(date.getDate() - daysAgo);
@@ -226,10 +251,21 @@ export const REVIEWS = [
         helpfulVotes: 5,
         unhelpfulVotes: 3,
     },
+    {
+        id: 6,
+        establishmentId: 6,
+        userId: 6,
+        rating: 5,
+        title: "Reliable and fast",
+        comment: "Always get my clothes back smelling fresh and neatly folded within 24 hours.",
+        date: getPastDate(3),
+        helpfulVotes: 12,
+        unhelpfulVotes: 0,
+    },
 
     // Reviews for Ate Rica's (ID 3)
     {
-        id: 6,
+        id: 7,
         establishmentId: 3,
         userId: 1, // leelanczers
         rating: 5,
@@ -240,7 +276,7 @@ export const REVIEWS = [
         unhelpfulVotes: 2,
     },
     {
-        id: 7,
+        id: 8,
         establishmentId: 3,
         userId: 4, // foodie_king
         rating: 5,
@@ -250,10 +286,43 @@ export const REVIEWS = [
         helpfulVotes: 15,
         unhelpfulVotes: 0,
     },
+    {
+        id: 9,
+        establishmentId: 3,
+        userId: 2,
+        rating: 4,
+        title: "Great value for money",
+        comment: "A little salty for some, but I personally love the cheese sauce. Best to eat while hot!",
+        date: getPastDate(8),
+        helpfulVotes: 20,
+        unhelpfulVotes: 1,
+    },
+    {
+        id: 10,
+        establishmentId: 3,
+        userId: 5,
+        rating: 3,
+        title: "Too crowded sometimes",
+        comment: "Love the food, but the queue at Agno can be insane during lunch hour.",
+        date: getPastDate(2),
+        helpfulVotes: 6,
+        unhelpfulVotes: 2,
+    },
+    {
+        id: 11,
+        establishmentId: 3,
+        userId: 6,
+        rating: 5,
+        title: "Bacsilog is life",
+        comment: "Literally fueled my entire freshman year. Never gets old.",
+        date: getPastDate(12),
+        helpfulVotes: 14,
+        unhelpfulVotes: 0,
+    },
 
     // Reviews for National Book Store (ID 1)
     {
-        id: 8,
+        id: 12,
         establishmentId: 1,
         userId: 3, // pro_student
         rating: 4,
@@ -263,10 +332,43 @@ export const REVIEWS = [
         helpfulVotes: 20,
         unhelpfulVotes: 1,
     },
+    {
+        id: 13,
+        establishmentId: 1,
+        userId: 1,
+        rating: 5,
+        title: "One-stop shop",
+        comment: "They always have the textbooks I need for my courses. Helpful staff too!",
+        date: getPastDate(15),
+        helpfulVotes: 10,
+        unhelpfulVotes: 0,
+    },
+    {
+        id: 14,
+        establishmentId: 1,
+        userId: 7,
+        rating: 3,
+        title: "A bit small",
+        comment: "Very convenient, but it doesn't have as much selection as the branch outside at One Archers.",
+        date: getPastDate(4),
+        helpfulVotes: 8,
+        unhelpfulVotes: 2,
+    },
+    {
+        id: 15,
+        establishmentId: 1,
+        userId: 4,
+        rating: 4,
+        title: "Essential for exam weeks",
+        comment: "Lifesaver when you realize you ran out of blue pens 5 minutes before your midterm starts!",
+        date: getPastDate(2),
+        helpfulVotes: 25,
+        unhelpfulVotes: 1,
+    },
 
     // Reviews for Anytime Fitness (ID 2)
     {
-        id: 9,
+        id: 16,
         establishmentId: 2,
         userId: 5, // gym_rat_dlsu
         rating: 5,
@@ -276,10 +378,89 @@ export const REVIEWS = [
         helpfulVotes: 12,
         unhelpfulVotes: 0,
     },
+    {
+        id: 17,
+        establishmentId: 2,
+        userId: 6,
+        rating: 4,
+        title: "Good for morning workouts",
+        comment: "Very quiet at 6AM. Perfect for getting your workout done before classes start.",
+        date: getPastDate(9),
+        helpfulVotes: 7,
+        unhelpfulVotes: 1,
+    },
+    {
+        id: 18,
+        establishmentId: 2,
+        userId: 2,
+        rating: 2,
+        title: "Too small",
+        comment: "It's a bit cramped during peak hours. Had to wait 20 minutes for a bench.",
+        date: getPastDate(11),
+        helpfulVotes: 4,
+        unhelpfulVotes: 5,
+    },
+    {
+        id: 19,
+        establishmentId: 2,
+        userId: 7,
+        rating: 5,
+        title: "Best AF branch in the area",
+        comment: "Better than the Vito Cruz one. Equipment is newer and it's much better ventilated.",
+        date: getPastDate(2),
+        helpfulVotes: 16,
+        unhelpfulVotes: 0,
+    },
+
+    // Reviews for Green Residences (ID 4)
+    {
+        id: 20,
+        establishmentId: 4,
+        userId: 1,
+        rating: 4,
+        title: "Nice but pricey",
+        comment: "The units are modern and the amenities are great, but the rent is quite high for students.",
+        date: getPastDate(30),
+        helpfulVotes: 15,
+        unhelpfulVotes: 2,
+    },
+    {
+        id: 21,
+        establishmentId: 4,
+        userId: 3,
+        rating: 5,
+        title: "Best location",
+        comment: "Literally zero travel time to campus. The study hall is a huge plus during finals week.",
+        date: getPastDate(10),
+        helpfulVotes: 22,
+        unhelpfulVotes: 0,
+    },
+    {
+        id: 22,
+        establishmentId: 4,
+        userId: 5,
+        rating: 3,
+        title: "Elevator issues",
+        comment: "Great place, but the elevators can be slow during rush hours. Better to live on lower floors if you can.",
+        date: getPastDate(5),
+        helpfulVotes: 30,
+        unhelpfulVotes: 5,
+    },
+    {
+        id: 23,
+        establishmentId: 4,
+        userId: 2,
+        rating: 4,
+        title: "Good amenities",
+        comment: "Pool and gym are always well-maintained. Highly recommended for students who can afford it.",
+        date: getPastDate(1),
+        helpfulVotes: 12,
+        unhelpfulVotes: 1,
+    },
 
     // Reviews for ZUS Coffee (ID 5)
     {
-        id: 10,
+        id: 24,
         establishmentId: 5,
         userId: 1, // leelanczers
         rating: 5,
@@ -288,5 +469,73 @@ export const REVIEWS = [
         date: getPastDate(0), // Today
         helpfulVotes: 5,
         unhelpfulVotes: 0,
+    },
+    {
+        id: 25,
+        establishmentId: 5,
+        userId: 3,
+        rating: 4,
+        title: "Nice study haunt",
+        comment: "Good coffee and relatively fast internet. Can be hard to find a table though.",
+        date: getPastDate(3),
+        helpfulVotes: 11,
+        unhelpfulVotes: 1,
+    },
+    {
+        id: 26,
+        establishmentId: 5,
+        userId: 4,
+        rating: 5,
+        title: "Try the Buttercreme Latte!",
+        comment: "Unique and very smooth. My new favorite coffee place in Taft.",
+        date: getPastDate(6),
+        helpfulVotes: 18,
+        unhelpfulVotes: 0,
+    },
+    {
+        id: 27,
+        establishmentId: 5,
+        userId: 7,
+        rating: 3,
+        title: "Good coffee, but too loud",
+        comment: "The blender is really loud and they play music a bit too high for studying.",
+        date: getPastDate(1),
+        helpfulVotes: 9,
+        unhelpfulVotes: 3,
+    },
+    {
+        id: 28,
+        establishmentId: 5,
+        userId: 6,
+        rating: 4,
+        title: "Reasonable prices",
+        comment: "Cheaper than Starbucks but tastes just as good, if not better. Highly recommended.",
+        date: getPastDate(5),
+        helpfulVotes: 14,
+        unhelpfulVotes: 0,
+    }
+];
+
+export const COMMENTS = [
+    {
+        id: 1,
+        reviewId: 7, // Ate Rica's Review by Leelancze
+        userId: 2, // archer_dc
+        text: "Totally agree about the liquid cheese sauce!",
+        date: getPastDate(1)
+    },
+    {
+        id: 2,
+        reviewId: 7,
+        userId: 3, // pro_student
+        text: "It's my favorite too! <3",
+        date: getPastDate(1)
+    },
+    {
+        id: 3,
+        reviewId: 1, // Laundry Review
+        userId: 4, // foodie_king
+        text: "I'll try this laundry shop next time!",
+        date: getPastDate(0)
     }
 ];

@@ -31,14 +31,14 @@ export default function EstablishmentHeader({
                             className="mb-0 fw-bold"
                             style={{ color: "#444646", fontSize: "20px" }}
                         >
-                            {establishment.reviews} reviews
+                            {establishment.reviewCount} reviews
                         </p>
                         <span className="mx-3">&bull;</span>
                         <p
                             className="mb-0 fw-bold"
                             style={{ color: "#444646", fontSize: "20px" }}
                         >
-                            {establishment.type}
+                            {establishment.category}
                         </p>
                     </div>
                 </div>
