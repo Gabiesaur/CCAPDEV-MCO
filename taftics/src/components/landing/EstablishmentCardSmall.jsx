@@ -1,3 +1,4 @@
+import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 
 const EstablishmentCardSmall = ({ 
@@ -17,19 +18,11 @@ const EstablishmentCardSmall = ({
         alt={name}
       />
       <div className="card-body px-0 pb-0">
-        <h5 className="fw-bold mb-1">{name}</h5>
+        <Link to="/establishment" className="fw-bold fs-5 text-decoration-none text-dark mb-1">{name}</Link>
         <p className="text-muted small mb-3">{category} • {location}</p>
-        <div className="d-flex justify-content-between align-items-end">
-          <span className="fw-bold text-dlsu-primary">
-            <Star size={20} fill={"currentColor"} className="text-success me-2"/>
-            {rating} <span className="text-muted fw-normal">• {reviewCount} Reviews</span>
-          </span>
-          <a
-            href="#"
-            className="text-dark text-decoration-none small fw-bold"
-          >
-            View ↗
-          </a>
+        <div className="d-flex flex-row align-items-start" style={{ marginBottom: "-8px" }}>
+          <Star size={16} fill={"currentColor"} className="text-success me-2"/>
+          <h1 className="fs-6 fw-bold text-dlsu-primary">{rating} <span className="text-muted fw-normal">• {reviewCount} Reviews</span></h1>
         </div>
       </div>
     </div>
