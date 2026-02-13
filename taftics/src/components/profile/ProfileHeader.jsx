@@ -11,7 +11,7 @@ export default function ProfileHeader({
     <div style={{ width: "100%" }}>
       {/* Green Banner */}
       <div
-        className="bg-dlsu-dark position-relative"
+        className="bg-dlsu-light position-relative"
         style={{ height: "200px" }}
       >
         <div className="container h-100 px-4 d-flex align-items-end pb-3">
@@ -40,12 +40,12 @@ export default function ProfileHeader({
           {/* User Info */}
           <div className="mb-2 text-white" style={{ paddingTop: "10px" }}>
             <h1
-              className="fw-bold mb-0"
+              className="text-dlsu-dark fw-bold mb-0"
               style={{ textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}
             >
               {name}
             </h1>
-            <p className="fs-5 mb-0 opacity-75">@{username}</p>
+            <p className="text-dlsu-dark fs-5 mb-0 opacity-75">@{username}</p>
           </div>
         </div>
       </div>

@@ -48,8 +48,8 @@ function NavBar({ user, onLogoutClick }) {
           {/* CENTER: Search Bar */}
           {showSearchBar && (
             <div
-              className="position-absolute start-50 translate-middle-x d-none d-md-flex"
-              style={{ width: "450px" }}
+              className="position-absolute end-50 translate-middle-x d-none d-md-flex"
+              style={{ width: "325px" }}
             >
               <div className="input-group">
                 <span className="input-group-text bg-light border-0 rounded-start-pill ps-3 py-2">
@@ -124,8 +124,9 @@ function NavBar({ user, onLogoutClick }) {
 
                   {/* Dropdown Menu (Conditionally Rendered) */}
                   <ul
-                    className={`dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 rounded-3 p-2 ${isDropdownOpen ? "show" : ""
-                      }`}
+                    className={`dropdown-menu dropdown-menu-end shadow-lg border-0 mt-2 rounded-3 p-2 ${
+                      isDropdownOpen ? "show" : ""
+                    }`}
                     style={{
                       position: "absolute",
                       right: 0,
