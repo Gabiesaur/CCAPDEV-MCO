@@ -100,10 +100,16 @@ const LoginPage = ({ onLogin }) => {
             </button>
 
             <p className="footer-text">
-              Not a member yet?{" "}
+              Not a member yet?
+              <br />
               <Link to="/register" className="text-link">
-                Register now!
+                Student Registration
               </Link>
+              <br />
+              <Link to="/apply" className="text-link">
+                Establishment Owner Application
+              </Link>
+              <br />
               <br />
               <Link to="/" className="text-link">
                 Return to home
