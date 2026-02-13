@@ -39,7 +39,7 @@ const LandingPage = () => {
       {/* We use pt-5 and mt-5 to prevent the fixed navbar from overlapping the text */}
       <header className="container text-center" style={{ paddingTop: '100px', paddingBottom: '80px' }}>
         <h1 className="fw-bold display-4 mt-5">
-          Every <span style={{ color: "#003e1c" }}>Archer</span> needs a strategy.
+          Every <span className="text-dlsu-dark">Archer</span> needs a strategy.
         </h1>
         <p className="text-muted fs-5">
           Find the best services and essentials around Taft with peer-verified
@@ -60,11 +60,11 @@ const LandingPage = () => {
       {/* Category Section */}
       <section className="container text-center" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
         <h2 className="fw-bold mb-4">
-          Browse reviews by <span style={{ color: "#003e1c" }}>category</span>
+          Browse reviews by <span className="text-dlsu-dark">category</span>
         </h2>
-        <div className="row g-3 justify-content-center">
+        <div className="row g-3 justify-content-center row-cols-2 row-cols-md-3 row-cols-lg-5">
           {categories.map((cat) => (
-            <div key={cat} className="col-6 col-md-4 col-lg-2">
+            <div key={cat} className="col">
               <Link
                 className="btn bg-dlsu-primary w-100 text-white py-2 rounded-pill fw-semibold"
                 to="/browse"
@@ -79,7 +79,7 @@ const LandingPage = () => {
       {/* Top Rated Section */}
       <section className="container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
         <h2 className="fw-bold text-center mb-5">
-          See the <span style={{ color: "#003e1c" }}>top rated</span>{" "}
+          See the <span className="text-dlsu-dark">top rated</span>{" "}
           establishments
         </h2>
         <div className="row g-4">
@@ -101,7 +101,7 @@ const LandingPage = () => {
       {/* Community Review Section */}
       <section className="container text-center" style={{ paddingTop: '80px', paddingBottom: '160px' }}>
         <h2 className="fw-bold mb-5">
-          Help others in the <span style={{ color: "#003e1c" }}>DLSU</span>{" "}
+          Help others in the <span className="text-dlsu-dark">DLSU</span>{" "}
           community
         </h2>
         <div
