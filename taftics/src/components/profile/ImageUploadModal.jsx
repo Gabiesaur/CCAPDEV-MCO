@@ -1,14 +1,35 @@
-import React, { useState, useRef } from 'react';
-import { X, Upload, Image as ImageIcon, Loader2 } from 'lucide-react';
+import React, { useState, useRef, useEffect } from "react";
+import { Upload, Image as ImageIcon, X, Loader2 } from "lucide-react";
 
-const ImageUploadModal = ({ isOpen, onClose, onUploadSuccess, userId }) => {
+export default function ImageUploadModal({ isOpen, onClose, onUploadSuccess, userId }) {
   const [file, setFile] = useState(null);
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [isDragging, setIsDragging] = useState(false);
-  
+
   const fileInputRef = useRef(null);
+
+  // Clean up object URL when component unmounts or previewUrl changes
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
+  // Reset state on modal close
+  useEffect(() => {
+    if (!isOpen) {
+      setFile(null);
+      setPreview(null);
+      setError(null);
+      setIsDragging(false);
+    }
+  }, [isOpen]);
+
+  if (!isOpen) return null;
 
   // --- NATIVE DRAG AND DROP HANDLERS ---
   const handleDragOver = (e) => {
@@ -46,13 +67,10 @@ const ImageUploadModal = ({ isOpen, onClose, onUploadSuccess, userId }) => {
 
   // --- FILE PROCESSING & VALIDATION ---
   const processFile = (selectedFile) => {
-    // Validate file type
     if (!selectedFile.type.startsWith('image/')) {
       setError('Please upload an image file (JPEG, PNG, GIF).');
       return;
     }
-    
-    // Validate file size (e.g., max 5MB)
     if (selectedFile.size > 5 * 1024 * 1024) {
       setError('File size must be less than 5MB.');
       return;
@@ -63,9 +81,18 @@ const ImageUploadModal = ({ isOpen, onClose, onUploadSuccess, userId }) => {
     setError(null);
   };
 
+  const handleRemoveImage = (e) => {
+    e.stopPropagation(); // prevent clicking the parent div
+    setFile(null);
+    setPreview(null);
+    if (fileInputRef.current) fileInputRef.current.value = "";
+  };
+
   // --- API COMMUNICATION ---
-  const handleUpload = async () => {
-    if (!file || !userId) return;
+  const handleSave = async () => {
+    if (!file || !userId) {
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -83,7 +110,7 @@ const ImageUploadModal = ({ isOpen, onClose, onUploadSuccess, userId }) => {
 
       if (data.success) {
         onUploadSuccess(data.user);
-        handleClose();
+        handleCloseModal();
       } else {
         setError(data.message || "Failed to upload image.");
       }
@@ -95,7 +122,7 @@ const ImageUploadModal = ({ isOpen, onClose, onUploadSuccess, userId }) => {
     }
   };
 
-  const handleClose = () => {
+  const handleCloseModal = () => {
     setFile(null);
     setPreview(null);
     setError(null);
@@ -103,118 +130,146 @@ const ImageUploadModal = ({ isOpen, onClose, onUploadSuccess, userId }) => {
     onClose();
   };
 
-  // Allow clicking the dropzone to open the file browser
   const triggerFileInput = () => {
     fileInputRef.current.click();
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="modal-backdrop-custom" style={{ position: "fixed", top: 0, left: 0, right: 0, bottom: 0, backgroundColor: "rgba(0,0,0,0.5)", zIndex: 1050, display: "flex", justifyContent: "center", alignItems: "center" }}>
-      <div className="modal-content-custom bg-white rounded-4 shadow-lg" style={{ width: "100%", maxWidth: "500px" }}>
-        
-        {/* Header */}
-        <div className="d-flex justify-content-between align-items-center p-4 border-bottom">
-          <h5 className="mb-0 fw-bold">Update Profile Picture</h5>
-          <button 
-            onClick={handleClose}
-            className="btn btn-link text-muted p-0 hover-text-dark transition-all"
-          >
-            <X size={24} />
-          </button>
-        </div>
-
-        {/* Body */}
-        <div className="p-4">
-          {error && (
-            <div className="alert alert-danger py-2 px-3 mb-4 text-sm d-flex align-items-center gap-2">
-              <X size={16} />
-              {error}
+    <>
+      <div className="glass-backdrop fade show" onClick={!loading ? handleCloseModal : undefined} />
+      
+      <div className="modal d-block" style={{ zIndex: 1060 }}>
+        <div className="modal-dialog modal-dialog-centered">
+          <div className="modal-content border-0 shadow-lg rounded-4 overflow-hidden bg-white">
+            <div className="modal-header bg-dlsu-dark text-white border-0 py-3">
+              <h5 className="modal-title fw-bold">Update Profile Picture</h5>
+              <button
+                type="button"
+                className="btn-close btn-close-white"
+                onClick={handleCloseModal}
+                disabled={loading}
+              />
             </div>
-          )}
 
-          {/* Native Dropzone Area */}
-          <div 
-            onClick={triggerFileInput}
-            onDragOver={handleDragOver}
-            onDragEnter={handleDragEnter}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            className={`dropzone-area p-5 rounded-4 text-center cursor-pointer transition-all ${
-              isDragging ? 'border-success bg-success bg-opacity-10 border-solid' : 'border-dashed border-2 bg-light'
-            } ${preview ? 'border-0 p-0 overflow-hidden' : ''}`}
-            style={{ borderStyle: preview ? 'none' : (isDragging ? 'solid' : 'dashed'), cursor: 'pointer' }}
-          >
-            {/* Hidden File Input */}
-            <input 
-              type="file" 
-              ref={fileInputRef}
-              onChange={handleFileChange}
-              accept="image/jpeg, image/png, image/gif"
-              style={{ display: 'none' }} 
-            />
-            
-            {preview ? (
-              <div className="position-relative w-100 h-100 bg-black">
-                <img 
-                  src={preview} 
-                  alt="Preview" 
-                  className="w-100 h-100 object-fit-cover opacity-75"
-                  style={{ maxHeight: '300px' }}
+            <div className="modal-body p-4 text-center">
+              {error && (
+                <div className="alert alert-danger py-2 px-3 mb-3 text-sm d-flex align-items-center gap-2">
+                  <X size={16} />
+                  {error}
+                </div>
+              )}
+
+              <div
+                className={`upload-drop-zone rounded-4 mb-3 d-flex flex-column align-items-center justify-content-center position-relative overflow-hidden mx-auto transition-all ${!preview ? 'p-5' : ''}`}
+                onClick={() => !preview && triggerFileInput()}
+                onDragOver={handleDragOver}
+                onDragEnter={handleDragEnter}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                style={{
+                  border: preview ? "none" : (isDragging ? "2px solid #48a868" : "2px dashed #ccc"),
+                  backgroundColor: isDragging ? "rgba(72, 168, 104, 0.05)" : "transparent",
+                  cursor: preview ? "default" : "pointer",
+                  width: preview ? "250px" : "100%",
+                  height: preview ? "250px" : "auto",
+                  minHeight: "200px"
+                }}
+              >
+                {preview ? (
+                  <>
+                    <img 
+                      src={preview} 
+                      alt="Preview" 
+                      className="img-fluid w-100 h-100 position-absolute top-0 start-0"
+                      style={{ objectFit: 'cover' }}
+                    />
+                    {/* Translucent overlay for circular preview cutout */}
+                    <div 
+                      className="position-absolute pe-none"
+                      style={{
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        borderRadius: "50%",
+                        boxShadow: "0 0 0 9999px rgba(0, 0, 0, 0.5)",
+                        border: "2px solid rgba(255, 255, 255, 0.8)",
+                        margin: "0"
+                      }}
+                    ></div>
+                    <button 
+                      className="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 rounded-circle shadow d-flex align-items-center justify-content-center p-1"
+                      onClick={handleRemoveImage}
+                      title="Remove image"
+                      style={{ zIndex: 10 }}
+                      disabled={loading}
+                    >
+                      <X size={16} />
+                    </button>
+                    {loading && (
+                      <div className="position-absolute top-50 start-50 translate-middle w-100 h-100 d-flex justify-content-center align-items-center" style={{ backgroundColor: 'rgba(255,255,255,0.7)', zIndex: 5 }}>
+                        <Loader2 size={32} className="spin text-dlsu-dark" />
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div className="bg-dlsu-light p-3 rounded-circle mb-3">
+                      <Upload size={32} className="text-dlsu-dark" />
+                    </div>
+                    <h6 className="fw-bold mb-1">
+                      {isDragging ? "Drop your image here" : "Click or drag to upload"}
+                    </h6>
+                    <p className="text-muted small mb-0">
+                      PNG, JPG or GIF (max. 5MB)
+                    </p>
+                  </>
+                )}
+                
+                <input
+                  type="file"
+                  id="fileInput"
+                  ref={fileInputRef}
+                  className="d-none"
+                  accept="image/jpeg, image/png, image/gif"
+                  onChange={handleFileChange}
                 />
-                <div className="position-absolute top-50 start-50 translate-middle text-white text-center w-100">
-                  <div className="bg-dark bg-opacity-50 d-inline-block px-4 py-2 rounded-pill fw-medium backdrop-blur">
-                    Click or drag to change
-                  </div>
-                </div>
               </div>
-            ) : (
-              <div className="py-4">
-                <div className="bg-white rounded-circle d-inline-flex p-3 shadow-sm mb-3">
-                  <Upload size={32} className="text-success" />
+
+              {file ? (
+                <div className="d-flex align-items-center gap-2 p-3 bg-light rounded-3 mb-2 text-start border">
+                  <ImageIcon size={18} className="text-muted" />
+                  <small className="text-muted text-truncate w-100">
+                    Selected: {file.name}
+                  </small>
                 </div>
-                <h6 className="fw-bold mb-2">
-                  {isDragging ? "Drop your image here" : "Click or drag image to upload"}
-                </h6>
-                <p className="text-muted small mb-0">
-                  SVG, PNG, JPG or GIF (max. 5MB)
-                </p>
-              </div>
-            )}
+              ) : (
+                <div className="d-flex align-items-center gap-2 p-3 bg-light rounded-3 mb-2 text-start border">
+                  <ImageIcon size={18} className="text-muted" />
+                  <small className="text-muted">
+                    No new image selected
+                  </small>
+                </div>
+              )}
+            </div>
+
+            <div className="modal-footer border-0 p-3 pt-0">
+              <button
+                className="btn btn-light fw-bold px-4 rounded-pill"
+                onClick={handleCloseModal}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-dlsu-dark rounded-pill px-4 fw-bold shadow-sm d-flex align-items-center gap-2"
+                onClick={handleSave}
+                disabled={!file || loading}
+              >
+                {loading ? <Loader2 size={16} className="spin" /> : null}
+                {loading ? "Saving..." : "Save Changes"}
+              </button>
+            </div>
           </div>
         </div>
-
-        {/* Footer */}
-        <div className="p-4 border-top bg-light rounded-bottom-4 d-flex justify-content-end gap-2">
-          <button 
-            className="btn btn-light border fw-medium px-4"
-            onClick={handleClose}
-            disabled={loading}
-          >
-            Cancel
-          </button>
-          <button 
-            className="btn btn-success fw-bold px-4 d-flex align-items-center gap-2"
-            onClick={handleUpload}
-            disabled={!file || loading}
-          >
-            {loading ? (
-              <>
-                <Loader2 size={18} className="spin" />
-                Uploading...
-              </>
-            ) : (
-              <>
-                <ImageIcon size={18} />
-                Save Picture
-              </>
-            )}
-          </button>
-        </div>
       </div>
-    </div>
+    </>
   );
-};
-
-export default ImageUploadModal;
+}

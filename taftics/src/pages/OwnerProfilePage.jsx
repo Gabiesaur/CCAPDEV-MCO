@@ -88,7 +88,13 @@ export default function OwnerProfilePage({ user, setUser }) {
       <ImageUploadModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onUploadSuccess={() => {
+        userId={user._id || user.id} // Ensure we have the ID for the backend string matching
+        onUploadSuccess={(updatedUser) => {
+          // Update global state and persist
+          if (setUser) {
+            setUser(updatedUser);
+            localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+          }
           setIsModalOpen(false);
           triggerToast("Establishment profile picture updated!");
         }}
