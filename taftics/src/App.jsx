@@ -69,28 +69,24 @@ function App() {
 
   const register = async (formData) => {
     try {
-      // NOTE: We do NOT set headers here because we are sending FormData (for the image)
       const response = await fetch('http://localhost:5000/api/register', {
         method: 'POST',
-        body: formData 
+        body: formData // No headers needed for FormData!
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // Update local dbUsers state so the new user instantly appears in the public list
-        setDbUsers([...dbUsers, data.user]); 
-        
-        // Auto-login the brand new user
+        // Auto-login the user after successful registration
         setUser(data.user);
         localStorage.setItem("currentUser", JSON.stringify(data.user));
         return { success: true };
       } else {
-        return { success: false, message: data.message || "Registration failed." };
+        return { success: false, message: data.message };
       }
     } catch (error) {
-      console.error("Registration Error:", error);
-      return { success: false, message: "Server error. Is the backend running?" };
+      console.error("Failed to register:", error);
+      return { success: false, message: "Network error. Is the server running?" };
     }
   };
 

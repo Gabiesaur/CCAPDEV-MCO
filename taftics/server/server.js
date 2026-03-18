@@ -87,6 +87,68 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
+// --- REGISTER ROUTE ---
+app.post('/api/register', async (req, res) => {
+  try {
+    // With FormData, text fields are in req.body
+    const { username, email, password, dlsuId } = req.body;
+
+    // 1. Check if username or email already exists
+    const existingUser = await User.findOne({ 
+      $or: [{ username: username }, { email: email }] 
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Username or Email already taken." });
+    }
+
+    // 2. Handle the Avatar File Upload
+    let avatarUrl = "https://ui-avatars.com/api/?name=" + username; // Default avatar
+
+    if (req.files && req.files.avatar) {
+      const avatarFile = req.files.avatar;
+      // Create a unique filename so users don't overwrite each other's images
+      const fileName = `${Date.now()}_${avatarFile.name}`;
+      const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+
+      // Move the file to your public/uploads folder
+      await avatarFile.mv(uploadPath);
+      
+      // Set the URL that React will use to display the image
+      avatarUrl = `http://localhost:5000/uploads/${fileName}`;
+    }
+
+    // 3. Create and save the new user
+    const newUser = new User({
+      username,
+      email,
+      password, // Again, hash this in a real production app!
+      idSeries: dlsuId,
+      avatar: avatarUrl,
+      isAdmin: false
+    });
+
+    await newUser.save();
+
+    // 4. Send success response and auto-login the user
+    res.status(201).json({ 
+      success: true, 
+      user: {
+        _id: newUser._id,
+        username: newUser.username,
+        email: newUser.email,
+        idSeries: newUser.idSeries,
+        avatar: newUser.avatar,
+        isAdmin: newUser.isAdmin
+      }
+    });
+
+  } catch (error) {
+    console.error("Registration error:", error);
+    res.status(500).json({ success: false, message: "Server error during registration." });
+  }
+});
+
 // --- START SERVER ---
 app.listen(PORT, () => { //
   console.log(`🚀 Server running on http://localhost:${PORT}`); //

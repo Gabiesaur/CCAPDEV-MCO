@@ -1,9 +1,11 @@
 import React, { useState, useRef } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/LoginRegStyles.css";
 import logoImage from "/logo_green.svg?url";
 
-const RegPage = () => {
+const RegPage = ({ onRegister }) => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -32,9 +34,38 @@ const RegPage = () => {
     }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Registration Data:", formData);
+
+    // 1. Basic Validation (Using alerts to preserve original layout)
+    if (!formData.username || !formData.email || !formData.password || !formData.dlsuId) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+    if (formData.password !== formData.confirmPassword) {
+      alert("Passwords do not match.");
+      return;
+    }
+
+    // 2. Package the data into FormData
+    const submitData = new FormData();
+    submitData.append("username", formData.username);
+    submitData.append("email", formData.email);
+    submitData.append("password", formData.password);
+    submitData.append("dlsuId", formData.dlsuId);
+    
+    if (formData.avatar) {
+      submitData.append("avatar", formData.avatar);
+    }
+
+    // 3. Send to App.jsx and wait for the response
+    const result = await onRegister(submitData);
+    
+    if (result.success) {
+      navigate("/"); // Redirect to home if successful
+    } else {
+      alert(result.message); // Display the error from the server
+    }
   };
 
   return (
