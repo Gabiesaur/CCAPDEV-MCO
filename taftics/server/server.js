@@ -243,6 +243,44 @@ app.get('/api/reviews/:id', async (req, res) => {
   }
 });
 
+app.put('/api/users/:id/avatar', async (req, res) => {
+  try {
+    // 1. Check if a file was actually uploaded
+    if (!req.files || !req.files.avatar) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    const avatarFile = req.files.avatar;
+    const fileName = `${Date.now()}_${avatarFile.name}`;
+    const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+
+    // 2. Move the file to your public/uploads folder
+    await avatarFile.mv(uploadPath);
+    
+    // 3. Generate the new URL
+    const avatarUrl = `http://localhost:5000/uploads/${fileName}`;
+
+    // 4. Find the user and update their avatar in the database
+    // { new: true } tells Mongoose to return the UPDATED user document
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id, 
+      { avatar: avatarUrl },
+      { new: true }
+    ).select('-password'); // Hide password!
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // 5. Send the updated user back to React
+    res.json({ success: true, user: updatedUser });
+
+  } catch (error) {
+    console.error("Avatar upload error:", error);
+    res.status(500).json({ success: false, message: "Server error during upload" });
+  }
+});
+
 // --- START SERVER ---
 app.listen(PORT, () => { //
   console.log(`🚀 Server running on http://localhost:${PORT}`); //
