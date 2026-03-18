@@ -22,6 +22,14 @@ function CreateReview() {
     };
 
     const selectedEstablishment = location.state?.establishment;
+    const selectedReviews = Array.isArray(location.state?.reviews) ? location.state.reviews : [];
+
+    const fallbackData = {
+        name: "Select an establishment",
+        type: "Establishment",
+        rating: 0,
+        totalReviews: 0,
+    };
 
     const establishmentData = selectedEstablishment
         ? {
@@ -29,11 +37,7 @@ function CreateReview() {
               type: selectedEstablishment.category || "Establishment",
               rating: selectedEstablishment.rating ?? 0,
               totalReviews: selectedEstablishment.reviewCount ?? 0,
-              fiveStar: selectedEstablishment.fiveStar ?? 0,
-              fourStar: selectedEstablishment.fourStar ?? 0,
-              threeStar: selectedEstablishment.threeStar ?? 0,
-              twoStar: selectedEstablishment.twoStar ?? 0,
-              oneStar: selectedEstablishment.oneStar ?? 0,
+                            image: selectedEstablishment.image || "",
           }
         : fallbackData;
 
@@ -75,20 +79,22 @@ function CreateReview() {
         });
     }
 
-    const totalReviews = establishmentData.totalReviews || 0;
-    const starCounts = [
-        establishmentData.oneStar || 0,
-        establishmentData.twoStar || 0,
-        establishmentData.threeStar || 0,
-        establishmentData.fourStar || 0,
-        establishmentData.fiveStar || 0,
-    ];
+    const starCounts = selectedReviews.reduce(
+        (acc, rev) => {
+            const normalizedRating = Number(rev?.rating || 0);
+            if (normalizedRating >= 1 && normalizedRating <= 5) {
+                acc[normalizedRating - 1] += 1;
+            }
+            return acc;
+        },
+        [0, 0, 0, 0, 0]
+    );
 
-    const average = establishmentData.rating || (() => {
-        if (!totalReviews) return 0;
-        const sum = 5 * starCounts[4] + 4 * starCounts[3] + 3 * starCounts[2] + 2 * starCounts[1] + 1 * starCounts[0];
-        return sum / totalReviews;
-    })();
+    const totalReviews = selectedReviews.length || establishmentData.totalReviews || 0;
+
+    const average = selectedReviews.length > 0
+        ? selectedReviews.reduce((sum, rev) => sum + Number(rev?.rating || 0), 0) / selectedReviews.length
+        : Number(establishmentData.rating || 0);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -104,7 +110,13 @@ function CreateReview() {
 
         // Redirect after a short delay
         setTimeout(() => {
-            navigate("/");
+            if (selectedEstablishment?._id) {
+                navigate(`/establishment/${selectedEstablishment._id}`, {
+                    state: { establishment: selectedEstablishment },
+                });
+            } else {
+                navigate("/browse");
+            }
         }, 2000);
     };
 
@@ -122,6 +134,9 @@ function CreateReview() {
                 <div className="d-flex flex-column align-items-left w-75">
                     <h5 className="text-dlsu-dark pt-5">CREATE REVIEW</h5>
                     <h1 className="mb-4">Tell us your story</h1>
+                    <p className="text-muted mb-4">
+                        Establishment selected: <span className="fw-bold text-dark">{establishmentData.name}</span>
+                    </p>
                 </div>
                 <div className="d-flex flex-row justify-content-between w-75">
                     <div className="custom-card border p-3 d-flex align-items-center justify-content-center mb-5" style={{ width: "60%", height: "700px" }}>
@@ -195,7 +210,18 @@ function CreateReview() {
                     </div>
 
                     <div className="custom-card border shadow-sm" style={{ width: "35%", height: "fit-content" }}>
-                        <div className="custom-bg pt-4 ps-4 pe-4 pb-2" style={{ height: "150px", borderRadius: "20px 20px 0 0" }}>
+                        <div
+                            className="custom-bg pt-4 ps-4 pe-4 pb-2"
+                            style={{
+                                height: "150px",
+                                borderRadius: "20px 20px 0 0",
+                                backgroundImage: establishmentData.image
+                                    ? `linear-gradient(rgba(0, 24, 12, 0.55), rgba(0, 24, 12, 0.55)), url(${establishmentData.image})`
+                                    : undefined,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                            }}
+                        >
                             <div className="d-flex flex-column h-100 justify-content-end">
                                 <div className="category-box d-inline-flex justify-content-center align-items-center mb-2" style={{ width: "fit-content", padding: "4px 12px" }}>
                                     <p className="text-white mb-0 fw-bold" style={{ fontSize: 12 }}>{(establishmentData.type || "ESTABLISHMENT").toUpperCase()}</p>
@@ -232,6 +258,7 @@ function CreateReview() {
                                             <div className="progress flex-grow-1" style={{ height: "8px", backgroundColor: "#f1f2f6" }}>
                                                 <div className="progress-bar bg-success" style={{ width: `${percent}%` }}></div>
                                             </div>
+                                            <span className="ms-2 small text-muted" style={{ width: "36px", textAlign: "right" }}>{starsCount}</span>
                                         </div>
                                     );
                                 })}

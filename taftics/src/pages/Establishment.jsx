@@ -135,7 +135,7 @@ function Establishment() {
 
                         {/* Right Column: Sidebar */}
                         <div style={{ width: "32%" }}>
-                            <EstablishmentSidebar establishment={establishment} />
+                            <EstablishmentSidebar establishment={establishment} reviews={reviews} />
                         </div>
                     </div>
                 </div>
