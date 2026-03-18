@@ -1,0 +1,51 @@
+[
+  {
+    "_id": { "$oid": "65f300000000000000000001" },
+    "reviewId": { "$oid": "65f200000000000000000007" },
+    "userId": { "$oid": "65f100000000000000000002" },
+    "text": "Totally agree about the liquid cheese sauce!",
+    "date": "2026-03-17"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000002" },
+    "reviewId": { "$oid": "65f200000000000000000007" },
+    "userId": { "$oid": "65f100000000000000000003" },
+    "text": "It's my favorite too! <3",
+    "date": "2026-01-12"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000003" },
+    "reviewId": { "$oid": "65f200000000000000000001" },
+    "userId": { "$oid": "65f100000000000000000004" },
+    "text": "I'll try this laundry shop next time!",
+    "date": "2026-07-17"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000004" },
+    "reviewId": { "$oid": "65f200000000000000000007" },
+    "userId": { "$oid": "65f100000000000000000005" },
+    "text": "Do they still offer the extra bacon bits for 10 pesos?",
+    "date": "2026-03-18"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000005" },
+    "reviewId": { "$oid": "65f200000000000000000012" },
+    "userId": { "$oid": "65f100000000000000000002" },
+    "text": "The Wi-Fi here is actually decent for studying if you go before 10 AM.",
+    "date": "2026-03-19"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000006" },
+    "reviewId": { "$oid": "65f200000000000000000007" },
+    "userId": { "$oid": "65f100000000000000000006" },
+    "text": "Best comfort food during hell week, honestly.",
+    "date": "2026-03-19"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000007" },
+    "reviewId": { "$oid": "65f200000000000000000003" },
+    "userId": { "$oid": "65f100000000000000000001" },
+    "text": "Thanks for the recommendation! The portion size was huge.",
+    "date": "2026-03-20"
+  }
+]
