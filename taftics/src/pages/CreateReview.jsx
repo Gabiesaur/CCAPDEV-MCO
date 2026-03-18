@@ -1,9 +1,10 @@
 import React from "react";
 import { Star, CheckCircle2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 function CreateReview() {
     const navigate = useNavigate();
+    const location = useLocation();
     const stars = Array(5).fill(0);
     const [rating, setRating] = React.useState(0);
     const [hover, setHover] = React.useState(0);
@@ -20,16 +21,21 @@ function CreateReview() {
         setTimeout(() => setShowToast(false), 3000);
     };
 
-    const dummyData = {
-        name: "De La Salle University",
-        type: "Laundry",
-        fiveStar: 13,
-        fourStar: 3,
-        threeStar: 1,
-        twoStar: 2,
-        oneStar: 1,
-        totalReviews: 20,
-    };
+    const selectedEstablishment = location.state?.establishment;
+
+    const establishmentData = selectedEstablishment
+        ? {
+              name: selectedEstablishment.name || "Unknown Establishment",
+              type: selectedEstablishment.category || "Establishment",
+              rating: selectedEstablishment.rating ?? 0,
+              totalReviews: selectedEstablishment.reviewCount ?? 0,
+              fiveStar: selectedEstablishment.fiveStar ?? 0,
+              fourStar: selectedEstablishment.fourStar ?? 0,
+              threeStar: selectedEstablishment.threeStar ?? 0,
+              twoStar: selectedEstablishment.twoStar ?? 0,
+              oneStar: selectedEstablishment.oneStar ?? 0,
+          }
+        : fallbackData;
 
     const handleClick = (index) => {
         setRating(index + 1);
@@ -69,11 +75,19 @@ function CreateReview() {
         });
     }
 
-    const average = (() => {
-        const total = dummyData.totalReviews || 0;
-        if (!total) return 0;
-        const sum = 5 * (dummyData.fiveStar || 0) + 4 * (dummyData.fourStar || 0) + 3 * (dummyData.threeStar || 0) + 2 * (dummyData.twoStar || 0) + 1 * (dummyData.oneStar || 0);
-        return sum / total;
+    const totalReviews = establishmentData.totalReviews || 0;
+    const starCounts = [
+        establishmentData.oneStar || 0,
+        establishmentData.twoStar || 0,
+        establishmentData.threeStar || 0,
+        establishmentData.fourStar || 0,
+        establishmentData.fiveStar || 0,
+    ];
+
+    const average = establishmentData.rating || (() => {
+        if (!totalReviews) return 0;
+        const sum = 5 * starCounts[4] + 4 * starCounts[3] + 3 * starCounts[2] + 2 * starCounts[1] + 1 * starCounts[0];
+        return sum / totalReviews;
     })();
 
     const handleSubmit = (e) => {
@@ -184,16 +198,16 @@ function CreateReview() {
                         <div className="custom-bg pt-4 ps-4 pe-4 pb-2" style={{ height: "150px", borderRadius: "20px 20px 0 0" }}>
                             <div className="d-flex flex-column h-100 justify-content-end">
                                 <div className="category-box d-inline-flex justify-content-center align-items-center mb-2" style={{ width: "fit-content", padding: "4px 12px" }}>
-                                    <p className="text-white mb-0 fw-bold" style={{ fontSize: 12 }}>{dummyData.type.toUpperCase()}</p>
+                                    <p className="text-white mb-0 fw-bold" style={{ fontSize: 12 }}>{(establishmentData.type || "ESTABLISHMENT").toUpperCase()}</p>
                                 </div>
-                                <h3 className="text-white fw-bold mb-3">{dummyData.name}</h3>
+                                <h3 className="text-white fw-bold mb-3">{establishmentData.name}</h3>
                             </div>
                         </div>
                         <div className="p-4 d-flex flex-column gap-3 sticky-top">
                             <div className="d-flex align-items-center gap-3">
                                 <div className="d-flex flex-row align-items-center gap-2">
-                                    <div className="fw-bold fs-3 text-dlsu-dark">{average.toFixed(1)}</div>
-                                    <div className="text-muted">({dummyData.totalReviews} reviews)</div>
+                                    <div className="fw-bold fs-3 text-dlsu-dark">{average ? average.toFixed(1) : "0.0"}</div>
+                                    <div className="text-muted">({totalReviews} reviews)</div>
                                 </div>
 
                                 <div className="d-flex align-items-center">
@@ -210,8 +224,8 @@ function CreateReview() {
 
                             <div className="d-flex flex-column gap-2 mt-2">
                                 {[5, 4, 3, 2, 1].map(num => {
-                                    const starsCount = [dummyData.oneStar, dummyData.twoStar, dummyData.threeStar, dummyData.fourStar, dummyData.fiveStar][num - 1];
-                                    const percent = (starsCount / dummyData.totalReviews * 100) || 0;
+                                    const starsCount = starCounts[num - 1];
+                                    const percent = (starsCount / (totalReviews || 1) * 100) || 0;
                                     return (
                                         <div key={num} className="d-flex flex-row align-items-center">
                                             <span className="me-2 small fw-bold" style={{ width: "15px" }}>{num}</span>

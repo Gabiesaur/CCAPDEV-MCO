@@ -223,6 +223,26 @@ app.get('/api/users/:username', async (req, res) => {
   }
 });
 
+// --- GET SPECIFIC REVIEW (Updated for Comments) ---
+app.get('/api/reviews/:id', async (req, res) => {
+  try {
+    const review = await Review.findById(req.params.id)
+      .populate('userId', 'username name avatar')
+      .populate('establishmentId', 'name location')
+      // THIS IS NEW: It grabs the user info for every comment!
+      .populate('comments.userId', 'username name avatar'); 
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
+    }
+
+    res.json(review);
+  } catch (error) {
+    console.error("Error fetching review:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
 // --- START SERVER ---
 app.listen(PORT, () => { //
   console.log(`🚀 Server running on http://localhost:${PORT}`); //

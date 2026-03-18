@@ -112,6 +112,7 @@ function App() {
           <Route path="/about" element={<AboutUsPage />} />
           <Route path="/browse" element={<BrowsePage />} />
           <Route path="/review" element={<ReviewPage />} />
+          <Route path="/review/:id" element={<ReviewPage />} />
           <Route path="/create" element={<CreateReviewPage />} />
 
           <Route path="/establishment/:id" element={<EstablishmentPage />} />
