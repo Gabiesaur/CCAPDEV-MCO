@@ -1,6 +1,5 @@
 [
   {
-    "_id": { "$oid": "65f000000000000000000001" },
     "name": "National Book Store",
     "category": "School Supplies",
     "location": "Inside Yuchengco Hall",
@@ -15,7 +14,6 @@
     "address": "Yuchengco Hall, De La Salle University, Taft Ave, Manila"
   },
   {
-    "_id": { "$oid": "65f000000000000000000002" },
     "name": "Anytime Fitness",
     "category": "Fitness",
     "location": "Inside R Square",
@@ -30,7 +28,6 @@
     "address": "R Square Mall, Taft Ave, Malate, Manila"
   },
   {
-    "_id": { "$oid": "65f000000000000000000003" },
     "name": "Ate Rica's Bacsilog",
     "category": "Food",
     "location": "Agno Food Court",
@@ -45,7 +42,6 @@
     "address": "Agno Food Court, De La Salle University, Taft Ave, Manila"
   },
   {
-    "_id": { "$oid": "65f000000000000000000004" },
     "name": "Green Residences",
     "category": "Dorms/Condos",
     "location": "Right beside DLSU",
@@ -60,7 +56,6 @@
     "address": "Taft Ave, Malate, Manila, Metro Manila"
   },
   {
-    "_id": { "$oid": "65f000000000000000000005" },
     "name": "ZUS Coffee",
     "category": "Coffee",
     "location": "Inside Green Mall",
@@ -75,7 +70,6 @@
     "address": "Ground Floor, Green Mall, Taft Ave, Manila"
   },
   {
-    "_id": { "$oid": "65f000000000000000000006" },
     "name": "De La Salle Laundry",
     "category": "Laundry",
     "location": "Near EGI",
