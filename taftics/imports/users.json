@@ -1,5 +1,6 @@
 [
   {
+    "_id": { "$oid": "65f100000000000000000001" },
     "username": "leelanczers",
     "password": "password123",
     "name": "Leelancze Pacomio",
@@ -13,6 +14,7 @@
     "isAdmin": true
   },
   {
+    "_id": { "$oid": "65f100000000000000000002" },
     "username": "archer_dc",
     "password": "password123",
     "name": "Archer Dela Cruz",
@@ -26,6 +28,7 @@
     "isAdmin": false
   },
   {
+    "_id": { "$oid": "65f100000000000000000003" },
     "username": "pro_student",
     "password": "password123",
     "name": "Maria Santos",

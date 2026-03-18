@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
 const EstablishmentSchema = new mongoose.Schema({
+    estNum: String,
     name: String,
     category: String,
     location: String,
