@@ -183,6 +183,46 @@ app.get('/api/establishments/:id/reviews', async (req, res) => {
   }
 });
 
+// --- GET ALL USERS ---
+// Used by App.jsx to load users for the Browse/Public Profile features
+app.get('/api/users', async (req, res) => {
+  try {
+    // .find({}) tells MongoDB to get every single user document.
+    // .select('-password') is CRITICAL: it strips the password field out 
+    // before sending the data to the frontend so your users stay secure!
+    const users = await User.find({}).select('-password'); 
+    
+    res.json(users);
+
+  } catch (error) {
+    console.error("Error fetching all users:", error);
+    res.status(500).json({ message: "Server error while fetching users." });
+  }
+});
+
+// --- GET SPECIFIC USER PROFILE ---
+app.get('/api/users/:username', async (req, res) => {
+  try {
+    // Grab the username from the URL (e.g., "leelanczers" from /api/users/leelanczers)
+    const targetUsername = req.params.username;
+
+    // Search the database for that exact username, excluding the password field
+    const user = await User.findOne({ username: targetUsername }).select('-password');
+
+    // If no user is found, send back a 404 error
+    if (!user) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // If found, send the user data back to React!
+    res.json({ success: true, user: user });
+
+  } catch (error) {
+    console.error("Error fetching user profile:", error);
+    res.status(500).json({ success: false, message: "Server error while fetching profile." });
+  }
+});
+
 // --- START SERVER ---
 app.listen(PORT, () => { //
   console.log(`🚀 Server running on http://localhost:${PORT}`); //
