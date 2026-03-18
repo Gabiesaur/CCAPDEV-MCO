@@ -311,8 +311,8 @@ app.put('/api/users/:id/avatar', async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id, 
       { avatar: avatarUrl },
-      { new: true }
-    ).select('-password'); // Hide password!
+      { returnDocument: 'after' } // <-- Replaced { new: true }
+    ).select('-password');
 
     if (!updatedUser) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -324,6 +324,30 @@ app.put('/api/users/:id/avatar', async (req, res) => {
   } catch (error) {
     console.error("Avatar upload error:", error);
     res.status(500).json({ success: false, message: "Server error during upload" });
+  }
+});
+
+// --- UPDATE USER BIO ---
+app.put('/api/users/:id/bio', async (req, res) => {
+  try {
+    const { bio } = req.body; // Extract the new bio from the request
+
+    // Find the user by ID and update the bio field
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id, 
+      { bio: bio },
+      { returnDocument: 'after' } // <-- Replaced { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user: updatedUser });
+
+  } catch (error) {
+    console.error("Bio update error:", error);
+    res.status(500).json({ success: false, message: "Server error updating bio" });
   }
 });
 
