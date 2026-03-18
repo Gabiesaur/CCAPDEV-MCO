@@ -90,9 +90,18 @@ export default function MyProfilePage({ user, setUser }) {
       <ImageUploadModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        onUploadSuccess={() =>
-          triggerToast("Profile picture updated successfully!", "success")
-        }
+        userId={user._id} // Pass the ID down to the modal!
+        onUploadSuccess={(updatedUser) => {
+          // 1. Update the global user state (this makes the image change instantly!)
+          setUser(updatedUser);
+          
+          // 2. Update localStorage so the image stays if they refresh the page
+          localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+          
+          // 3. Close modal and show success toast
+          setIsModalOpen(false);
+          triggerToast("Profile picture updated successfully!", "success");
+        }}
       />
 
       {showToast && (

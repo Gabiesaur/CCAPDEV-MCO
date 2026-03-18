@@ -1,10 +1,11 @@
 import React from "react";
 import { Star, CheckCircle2 } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 
 function CreateReview() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user: currentUser } = useOutletContext() || {};
     const stars = Array(5).fill(0);
     const [rating, setRating] = React.useState(0);
     const [hover, setHover] = React.useState(0);
@@ -22,6 +23,14 @@ function CreateReview() {
     };
 
     const selectedEstablishment = location.state?.establishment;
+    const selectedReviews = Array.isArray(location.state?.reviews) ? location.state.reviews : [];
+
+    const fallbackData = {
+        name: "Select an establishment",
+        type: "Establishment",
+        rating: 0,
+        totalReviews: 0,
+    };
 
     const establishmentData = selectedEstablishment
         ? {
@@ -29,11 +38,7 @@ function CreateReview() {
               type: selectedEstablishment.category || "Establishment",
               rating: selectedEstablishment.rating ?? 0,
               totalReviews: selectedEstablishment.reviewCount ?? 0,
-              fiveStar: selectedEstablishment.fiveStar ?? 0,
-              fourStar: selectedEstablishment.fourStar ?? 0,
-              threeStar: selectedEstablishment.threeStar ?? 0,
-              twoStar: selectedEstablishment.twoStar ?? 0,
-              oneStar: selectedEstablishment.oneStar ?? 0,
+                            image: selectedEstablishment.image || "",
           }
         : fallbackData;
 
@@ -75,37 +80,74 @@ function CreateReview() {
         });
     }
 
-    const totalReviews = establishmentData.totalReviews || 0;
-    const starCounts = [
-        establishmentData.oneStar || 0,
-        establishmentData.twoStar || 0,
-        establishmentData.threeStar || 0,
-        establishmentData.fourStar || 0,
-        establishmentData.fiveStar || 0,
-    ];
+    const starCounts = selectedReviews.reduce(
+        (acc, rev) => {
+            const normalizedRating = Number(rev?.rating || 0);
+            if (normalizedRating >= 1 && normalizedRating <= 5) {
+                acc[normalizedRating - 1] += 1;
+            }
+            return acc;
+        },
+        [0, 0, 0, 0, 0]
+    );
 
-    const average = establishmentData.rating || (() => {
-        if (!totalReviews) return 0;
-        const sum = 5 * starCounts[4] + 4 * starCounts[3] + 3 * starCounts[2] + 2 * starCounts[1] + 1 * starCounts[0];
-        return sum / totalReviews;
-    })();
+    const totalReviews = selectedReviews.length || establishmentData.totalReviews || 0;
 
-    const handleSubmit = (e) => {
+    const average = selectedReviews.length > 0
+        ? selectedReviews.reduce((sum, rev) => sum + Number(rev?.rating || 0), 0) / selectedReviews.length
+        : Number(establishmentData.rating || 0);
+
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validation (Optional but good practice)
+        // 1. Basic Validation
         if (rating === 0) {
             alert("Please provide a rating.");
             return;
         }
+        if (!currentUser) {
+            alert("You must be logged in to post a review.");
+            return;
+        }
+        if (!selectedEstablishment?._id) {
+            alert("Please choose an establishment before submitting this review.");
+            return;
+        }
 
-        // Show toast
-        triggerToast("Review submitted successfully! Redirecting...");
+        // 2. Prepare FormData (required for file uploads)
+        const formData = new FormData();
+        formData.append("userId", currentUser._id);
+        formData.append("establishmentId", selectedEstablishment._id);
+        formData.append("rating", rating);
+        formData.append("title", titleText);
+        formData.append("text", reviewText);
 
-        // Redirect after a short delay
-        setTimeout(() => {
-            navigate("/");
-        }, 2000);
+        // Append each selected image file
+        images.forEach((imgObj) => {
+            formData.append("images", imgObj.file);
+        });
+
+        try {
+            const response = await fetch("http://localhost:5000/api/reviews", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errResult = await response.json().catch(() => ({}));
+                throw new Error(errResult.message || "Failed to submit review.");
+            }
+
+            const result = await response.json();
+
+            triggerToast("Review submitted successfully! Redirecting...");
+            setTimeout(() => {
+                navigate(`/establishment/${selectedEstablishment._id}`);
+            }, 2000);
+        } catch (err) {
+            console.error("Submission error:", err);
+            alert(err.message || "Something went wrong while submitting your review.");
+        }
     };
 
     return (
@@ -122,6 +164,9 @@ function CreateReview() {
                 <div className="d-flex flex-column align-items-left w-75">
                     <h5 className="text-dlsu-dark pt-5">CREATE REVIEW</h5>
                     <h1 className="mb-4">Tell us your story</h1>
+                    <p className="text-muted mb-4">
+                        Establishment selected: <span className="fw-bold text-dark">{establishmentData.name}</span>
+                    </p>
                 </div>
                 <div className="d-flex flex-row justify-content-between w-75">
                     <div className="custom-card border p-3 d-flex align-items-center justify-content-center mb-5" style={{ width: "60%", height: "700px" }}>
@@ -195,7 +240,18 @@ function CreateReview() {
                     </div>
 
                     <div className="custom-card border shadow-sm" style={{ width: "35%", height: "fit-content" }}>
-                        <div className="custom-bg pt-4 ps-4 pe-4 pb-2" style={{ height: "150px", borderRadius: "20px 20px 0 0" }}>
+                        <div
+                            className="custom-bg pt-4 ps-4 pe-4 pb-2"
+                            style={{
+                                height: "150px",
+                                borderRadius: "20px 20px 0 0",
+                                backgroundImage: establishmentData.image
+                                    ? `linear-gradient(rgba(0, 24, 12, 0.55), rgba(0, 24, 12, 0.55)), url(${establishmentData.image})`
+                                    : undefined,
+                                backgroundSize: "cover",
+                                backgroundPosition: "center",
+                            }}
+                        >
                             <div className="d-flex flex-column h-100 justify-content-end">
                                 <div className="category-box d-inline-flex justify-content-center align-items-center mb-2" style={{ width: "fit-content", padding: "4px 12px" }}>
                                     <p className="text-white mb-0 fw-bold" style={{ fontSize: 12 }}>{(establishmentData.type || "ESTABLISHMENT").toUpperCase()}</p>
@@ -224,7 +280,7 @@ function CreateReview() {
 
                             <div className="d-flex flex-column gap-2 mt-2">
                                 {[5, 4, 3, 2, 1].map(num => {
-                                    const starsCount = starCounts[num - 1];
+                                    const starsCount = starCounts[5 - num];
                                     const percent = (starsCount / (totalReviews || 1) * 100) || 0;
                                     return (
                                         <div key={num} className="d-flex flex-row align-items-center">
@@ -232,6 +288,7 @@ function CreateReview() {
                                             <div className="progress flex-grow-1" style={{ height: "8px", backgroundColor: "#f1f2f6" }}>
                                                 <div className="progress-bar bg-success" style={{ width: `${percent}%` }}></div>
                                             </div>
+                                            <span className="ms-2 small text-muted" style={{ width: "36px", textAlign: "right" }}>{starsCount}</span>
                                         </div>
                                     );
                                 })}

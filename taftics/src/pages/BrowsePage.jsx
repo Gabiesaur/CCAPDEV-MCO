@@ -147,6 +147,7 @@ const BrowsePage = () => {
                   <EstablishmentCard
                     key={store._id}       // ✅ CHANGED: MongoDB uses _id
                     id={store._id}        // ✅ CHANGED: Passing the MongoDB ID to the card
+                    establishment={store}
                     name={store.name}
                     category={store.category}
                     location={store.location}

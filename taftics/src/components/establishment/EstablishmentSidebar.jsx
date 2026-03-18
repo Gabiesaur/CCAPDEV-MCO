@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Star } from "lucide-react";
 import addressIcon from "../../assets/address.png"; // Adjusted path import
 
-export default function EstablishmentSidebar({ establishment }) {
+export default function EstablishmentSidebar({ establishment, reviews = [] }) {
     return (
         <div
             className="custom-card d-flex flex-column p-4"
@@ -85,7 +85,7 @@ export default function EstablishmentSidebar({ establishment }) {
 
             <Link
                 to="/create"
-                state={{ establishment }}
+                state={{ establishment, reviews }}
                 className="button btn mt-auto d-flex align-items-center justify-content-center py-2" // mt-auto pushes to bottom
                 style={{ background: "#00441B", border: "none", color: "white" }}
             >

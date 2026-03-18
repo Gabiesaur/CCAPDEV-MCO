@@ -1,54 +1,99 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
-import { Search } from "lucide-react";
+import { Search, Star, MapPin, ThumbsUp, ThumbsDown } from "lucide-react";
 
 import EstablishmentCardSmall from "../components/landing/EstablishmentCardSmall";
-import ProfileReviews from "../components/profile/ProfileReviews";
 
 // ❌ REMOVED: import { ESTABLISHMENTS } from "../data/mockData";
 
 const LandingPage = () => {
   const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
 
+  const getRelativeDate = (dateString) => {
+    if (!dateString) return "";
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInSeconds = Math.floor((now - date) / 1000);
+
+    if (diffInSeconds < 60) return "Just now";
+    const diffInMinutes = Math.floor(diffInSeconds / 60);
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d ago`;
+
+    return date.toLocaleDateString();
+  };
+
   // 1. NEW: State to hold top rated establishments and loading status
   const [topRatedEstablishments, setTopRatedEstablishments] = useState([]);
+  const [showcaseReviews, setShowcaseReviews] = useState([]);
   const [loading, setLoading] = useState(true);
 
   // 2. NEW: Fetch, sort, and slice data from the database
   useEffect(() => {
-    fetch('http://localhost:5000/api/establishments')
-      .then(res => res.json())
-      .then(data => {
-        // Sort by rating (highest first) and grab the top 3
-        const topRated = data
-          .sort((a, b) => b.rating - a.rating)
-          .slice(0, 3);
-        
+    const fetchLandingData = async () => {
+      try {
+        const res = await fetch('http://localhost:5000/api/establishments');
+        const data = await res.json();
+
+        const sortedByRating = [...data].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        const topRated = sortedByRating.slice(0, 3);
         setTopRatedEstablishments(topRated);
+
+        const reviewResults = await Promise.all(
+          sortedByRating.map(async (est) => {
+            try {
+              const reviewsRes = await fetch(`http://localhost:5000/api/establishments/${est._id}/reviews`);
+              if (!reviewsRes.ok) return [];
+
+              const reviews = await reviewsRes.json();
+              if (!Array.isArray(reviews)) return [];
+
+              return reviews.map((review) => ({ review, establishment: est }));
+            } catch {
+              return [];
+            }
+          })
+        );
+
+        const allReviewPairs = reviewResults.flat();
+        const shuffledReviewPairs = [...allReviewPairs].sort(() => Math.random() - 0.5);
+        const selectedPairs = shuffledReviewPairs.slice(0, 3);
+
+        const selectedShowcaseReviews = selectedPairs.map(({ review, establishment }) => ({
+          id: review._id,
+          rating: Number(review.rating || 0),
+          date: getRelativeDate(review.date),
+          title: review.title || "Untitled Review",
+          body: review.comment || review.text || "",
+          helpfulVotes: Number(review.helpfulVotes || 0),
+          unhelpfulVotes: Number(review.unhelpfulVotes || 0),
+          establishment: {
+            id: establishment._id,
+            name: establishment.name,
+            location: establishment.location,
+            image: establishment.image,
+          },
+          user: review.userId?.name || review.userId?.username || "Anonymous",
+          avatar: review.userId?.avatar || "https://ui-avatars.com/api/?name=Anonymous&background=0D8ABC&color=fff",
+          username: review.userId?.username || null,
+          rawReview: review,
+          rawEstablishment: establishment,
+        }));
+
+        setShowcaseReviews(selectedShowcaseReviews);
+
         setLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error("Failed to fetch top establishments:", err);
         setLoading(false);
-      });
-  }, []);
+      }
+    };
 
-  // Define a mock review object for the landing page showcase
-  const showcaseReview = {
-    rating: 5,
-    date: "2 days ago",
-    title: "The best budget friendly meals on campus!",
-    body: "Ate Rica's remains the gold standard for a quick and affordable meal between classes at Andrew. That signature liquid cheese sauce combined with the smoky bacon bits is an elite flavor combination that never misses. Even during the peak 12:00 PM rush, the service is incredibly efficient so you won't be late for your next lecture. It is the perfect comfort food for those long study sessions or stressful midterms week. I always get extra rice whenever I eat here. Every Archer needs to experience this Taft staple at least once before they graduate.",
-    establishment: {
-      id: "65f000000000000000000003", // ✅ UPDATED: Now uses the MongoDB ObjectId for Ate Rica's
-      name: "Ate Rica's Bacsilog",
-      location: "Agno Food Court",
-      image: "https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg"
-    },
-    user: "Leelancze Pacomio",
-    avatar: "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff",
-    username: "leelanczers"
-  };
+    fetchLandingData();
+  }, []);
 
   return (
     <div className="min-vh-100 bg-white">
@@ -140,8 +185,105 @@ const LandingPage = () => {
           Help others in the <span className="text-dlsu-dark">DLSU</span> community
         </h2>
 
-        <div className="mx-auto text-start" style={{ maxWidth: "800px" }}>
-          <ProfileReviews review={showcaseReview} />
+        <div className="mx-auto text-start" style={{ maxWidth: "1200px" }}>
+          {loading ? (
+            <p className="text-muted">Loading featured review...</p>
+          ) : showcaseReviews.length > 0 ? (
+            <div className="d-flex gap-4 overflow-auto pb-2" style={{ scrollSnapType: "x mandatory" }}>
+              {showcaseReviews.map((review) => (
+                <article
+                  key={review.id}
+                  className="custom-card p-4 flex-shrink-0"
+                  style={{ width: "380px", scrollSnapAlign: "start" }}
+                >
+                  <div className="d-flex align-items-center mb-3">
+                    <img
+                      src={review.avatar || "https://ui-avatars.com/api/?name=User&background=random"}
+                      alt="avatar"
+                      className="rounded-circle me-3 object-cover"
+                      style={{ width: "40px", height: "40px" }}
+                    />
+                    <div>
+                      <Link
+                        to={review.username ? `/profile/${review.username}` : "#"}
+                        className="fw-bold text-dark text-decoration-none"
+                        style={{ display: "block", lineHeight: "1.2" }}
+                      >
+                        {review.user}
+                      </Link>
+                    </div>
+                  </div>
+
+                  <div className="d-flex justify-content-between mb-2">
+                    <div className="d-flex gap-1 text-dlsu-primary">
+                      {[...Array(5)].map((_, i) => (
+                        <Star
+                          key={i}
+                          size={16}
+                          fill={i < review.rating ? "currentColor" : "none"}
+                          className={i < review.rating ? "text-dlsu-primary" : "text-muted opacity-25"}
+                        />
+                      ))}
+                    </div>
+                    <small className="text-muted">{review.date}</small>
+                  </div>
+
+                  <Link
+                    to={`/review/${review.id}`}
+                    state={{ review: review.rawReview, establishment: review.rawEstablishment }}
+                    className="text-decoration-none"
+                  >
+                    <h5 className="fw-bold text-dlsu-dark mb-2 hover-underline">{review.title}</h5>
+                  </Link>
+
+                  <p className="text-secondary small mb-3" style={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 3,
+                    WebkitBoxOrient: "vertical",
+                  }}>
+                    {review.body}
+                  </p>
+
+                  <div className="d-flex align-items-center gap-3 mb-3">
+                    <span className="d-inline-flex align-items-center text-muted small">
+                      <ThumbsUp size={14} className="me-1" />
+                      {review.helpfulVotes}
+                    </span>
+                    <span className="d-inline-flex align-items-center text-muted small">
+                      <ThumbsDown size={14} className="me-1" />
+                      {review.unhelpfulVotes}
+                    </span>
+                  </div>
+
+                  <Link
+                    to={`/establishment/${review.establishment.id}`}
+                    state={{ establishment: review.rawEstablishment }}
+                    className="btn btn-light border rounded-pill d-inline-flex align-items-center pe-3 ps-1 py-1 text-decoration-none"
+                    style={{ maxWidth: "100%" }}
+                  >
+                    <img
+                      src={review.establishment.image}
+                      alt="shop"
+                      className="rounded-circle me-2 object-cover"
+                      style={{ width: "28px", height: "28px" }}
+                    />
+                    <div className="lh-1 text-start">
+                      <h6 className="fw-bold mb-0 text-dark" style={{ fontSize: "0.8rem" }}>
+                        {review.establishment.name}
+                      </h6>
+                      <small className="text-muted d-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
+                        <MapPin size={10} /> {review.establishment.location}
+                      </small>
+                    </div>
+                  </Link>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <p className="text-muted">No reviews available yet.</p>
+          )}
         </div>
 
         <div>

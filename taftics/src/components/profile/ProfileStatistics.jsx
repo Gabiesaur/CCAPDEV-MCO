@@ -1,18 +1,47 @@
 import { useState } from "react";
-import { Share2, Edit2 } from "lucide-react";
+import { Share2, Edit2, Loader2 } from "lucide-react";
 
 export default function ProfileStatistics({ user, isOwnProfile, setUser, onShareSuccess }) {
   // Bio Edit State
   const [isEditing, setIsEditing] = useState(false);
   const [bioInput, setBioInput] = useState(user?.bio || "");
+  const [isSaving, setIsSaving] = useState(false); // New state for loading UI
 
-  const handleSaveBio = () => {
-    if (setUser) {
-      const updatedUser = { ...user, bio: bioInput };
-      setUser(updatedUser);
-      localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+  const handleSaveBio = async () => {
+    // Prevent saving if there's no user ID
+    if (!user?._id) return;
+
+    setIsSaving(true);
+
+    try {
+      // 1. Send the updated bio to the backend
+      const response = await fetch(`http://localhost:5000/api/users/${user._id}/bio`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ bio: bioInput }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // 2. Update React State and LocalStorage ONLY if backend succeeds
+        if (setUser) {
+          const updatedUser = { ...user, bio: bioInput };
+          setUser(updatedUser);
+          localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+        }
+        setIsEditing(false);
+      } else {
+        alert(data.message || "Failed to save bio.");
+      }
+    } catch (error) {
+      console.error("Error saving bio:", error);
+      alert("Network error. Please make sure the server is running.");
+    } finally {
+      setIsSaving(false);
     }
-    setIsEditing(false);
   };
 
   const handleCancel = () => {
@@ -45,37 +74,39 @@ export default function ProfileStatistics({ user, isOwnProfile, setUser, onShare
         <div className="mb-4">
           {isOwnProfile ? (
             <>
-              <label className="fw-bold mb-1" style={{ fontSize: "0.85rem" }}>
-                Bio
-              </label>
               {isEditing ? (
-                <div className="d-flex flex-column gap-2">
+                <div className="position-relative">
                   <textarea
-                    className="form-control form-control-sm"
+                    className="form-control text-sm mb-2"
                     rows="3"
                     value={bioInput}
                     onChange={(e) => setBioInput(e.target.value)}
-                    placeholder="Tell us about yourself..."
+                    placeholder="Write a short bio..."
+                    autoFocus
+                    disabled={isSaving}
                   />
-                  <div className="d-flex gap-2">
+                  <div className="d-flex justify-content-end gap-2">
                     <button
-                      className="btn btn-sm btn-dlsu-dark flex-grow-1"
-                      onClick={handleSaveBio}
-                    >
-                      Save
-                    </button>
-                    <button
-                      className="btn btn-sm btn-light border flex-grow-1"
+                      className="btn btn-sm btn-light border"
                       onClick={handleCancel}
+                      disabled={isSaving}
                     >
                       Cancel
+                    </button>
+                    <button
+                      className="btn btn-sm btn-success d-flex align-items-center gap-1"
+                      onClick={handleSaveBio}
+                      disabled={isSaving}
+                    >
+                      {isSaving ? <Loader2 size={14} className="spin" /> : null}
+                      {isSaving ? "Saving..." : "Save"}
                     </button>
                   </div>
                 </div>
               ) : (
                 <div className="position-relative group">
                   <p className="small text-muted mb-1 fst-italic">
-                    {user?.bio || "No bio yet."}
+                    {user?.bio ? `"${user.bio}"` : "No bio yet. Add one!"}
                   </p>
                   <button
                     className="btn btn-link p-0 text-decoration-none"
@@ -101,16 +132,16 @@ export default function ProfileStatistics({ user, isOwnProfile, setUser, onShare
           <Share2 size={16} /> Share Profile
         </button>
 
-        {/* Stats Grid - Follower count removed */}
+        {/* Stats Grid */}
         <div className="row text-center g-2 mb-3">
           <div className="col-6">
-            <h5 className="fw-bold mb-0">{user?.helpfulCount}</h5>
+            <h5 className="fw-bold mb-0">{user?.helpfulCount || 0}</h5>
             <small className="text-muted" style={{ fontSize: "0.75rem" }}>
               Helpful
             </small>
           </div>
           <div className="col-6">
-            <h5 className="fw-bold mb-0">{user?.contributions}</h5>
+            <h5 className="fw-bold mb-0">{user?.contributions || 0}</h5>
             <small className="text-muted" style={{ fontSize: "0.75rem" }}>
               Contributions
             </small>

@@ -8,7 +8,8 @@ const EstablishmentCard = ({
   location,
   rating,
   reviewCount,
-  image
+  image,
+  establishment
 }) => {
   return (
     <div
@@ -17,7 +18,7 @@ const EstablishmentCard = ({
     >
       {/* 1. Full-Width Header Image Wrapper */}
       <div className="mx-auto mb-4" style={{ height: '280px' }}>
-        <Link to={`/establishment/${id}`}>
+        <Link to={`/establishment/${id}`} state={{ establishment }}>
           <img
             src={image}
             className="w-100 h-100"
@@ -31,7 +32,7 @@ const EstablishmentCard = ({
       <div style={{ padding: '4px', marginBottom: '-8px' }}>
         <div className="align-items-start mb-4">
           <div>
-            <Link to={`/establishment/${id}`} className="d-block text-dark text-decoration-none fw-bold fs-4">{name}</Link>
+            <Link to={`/establishment/${id}`} state={{ establishment }} className="d-block text-dark text-decoration-none fw-bold fs-4">{name}</Link>
             <p className="opacity-50 fs-5">{category} • {location}</p>
           </div>
         </div>
@@ -45,7 +46,7 @@ const EstablishmentCard = ({
           </h1>
 
           <div className="text-end">
-            <Link to={`/establishment/${id}`} className="d-block text-dark text-decoration-none fw-bold fs-5">
+            <Link to={`/establishment/${id}`} state={{ establishment }} className="d-block text-dark text-decoration-none fw-bold fs-5">
               Write a review ↗
             </Link>
           </div>

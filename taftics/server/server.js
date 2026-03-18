@@ -15,7 +15,7 @@ app.use(cors()); //
 app.use(express.json()); // Allows the server to accept JSON data
 app.use(express.urlencoded({ extended: true })); //
 app.use(express.static('public')); //
-app.use(fileUpload()); //
+app.use(fileUpload( {parseNested: true} )); //
 
 // --- DATABASE CONNECTION ---
 const mongoUri = process.env.MONGO_URI; //
@@ -150,6 +150,54 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// Create review
+app.post('/api/reviews', async (req, res) => {
+  console.log("req.body:", req.body);   // Should show userId, rating, title, text
+  console.log("req.files:", req.files); // Should show uploaded files if any
+  try {
+    const { userId, establishmentId, rating, title, text } = req.body;
+
+    // 1. Process Images using express-fileupload
+    let imageUrls = [];
+    if (req.files && req.files.images) {
+      const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+      
+      for (const file of files) {
+        const fileName = `${Date.now()}_${file.name}`;
+        const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+        await file.mv(uploadPath);
+        imageUrls.push(`http://localhost:5000/uploads/${fileName}`);
+      }
+    }
+
+    // 2. Save to Database
+    const newReview = new Review({
+      userId,
+      establishmentId,
+      rating: Number(rating),
+      title,
+      text,
+      images: imageUrls,
+      date: new Date()
+    });
+
+    await newReview.save();
+
+    // 3. Update Establishment star counts automatically
+    const starFields = ["oneStar", "twoStar", "threeStar", "fourStar", "fiveStar"];
+    const fieldToUpdate = starFields[Number(rating) - 1];
+
+    await Establishment.findByIdAndUpdate(establishmentId, {
+      $inc: { [fieldToUpdate]: 1, totalReviews: 1 }
+    });
+
+    res.status(201).json({ success: true, review: newReview });
+  } catch (error) {
+    console.error("Error creating review:", error);
+    res.status(500).json({ success: false, message: "Failed to save review." });
+  }
+});
+
 // 1. GET SINGLE ESTABLISHMENT
 app.get('/api/establishments/:id', async (req, res) => {
   try {
@@ -240,6 +288,68 @@ app.get('/api/reviews/:id', async (req, res) => {
   } catch (error) {
     console.error("Error fetching review:", error);
     res.status(500).json({ message: "Server error" });
+  }
+});
+
+app.put('/api/users/:id/avatar', async (req, res) => {
+  try {
+    // 1. Check if a file was actually uploaded
+    if (!req.files || !req.files.avatar) {
+      return res.status(400).json({ success: false, message: "No file uploaded" });
+    }
+
+    const avatarFile = req.files.avatar;
+    const fileName = `${Date.now()}_${avatarFile.name}`;
+    const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+
+    // 2. Move the file to your public/uploads folder
+    await avatarFile.mv(uploadPath);
+    
+    // 3. Generate the new URL
+    const avatarUrl = `http://localhost:5000/uploads/${fileName}`;
+
+    // 4. Find the user and update their avatar in the database
+    // { new: true } tells Mongoose to return the UPDATED user document
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id, 
+      { avatar: avatarUrl },
+      { returnDocument: 'after' } // <-- Replaced { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // 5. Send the updated user back to React
+    res.json({ success: true, user: updatedUser });
+
+  } catch (error) {
+    console.error("Avatar upload error:", error);
+    res.status(500).json({ success: false, message: "Server error during upload" });
+  }
+});
+
+// --- UPDATE USER BIO ---
+app.put('/api/users/:id/bio', async (req, res) => {
+  try {
+    const { bio } = req.body; // Extract the new bio from the request
+
+    // Find the user by ID and update the bio field
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id, 
+      { bio: bio },
+      { returnDocument: 'after' } // <-- Replaced { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user: updatedUser });
+
+  } catch (error) {
+    console.error("Bio update error:", error);
+    res.status(500).json({ success: false, message: "Server error updating bio" });
   }
 });
 

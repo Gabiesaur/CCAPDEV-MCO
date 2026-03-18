@@ -1,14 +1,60 @@
-import { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { useEffect, useMemo, useState } from 'react';
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
 import { Star, Send, MapPin, ThumbsUp, ThumbsDown, CheckCircle2 } from 'lucide-react';
 
-import Comment from "../components/review/Comment";
+const getRelativeDate = (dateString) => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  const now = new Date();
+  const diffInSeconds = Math.floor((now - date) / 1000);
+
+  if (diffInSeconds < 60) return "Just now";
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours}h ago`;
+  const diffInDays = Math.floor(diffInHours / 24);
+  if (diffInDays < 7) return `${diffInDays}d ago`;
+
+  return date.toLocaleDateString();
+};
+
+const getAuthorFromReview = (review) => {
+  const userObj = review?.userId || {};
+  const displayName = userObj.name || userObj.username || review?.user || "Unknown User";
+  const username = userObj.username || review?.username || null;
+  const avatar = userObj.avatar || review?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}`;
+
+  return { displayName, username, avatar };
+};
 
 const ReviewPage = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const { id } = useParams();
+
+  const stateReview = location.state?.review || null;
+  const stateEstablishment = location.state?.establishment || null;
+
+  const storageKey = `review-page:${id || "unknown"}`;
+  const storedState = useMemo(() => {
+    try {
+      const raw = sessionStorage.getItem(storageKey);
+      return raw ? JSON.parse(raw) : null;
+    } catch {
+      return null;
+    }
+  }, [storageKey]);
+
+  const [review, setReview] = useState(stateReview || storedState?.review || null);
+  const [establishment, setEstablishment] = useState(stateEstablishment || storedState?.establishment || null);
+
   // 1. STATE FOR VOTING
   const [userVote, setUserVote] = useState(null); // 'up', 'down', or null
-  const [counts, setCounts] = useState({ up: 12, down: 2 }); // Initial dummy data
+  const [counts, setCounts] = useState({
+    up: stateReview?.helpfulVotes || storedState?.review?.helpfulVotes || 0,
+    down: stateReview?.unhelpfulVotes || storedState?.review?.unhelpfulVotes || 0,
+  });
 
   // Toast State
   const [showToast, setShowToast] = useState(false);
@@ -19,6 +65,34 @@ const ReviewPage = () => {
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
   };
+
+  useEffect(() => {
+    if (stateReview) {
+      setReview(stateReview);
+      setCounts({
+        up: stateReview.helpfulVotes || 0,
+        down: stateReview.unhelpfulVotes || 0,
+      });
+      setUserVote(null);
+    }
+
+    if (stateEstablishment) {
+      setEstablishment(stateEstablishment);
+    }
+  }, [stateReview, stateEstablishment]);
+
+  useEffect(() => {
+    if (!review) return;
+
+    try {
+      sessionStorage.setItem(
+        storageKey,
+        JSON.stringify({ review, establishment })
+      );
+    } catch {
+      // Ignore session storage failures
+    }
+  }, [review, establishment, storageKey]);
 
   const handleVote = (type) => {
     setCounts((prev) => {
@@ -49,17 +123,33 @@ const ReviewPage = () => {
     e.preventDefault();
     triggerToast("Comment submitted! Redirecting...");
     setTimeout(() => {
-      navigate("/");
+      navigate(`/review/${review?._id || review?.id || id}`);
     }, 2000);
   };
 
-  const comments = [
-    { id: 1, name: "Ate Rica", avatar: "https://static.wixstatic.com/media/52e0bf_f720ed1120f74f6a8dc7c4024f8eb752~mv2_d_1500_1500_s_2.png", owner: true, date: "Yesterday", text: "Glad you liked it! Please come again <3" },
-    { id: 2, name: "Leelancze Pacomio", avatar: "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff", owner: false, date: "2 days ago", text: "Forgot to mention, they serve really fast! :)" },
-    { id: 3, name: "Martin Manalo", avatar: "https://ui-avatars.com/api/?name=Martin+Manalo&background=F94449&color=fff", owner: false, date: "Yesterday", text: "I love Ate Rica's too!" },
-    { id: 4, name: "Gabe Leoncio", avatar: "https://ui-avatars.com/api/?name=Gabe+Leoncio&background=FFAF6E&color=fff", owner: false, date: "Yesterday", text: "Sisig better" },
-    { id: 5, name: "Gab Espineli", avatar: "https://ui-avatars.com/api/?name=Gabe+Leoncio&background=9AB180&color=fff", owner: false, date: "2 hours ago", text: "Just had it! Thanks for the reco" }
-  ];
+  const author = getAuthorFromReview(review);
+  const reviewTitle = review?.title || "Review";
+  const reviewBody = review?.comment || "No review content available.";
+  const reviewDate = getRelativeDate(review?.date);
+  const reviewRating = Number(review?.rating || 0);
+  const reviewId = review?._id || review?.id || id;
+
+  const establishmentName = establishment?.name || "Establishment";
+  const establishmentLocation = establishment?.location || "Unknown location";
+  const establishmentImage = establishment?.image || "https://ui-avatars.com/api/?name=Establishment";
+  const establishmentId = establishment?._id || review?.establishmentId;
+
+  if (!review) {
+    return (
+      <div className="bg-white min-vh-100 d-flex align-items-center justify-content-center">
+        <div className="text-center">
+          <h1 className="fw-bold fs-3">Review not found</h1>
+          <p className="text-muted mb-4">Open a review from an establishment page to load it here.</p>
+          <Link to="/browse" className="btn btn-success">Back to Browse</Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-white min-vh-100 d-flex flex-column position-relative">
@@ -78,46 +168,64 @@ const ReviewPage = () => {
         <div className="bg-light p-4 rounded-5 shadow-sm text-start mb-5 border-0">
           <div className="d-flex align-items-center mb-3">
             <img
-              src="https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff"
+              src={author.avatar}
               className="rounded-circle me-3"
               style={{ width: "40px", height: "40px", objectFit: 'cover' }}
               alt="User"
             />
             <div className="d-flex flex-column">
-              <Link to="/profile/leelanczers" className="fw-bold text-decoration-none text-dark" style={{ marginBottom: '-4px' }}>
-                Leelancze Pacomio
-              </Link>
-              <small className="text-muted">2 days ago</small>
+              {author.username ? (
+                <Link to={`/profile/${author.username}`} className="fw-bold text-decoration-none text-dark" style={{ marginBottom: '-4px' }}>
+                  {author.displayName}
+                </Link>
+              ) : (
+                <span className="fw-bold text-dark" style={{ marginBottom: '-4px' }}>
+                  {author.displayName}
+                </span>
+              )}
+              <small className="text-muted">{reviewDate}</small>
             </div>
           </div>
 
           <div className="d-flex gap-1 mb-3">
             {[...Array(5)].map((_, i) => (
-              <Star key={i} size={18} fill="#48a868" stroke="#48a868" />
+              <Star
+                key={i}
+                size={18}
+                fill={i < reviewRating ? "#48a868" : "none"}
+                stroke="#48a868"
+              />
             ))}
           </div>
 
           <h1 className="fw-bold text-dark mb-2 fs-4">
-            The best budget friendly meals on campus!
+            {reviewTitle}
           </h1>
 
           <p className="text-muted lh-base mb-4" style={{ fontSize: '0.95rem' }}>
-            Ate Rica's remains the gold standard for a quick and affordable meal between classes at Andrew. That signature liquid cheese sauce combined with the smoky bacon bits is an elite flavor combination that never misses. Even during the peak 12:00 PM rush, the service is incredibly efficient so you won't be late for your next lecture. It is the perfect comfort food for those long study sessions or stressful midterms week. I always get extra rice whenever I eat here. Every Archer needs to experience this Taft staple at least once before they graduate.
+            {reviewBody}
           </p>
 
           <div className="d-flex justify-content-between align-items-center">
             {/* Establishment Tag */}
             <div className="d-inline-flex align-items-center bg-white border border-light-subtle rounded-pill p-2 pe-3 shadow-sm">
               <img
-                src="https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg"
+                src={establishmentImage}
                 className="rounded-circle object-fit-cover me-2"
                 style={{ width: "32px", height: "32px" }}
                 alt="shop"
               />
               <div className="lh-1">
-                <Link to="/establishment" className="fw-bold text-decoration-none text-dark" style={{ fontSize: "0.85rem" }}>Ate Rica's Bacsilog</Link>
+                <Link
+                  to={establishmentId ? `/establishment/${establishmentId}` : "/browse"}
+                  state={establishment ? { establishment } : undefined}
+                  className="fw-bold text-decoration-none text-dark"
+                  style={{ fontSize: "0.85rem" }}
+                >
+                  {establishmentName}
+                </Link>
                 <div className="text-muted d-flex align-items-center gap-1 mt-1" style={{ fontSize: "0.7rem" }}>
-                  <MapPin size={10} /> Agno Food Court
+                  <MapPin size={10} /> {establishmentLocation}
                 </div>
               </div>
             </div>
@@ -149,9 +257,7 @@ const ReviewPage = () => {
         <div style={{ marginTop: '48px' }}>
           <h1 className="fs-3 fw-bold mb-4">Comments</h1>
           <div className="mb-5 ps-1">
-            {comments.map((comment) => (
-              <Comment key={comment.id} {...comment} />
-            ))}
+            <p className="text-muted mb-0">No comments yet.</p>
           </div>
 
           <form onSubmit={handleCommentSubmit} className="position-relative">
