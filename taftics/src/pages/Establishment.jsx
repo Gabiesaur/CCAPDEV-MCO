@@ -1,67 +1,93 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useOutletContext } from "react-router-dom";
+import { useParams, Link, useOutletContext, useNavigate } from "react-router-dom";
 import EstablishmentGallery from "../components/establishment/EstablishmentGallery";
 import EstablishmentHeader from "../components/establishment/EstablishmentHeader";
 import EstablishmentInfo from "../components/establishment/EstablishmentInfo";
 import EstablishmentReviews from "../components/establishment/EstablishmentReviews";
 import EstablishmentSidebar from "../components/establishment/EstablishmentSidebar";
 
-import { ESTABLISHMENTS, REVIEWS, USERS } from "../data/mockData";
+// ❌ REMOVED: import { ESTABLISHMENTS, REVIEWS, USERS } from "../data/mockData";
 
 function Establishment() {
-    const { id } = useParams();
-    // Use Outlet context to get current user, fallback to empty object if undefined
+    const { id } = useParams(); // This will now be the MongoDB _id (e.g., "65f00...")
+    const navigate = useNavigate();
+    
+    // Use Outlet context to get current user
     const { user: currentUser } = useOutletContext() || {};
+    
+    // States for live data
     const [establishment, setEstablishment] = useState(null);
     const [reviews, setReviews] = useState([]);
-    const [isBookmarked, setIsBookmarked] = React.useState(false);
+    const [isBookmarked, setIsBookmarked] = useState(false);
+    
+    // States for UI handling
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState("");
 
     useEffect(() => {
-        // 1. Resolve ID (default to 6 'De La Salle Laundry' if no ID provided for backward compatibility)
-        const establishmentId = id ? parseInt(id) : 6;
-
-        // 2. Fetch Establishment
-        const foundEst = ESTABLISHMENTS.find(e => e.id === establishmentId);
-        setEstablishment(foundEst || null);
-
-        // 3. Fetch Reviews
-        if (foundEst) {
-            const foundReviews = REVIEWS.filter(r => r.establishmentId === establishmentId).map(review => {
-                // Enrich review with user data
-                const reviewAuthor = USERS.find(u => u.id === review.userId);
-                return {
-                    ...review,
-                    // Use user's name if found, otherwise fallback
-                    user: reviewAuthor ? reviewAuthor.name : "Unknown User",
-                    avatar: reviewAuthor ? reviewAuthor.avatar : "https://ui-avatars.com/api/?name=Unknown",
-                    username: reviewAuthor ? reviewAuthor.username : "unknown",
-                    // Check if current user is the author
-                    isOwnReview: currentUser ? currentUser.id === review.userId : false
-                };
-            });
-            setReviews(foundReviews);
+        // If someone navigates to /establishment without an ID, send them back to browse
+        if (!id) {
+            navigate('/browse');
+            return;
         }
-    }, [id, currentUser]);
 
-    if (!establishment) {
+        const fetchEstablishmentData = async () => {
+            try {
+                // Fetch the Establishment and its Reviews at the same time!
+                const [estRes, reviewsRes] = await Promise.all([
+                    fetch(`http://localhost:5000/api/establishments/${id}`),
+                    fetch(`http://localhost:5000/api/establishments/${id}/reviews`)
+                ]);
+
+                if (!estRes.ok) {
+                    throw new Error("Establishment not found");
+                }
+
+                const estData = await estRes.json();
+                const reviewsData = await reviewsRes.json();
+
+                setEstablishment(estData);
+                setReviews(reviewsData); // Assumes the backend populates the user data into the review!
+                setLoading(false);
+
+            } catch (err) {
+                console.error("Failed to fetch establishment data:", err);
+                setError("Could not load establishment. It may have been removed.");
+                setLoading(false);
+            }
+        };
+
+        fetchEstablishmentData();
+    }, [id, navigate]);
+
+    // --- Loading & Error UI ---
+    if (loading) {
         return (
-            <div className="min-vh-100 d-flex flex-column align-items-center justify-content-center">
-                <h2>Establishment not found</h2>
-                <Link to="/browse" className="btn btn-primary mt-3">Back to Browse</Link>
+            <div className="d-flex justify-content-center align-items-center min-vh-100">
+                <h3 className="text-muted">Loading establishment details...</h3>
             </div>
         );
     }
 
+    if (error || !establishment) {
+        return (
+            <div className="d-flex flex-column justify-content-center align-items-center min-vh-100">
+                <h3 className="text-danger">{error}</h3>
+                <Link to="/browse" className="btn btn-dark mt-3">Back to Browse</Link>
+            </div>
+        );
+    }
+
+    // --- Main UI ---
     return (
-        <div>
-            <div className="d-flex flex-column align-items-center min-vw-100 pb-5">
-                <div className="d-flex flex-column align-items-center w-75">
+        <div className="bg-white min-vh-100">
+            <div className="container-fluid" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+                <div className="d-flex flex-column align-items-center w-75 mx-auto">
                     {/* Gallery Section */}
-                    {/* Pass image from establishment data */}
                     <EstablishmentGallery image={establishment.image} />
 
                     {/* Main Content Row */}
-                    <div className="d-flex flex-row justify-content-between align-items-start w-75 mt-4 gap-4">
+                    <div className="d-flex flex-row justify-content-between align-items-start w-100 mt-4 gap-4">
                         {/* Left Column: Header, Info, Reviews */}
                         <div
                             className="d-flex flex-column"

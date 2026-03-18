@@ -4,6 +4,7 @@ const cors = require('cors');
 const fileUpload = require('express-fileupload'); // Moved up
 require('dotenv').config({ path: path.resolve(__dirname, 'taftics.env') }); //
 const User = require('./models/User'); // Adjust the path if needed
+const Review = require('./models/Review');
 
 const express = require('express');
 const app = express();
@@ -146,6 +147,39 @@ app.post('/api/register', async (req, res) => {
   } catch (error) {
     console.error("Registration error:", error);
     res.status(500).json({ success: false, message: "Server error during registration." });
+  }
+});
+
+// 1. GET SINGLE ESTABLISHMENT
+app.get('/api/establishments/:id', async (req, res) => {
+  try {
+    // Find establishment by its unique MongoDB _id
+    const establishment = await Establishment.findById(req.params.id);
+    
+    if (!establishment) {
+      return res.status(404).json({ message: "Establishment not found" });
+    }
+    
+    res.json(establishment);
+  } catch (error) {
+    console.error("Error fetching establishment:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+});
+
+// 2. GET REVIEWS FOR A SPECIFIC ESTABLISHMENT
+app.get('/api/establishments/:id/reviews', async (req, res) => {
+  try {
+    // Find all reviews where establishmentId matches the URL parameter
+    const reviews = await Review.find({ establishmentId: req.params.id })
+      // .populate() pulls the user details from the User collection!
+      .populate('userId', 'username name avatar') 
+      .sort({ date: -1 }); // Sort by newest first
+
+    res.json(reviews);
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    res.status(500).json({ message: "Server error" });
   }
 });
 
