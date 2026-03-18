@@ -21,6 +21,7 @@ import LoginPage from "./pages/LoginPage";
 import RegPage from "./pages/RegPage";
 import OwnerAppPage from "./pages/OwnerAppPage";
 import EstablishmentPage from "./pages/Establishment";
+import OwnerProfilePage from "./pages/OwnerProfilePage";
 
 function App() {
   // --- GLOBAL STATE ---
@@ -122,7 +123,11 @@ function App() {
             path="/profile/me"
             element={
               user ? (
-                <MyProfilePage user={user} setUser={setUser} />
+                user.idSeries === "owner" ? (
+                  <OwnerProfilePage user={user} setUser={setUser} />
+                ) : (
+                  <MyProfilePage user={user} setUser={setUser} />
+                )
               ) : (
                 <Navigate to="/login" />
               )

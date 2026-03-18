@@ -91,6 +91,20 @@ export const USERS = [
         helpfulCount: 60,
         contributions: 20,
         avatar: "https://ui-avatars.com/api/?name=Isabella+Garcia&background=795548&color=fff",
+    },
+    {
+        id: 8,
+        username: "boss_rica",
+        password: "password123",
+        name: "Ate Rica's Bacsilog",
+        email: "rica@gmail.com",
+        idSeries: "owner",
+        bio: "The home of the famous Bacsilog. Affordable and delicious student meals.",
+        followers: 1200,
+        helpfulCount: 50,
+        contributions: 5,
+        avatar: "https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg",
+        ownedEstablishmentId: "65f000000000000000000003",
     }
 ];
 
@@ -536,6 +550,13 @@ export const COMMENTS = [
         reviewId: 1, // Laundry Review
         userId: 4, // foodie_king
         text: "I'll try this laundry shop next time!",
+        date: getPastDate(0)
+    },
+    {
+        id: 4,
+        reviewId: 7, // Ate Rica's Review by Leelancze
+        userId: 8, // boss_rica
+        text: "Thank you for the wonderful review! We always strive to serve the best bacsilog.",
         date: getPastDate(0)
     }
 ];
