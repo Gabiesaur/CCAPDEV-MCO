@@ -15,7 +15,7 @@ app.use(cors()); //
 app.use(express.json()); // Allows the server to accept JSON data
 app.use(express.urlencoded({ extended: true })); //
 app.use(express.static('public')); //
-app.use(fileUpload()); //
+app.use(fileUpload( {parseNested: true} )); //
 
 // --- DATABASE CONNECTION ---
 const mongoUri = process.env.MONGO_URI; //
@@ -152,6 +152,8 @@ app.post('/api/register', async (req, res) => {
 
 // Create review
 app.post('/api/reviews', async (req, res) => {
+  console.log("req.body:", req.body);   // Should show userId, rating, title, text
+  console.log("req.files:", req.files); // Should show uploaded files if any
   try {
     const { userId, establishmentId, rating, title, text } = req.body;
 
