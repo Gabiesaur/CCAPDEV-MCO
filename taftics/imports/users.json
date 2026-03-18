@@ -40,5 +40,61 @@
     "contributions": 34,
     "avatar": "https://ui-avatars.com/api/?name=Maria+Santos&background=800000&color=fff",
     "isAdmin": false
+  },
+  {
+    "_id": { "$oid": "65f100000000000000000004" },
+    "username": "foodie_king",
+    "password": "password123",
+    "name": "Juan Karlos",
+    "email": "jk@dlsu.edu.ph",
+    "idSeries": "122",
+    "bio": "Living for Agno food trips",
+    "followers": 230,
+    "helpfulCount": 150,
+    "contributions": 80,
+    "avatar": "https://ui-avatars.com/api/?name=Juan+Karlos&background=C70039&color=fff",
+    "isAdmin": false
+  },
+  {
+    "_id": { "$oid": "65f100000000000000000005" },
+    "username": "gym_rat_dlsu",
+    "password": "password123",
+    "name": "Sam Smith",
+    "email": "sam@dlsu.edu.ph",
+    "idSeries": "120",
+    "bio": "Gains over grades (jk)",
+    "followers": 45,
+    "helpfulCount": 20,
+    "contributions": 10,
+    "avatar": "https://ui-avatars.com/api/?name=Sam+Smith&background=900C3F&color=fff",
+    "isAdmin": false
+  },
+  {
+    "_id": { "$oid": "65f100000000000000000006" },
+    "username": "tech_wiz",
+    "password": "password123",
+    "name": "Nikolai Tesla",
+    "email": "nik@dlsu.edu.ph",
+    "idSeries": "119",
+    "bio": "Building the future, one line at a time.",
+    "followers": 55,
+    "helpfulCount": 30,
+    "contributions": 12,
+    "avatar": "https://ui-avatars.com/api/?name=Nikolai+Tesla&background=2C3E50&color=fff",
+    "isAdmin": false
+  },
+  {
+    "_id": { "$oid": "65f100000000000000000007" },
+    "username": "coffee_lover",
+    "password": "password123",
+    "name": "Isabella Garcia",
+    "email": "isabella@dlsu.edu.ph",
+    "idSeries": "125",
+    "bio": "Lover of all things caffeine.",
+    "followers": 88,
+    "helpfulCount": 60,
+    "contributions": 20,
+    "avatar": "https://ui-avatars.com/api/?name=Isabella+Garcia&background=795548&color=fff",
+    "isAdmin": false
   }
 ]
