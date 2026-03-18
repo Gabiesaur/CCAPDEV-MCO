@@ -85,6 +85,7 @@ export default function EstablishmentSidebar({ establishment }) {
 
             <Link
                 to="/create"
+                state={{ establishment }}
                 className="button btn mt-auto d-flex align-items-center justify-content-center py-2" // mt-auto pushes to bottom
                 style={{ background: "#00441B", border: "none", color: "white" }}
             >
