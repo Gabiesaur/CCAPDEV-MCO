@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom"; // Added Navigate, useNavigate
-import { Star, MessageSquare } from "lucide-react";
+import { Star, MessageSquare, Link as LinkIcon, CheckCircle2 } from "lucide-react";
 
 import ProfileHeader from "../components/profile/ProfileHeader";
-import PublicProfileStatistics from "../components/profile/PublicProfileStatistics";
+import ProfileStatistics from "../components/profile/ProfileStatistics";
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 
@@ -11,6 +11,25 @@ export default function PublicProfilePage({ db, currentUser }) {
   const { username } = useParams();
   const navigate = useNavigate(); // Added navigate hook
   const [activeTab, setActiveTab] = useState("reviews");
+
+  // Toast State
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [toastIcon, setToastIcon] = useState(null);
+
+  // Dynamic Toast Trigger
+  const triggerToast = (message, iconType) => {
+    setToastMessage(message);
+    setToastIcon(
+      iconType === "success" ? (
+        <CheckCircle2 size={24} />
+      ) : (
+        <LinkIcon size={24} />
+      ),
+    );
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
 
   // 0. Redirect if viewing own profile
   if (currentUser && currentUser.username === username) {
@@ -68,6 +87,13 @@ export default function PublicProfilePage({ db, currentUser }) {
         isOwnProfile={false}
       />
 
+      {showToast && (
+        <div className="toast-success-custom fw-bold" style={{ zIndex: 9999 }}>
+          {toastIcon}
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       <div className="container mt-4">
         <div className="row g-4">
           {/* LEFT COLUMN */}
@@ -107,7 +133,13 @@ export default function PublicProfilePage({ db, currentUser }) {
 
           {/* RIGHT COLUMN */}
           <div className="col-lg-4">
-            <PublicProfileStatistics user={publicUser} />
+            <ProfileStatistics 
+              user={publicUser} 
+              isOwnProfile={false}
+              onShareSuccess={() =>
+                triggerToast("Profile link copied to clipboard!", "link")
+              }
+            />
           </div>
         </div>
       </div>

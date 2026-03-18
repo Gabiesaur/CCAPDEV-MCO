@@ -11,7 +11,7 @@ import {
 
 // --- COMPONENT IMPORTS ---
 import ProfileHeader from "../components/profile/ProfileHeader";
-import MyProfileStatistics from "../components/profile/MyProfileStatistics";
+import ProfileStatistics from "../components/profile/ProfileStatistics";
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 import ImageUploadModal from "../components/profile/ImageUploadModal";
@@ -155,8 +155,9 @@ export default function MyProfilePage({ user, setUser }) {
 
           {/* RIGHT COLUMN: Sidebar Stats */}
           <div className="col-lg-4">
-            <MyProfileStatistics
+            <ProfileStatistics
               user={user}
+              isOwnProfile={true}
               setUser={setUser}
               onShareSuccess={() =>
                 triggerToast("Profile link copied to clipboard!", "link")
