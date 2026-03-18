@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useParams, Link, useOutletContext, useNavigate } from "react-router-dom";
+import { useParams, Link, useOutletContext, useNavigate, useLocation } from "react-router-dom";
 import EstablishmentGallery from "../components/establishment/EstablishmentGallery";
 import EstablishmentHeader from "../components/establishment/EstablishmentHeader";
 import EstablishmentInfo from "../components/establishment/EstablishmentInfo";
@@ -11,54 +11,83 @@ import EstablishmentSidebar from "../components/establishment/EstablishmentSideb
 function Establishment() {
     const { id } = useParams(); // This will now be the MongoDB _id (e.g., "65f00...")
     const navigate = useNavigate();
+    const location = useLocation();
     
     // Use Outlet context to get current user
     const { user: currentUser } = useOutletContext() || {};
     
+    const establishmentFromState = location.state?.establishment;
+
     // States for live data
-    const [establishment, setEstablishment] = useState(null);
+    const [establishment, setEstablishment] = useState(establishmentFromState || null);
     const [reviews, setReviews] = useState([]);
     const [isBookmarked, setIsBookmarked] = useState(false);
     
     // States for UI handling
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(!establishmentFromState);
     const [error, setError] = useState("");
 
     useEffect(() => {
         // If someone navigates to /establishment without an ID, send them back to browse
         if (!id) {
-            navigate('/browse');
+            navigate('/browse', { replace: true });
             return;
         }
 
+        let isMounted = true;
+
         const fetchEstablishmentData = async () => {
             try {
-                // Fetch the Establishment and its Reviews at the same time!
-                const [estRes, reviewsRes] = await Promise.all([
-                    fetch(`http://localhost:5000/api/establishments/${id}`),
-                    fetch(`http://localhost:5000/api/establishments/${id}/reviews`)
+                const shouldFetchEstablishment =
+                    !establishmentFromState || String(establishmentFromState._id) !== String(id);
+
+                const establishmentPromise = shouldFetchEstablishment
+                    ? fetch(`http://localhost:5000/api/establishments/${id}`).then((res) => {
+                        if (!res.ok) {
+                            throw new Error("Establishment not found");
+                        }
+                        return res.json();
+                    })
+                    : Promise.resolve(establishmentFromState);
+
+                const reviewsPromise = fetch(`http://localhost:5000/api/establishments/${id}/reviews`).then((res) => {
+                    if (!res.ok) {
+                        return [];
+                    }
+                    return res.json();
+                });
+
+                const [estData, reviewsData] = await Promise.all([
+                    establishmentPromise,
+                    reviewsPromise,
                 ]);
 
-                if (!estRes.ok) {
-                    throw new Error("Establishment not found");
+                if (!isMounted) {
+                    return;
                 }
 
-                const estData = await estRes.json();
-                const reviewsData = await reviewsRes.json();
-
                 setEstablishment(estData);
-                setReviews(reviewsData); // Assumes the backend populates the user data into the review!
-                setLoading(false);
+                setReviews(Array.isArray(reviewsData) ? reviewsData : []);
+                setError("");
 
             } catch (err) {
                 console.error("Failed to fetch establishment data:", err);
-                setError("Could not load establishment. It may have been removed.");
-                setLoading(false);
+                if (isMounted) {
+                    setError("Could not load establishment. It may have been removed.");
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
 
         fetchEstablishmentData();
-    }, [id, navigate]);
+
+        return () => {
+            isMounted = false;
+        };
+    }, [id, navigate, establishmentFromState]);
 
     // --- Loading & Error UI ---
     if (loading) {
@@ -101,7 +130,7 @@ function Establishment() {
 
                             <EstablishmentInfo description={establishment.description} />
 
-                            <EstablishmentReviews reviews={reviews} />
+                            <EstablishmentReviews reviews={reviews} establishment={establishment} />
                         </div>
 
                         {/* Right Column: Sidebar */}
