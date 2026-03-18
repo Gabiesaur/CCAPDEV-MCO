@@ -150,6 +150,52 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+// Create review
+app.post('/api/reviews', async (req, res) => {
+  try {
+    const { userId, establishmentId, rating, title, text } = req.body;
+
+    // 1. Process Images using express-fileupload
+    let imageUrls = [];
+    if (req.files && req.files.images) {
+      const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+      
+      for (const file of files) {
+        const fileName = `${Date.now()}_${file.name}`;
+        const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+        await file.mv(uploadPath);
+        imageUrls.push(`http://localhost:5000/uploads/${fileName}`);
+      }
+    }
+
+    // 2. Save to Database
+    const newReview = new Review({
+      userId,
+      establishmentId,
+      rating: Number(rating),
+      title,
+      text,
+      images: imageUrls,
+      date: new Date()
+    });
+
+    await newReview.save();
+
+    // 3. Update Establishment star counts automatically
+    const starFields = ["oneStar", "twoStar", "threeStar", "fourStar", "fiveStar"];
+    const fieldToUpdate = starFields[Number(rating) - 1];
+
+    await Establishment.findByIdAndUpdate(establishmentId, {
+      $inc: { [fieldToUpdate]: 1, totalReviews: 1 }
+    });
+
+    res.status(201).json({ success: true, review: newReview });
+  } catch (error) {
+    console.error("Error creating review:", error);
+    res.status(500).json({ success: false, message: "Failed to save review." });
+  }
+});
+
 // 1. GET SINGLE ESTABLISHMENT
 app.get('/api/establishments/:id', async (req, res) => {
   try {
@@ -265,8 +311,8 @@ app.put('/api/users/:id/avatar', async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id, 
       { avatar: avatarUrl },
-      { new: true }
-    ).select('-password'); // Hide password!
+      { returnDocument: 'after' } // <-- Replaced { new: true }
+    ).select('-password');
 
     if (!updatedUser) {
       return res.status(404).json({ success: false, message: "User not found" });
@@ -278,6 +324,30 @@ app.put('/api/users/:id/avatar', async (req, res) => {
   } catch (error) {
     console.error("Avatar upload error:", error);
     res.status(500).json({ success: false, message: "Server error during upload" });
+  }
+});
+
+// --- UPDATE USER BIO ---
+app.put('/api/users/:id/bio', async (req, res) => {
+  try {
+    const { bio } = req.body; // Extract the new bio from the request
+
+    // Find the user by ID and update the bio field
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id, 
+      { bio: bio },
+      { returnDocument: 'after' } // <-- Replaced { new: true }
+    ).select('-password');
+
+    if (!updatedUser) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user: updatedUser });
+
+  } catch (error) {
+    console.error("Bio update error:", error);
+    res.status(500).json({ success: false, message: "Server error updating bio" });
   }
 });
 

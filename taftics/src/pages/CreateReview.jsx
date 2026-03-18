@@ -1,10 +1,11 @@
 import React from "react";
 import { Star, CheckCircle2 } from "lucide-react";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 
 function CreateReview() {
     const navigate = useNavigate();
     const location = useLocation();
+    const { user: currentUser } = useOutletContext() || {};
     const stars = Array(5).fill(0);
     const [rating, setRating] = React.useState(0);
     const [hover, setHover] = React.useState(0);
@@ -96,28 +97,57 @@ function CreateReview() {
         ? selectedReviews.reduce((sum, rev) => sum + Number(rev?.rating || 0), 0) / selectedReviews.length
         : Number(establishmentData.rating || 0);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
 
-        // Validation (Optional but good practice)
+        // 1. Basic Validation
         if (rating === 0) {
             alert("Please provide a rating.");
             return;
         }
+        if (!currentUser) {
+            alert("You must be logged in to post a review.");
+            return;
+        }
+        if (!selectedEstablishment?._id) {
+            alert("Please choose an establishment before submitting this review.");
+            return;
+        }
 
-        // Show toast
-        triggerToast("Review submitted successfully! Redirecting...");
+        // 2. Prepare FormData (required for file uploads)
+        const formData = new FormData();
+        formData.append("userId", currentUser._id);
+        formData.append("establishmentId", selectedEstablishment._id);
+        formData.append("rating", rating);
+        formData.append("title", titleText);
+        formData.append("text", reviewText);
 
-        // Redirect after a short delay
-        setTimeout(() => {
-            if (selectedEstablishment?._id) {
-                navigate(`/establishment/${selectedEstablishment._id}`, {
-                    state: { establishment: selectedEstablishment },
-                });
-            } else {
-                navigate("/browse");
+        // Append each selected image file
+        images.forEach((imgObj) => {
+            formData.append("images", imgObj.file);
+        });
+
+        try {
+            const response = await fetch("http://localhost:5000/api/reviews", {
+                method: "POST",
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errResult = await response.json().catch(() => ({}));
+                throw new Error(errResult.message || "Failed to submit review.");
             }
-        }, 2000);
+
+            const result = await response.json();
+
+            triggerToast("Review submitted successfully! Redirecting...");
+            setTimeout(() => {
+                navigate(`/establishment/${selectedEstablishment._id}`);
+            }, 2000);
+        } catch (err) {
+            console.error("Submission error:", err);
+            alert(err.message || "Something went wrong while submitting your review.");
+        }
     };
 
     return (
@@ -250,7 +280,7 @@ function CreateReview() {
 
                             <div className="d-flex flex-column gap-2 mt-2">
                                 {[5, 4, 3, 2, 1].map(num => {
-                                    const starsCount = starCounts[num - 1];
+                                    const starsCount = starCounts[5 - num];
                                     const percent = (starsCount / (totalReviews || 1) * 100) || 0;
                                     return (
                                         <div key={num} className="d-flex flex-row align-items-center">
