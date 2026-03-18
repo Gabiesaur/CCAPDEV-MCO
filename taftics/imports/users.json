@@ -1,0 +1,44 @@
+[
+  {
+    "_id": { "$oid": "65f100000000000000000001" },
+    "username": "leelanczers",
+    "password": "password123",
+    "name": "Leelancze Pacomio",
+    "email": "lee@dlsu.edu.ph",
+    "idSeries": "124",
+    "bio": "CS Student @ DLSU | Love coffee and coding",
+    "followers": 67,
+    "helpfulCount": 42,
+    "contributions": 15,
+    "avatar": "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff",
+    "isAdmin": true
+  },
+  {
+    "_id": { "$oid": "65f100000000000000000002" },
+    "username": "archer_dc",
+    "password": "password123",
+    "name": "Archer Dela Cruz",
+    "email": "archer@dlsu.edu.ph",
+    "idSeries": "121",
+    "bio": "Just a regular Archer",
+    "followers": 12,
+    "helpfulCount": 5,
+    "contributions": 3,
+    "avatar": "https://ui-avatars.com/api/?name=Archer+Dela+Cruz&background=00441B&color=fff",
+    "isAdmin": false
+  },
+  {
+    "_id": { "$oid": "65f100000000000000000003" },
+    "username": "pro_student",
+    "password": "password123",
+    "name": "Maria Santos",
+    "email": "maria@dlsu.edu.ph",
+    "idSeries": "123",
+    "bio": "Dean's Lister",
+    "followers": 150,
+    "helpfulCount": 89,
+    "contributions": 34,
+    "avatar": "https://ui-avatars.com/api/?name=Maria+Santos&background=800000&color=fff",
+    "isAdmin": false
+  }
+]
