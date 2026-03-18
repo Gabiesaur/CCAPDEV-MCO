@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const fileUpload = require('express-fileupload'); // Moved up
 require('dotenv').config({ path: path.resolve(__dirname, 'taftics.env') }); //
+const User = require('./models/User'); // Adjust the path if needed
 
 const express = require('express');
 const app = express();
@@ -49,37 +50,40 @@ app.get('/api/establishments', async (req, res) => {
   }
 });
 
-// 2. TEMPORARY SEED ROUTE (To populate your empty DB)
-app.post('/api/seed-establishments', async (req, res) => {
-  try {
-    // You can paste your mock array directly in here to test
-    const mockEstablishments = [
-      {
-          name: "National Book Store",
-          category: "School Supplies",
-          location: "Inside Yuchengco Hall",
-          rating: 4.7,
-          reviewCount: 14,
-          image: "https://images.summitmedia-digital.com/spotph/images/2020/08/24/nbs-statement-closure-640-1598256966.jpg",
-          description: "Your go-to place for all school requirements...",
-          businessHours: "8:00 AM - 6:00 PM",
-          contactNumber: "02-8888-1234",
-          email: "support@nationalbookstore.com",
-          website: "https://www.nationalbookstore.com",
-          address: "Yuchengco Hall, De La Salle University"
-      },
-      // ... Add Ate Rica's, ZUS Coffee, etc. here
-    ];
+// --- LOGIN ROUTE ---
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
 
-    // Wipe the existing ones so we don't get duplicates if you click twice
-    await Establishment.deleteMany({}); 
-    // Insert the mock data
-    const created = await Establishment.insertMany(mockEstablishments); 
-    
-    res.json({ message: "Database seeded successfully!", count: created.length });
+  try {
+    // 1. Find the user by username
+    const user = await User.findOne({ username: username });
+
+    // 2. Check if user exists AND password matches
+    if (!user || user.password !== password) {
+      return res.status(401).json({ success: false, message: "Invalid username or password" });
+    }
+
+    // 3. Success! Send the user data back to React (omitting the password!)
+    res.json({ 
+      success: true, 
+      user: {
+        _id: user._id,
+        username: user.username,
+        name: user.name,
+        email: user.email,
+        idSeries: user.idSeries,
+        bio: user.bio,
+        followers: user.followers,
+        helpfulCount: user.helpfulCount,
+        contributions: user.contributions,
+        avatar: user.avatar,
+        isAdmin: user.isAdmin
+      } 
+    });
+
   } catch (error) {
-    console.error("Error seeding database:", error);
-    res.status(500).json({ message: "Failed to seed database" });
+    console.error("Login error:", error);
+    res.status(500).json({ success: false, message: "Server error during login" });
   }
 });
 

@@ -23,16 +23,17 @@ import OwnerAppPage from "./pages/OwnerAppPage";
 import EstablishmentPage from "./pages/Establishment";
 
 function App() {
-  // GLOBAL USER STATE
+  // --- GLOBAL STATE ---
+  // Check localStorage so user stays logged in if they refresh the page
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("currentUser");
     return saved ? JSON.parse(saved) : null;
   });
 
-  // Local state for users - Now fetched from the database!
+  // Local state for all users (needed so PublicProfilePage can view other people)
   const [dbUsers, setDbUsers] = useState([]);
 
-  // Fetch all users on mount so PublicProfilePage still works
+  // Fetch all users on mount so PublicProfilePage still works seamlessly
   useEffect(() => {
     fetch('http://localhost:5000/api/users')
       .then(res => res.json())
@@ -40,6 +41,8 @@ function App() {
       .catch(err => console.error("Failed to fetch users from DB:", err));
   }, []);
 
+  // --- AUTHENTICATION FUNCTIONS ---
+  
   const login = async (username, password) => {
     try {
       const response = await fetch('http://localhost:5000/api/login', {
@@ -47,10 +50,11 @@ function App() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
       });
-      
+
       const data = await response.json();
 
-      if (response.ok) {
+      if (data.success) {
+        // Save to state and localStorage
         setUser(data.user);
         localStorage.setItem("currentUser", JSON.stringify(data.user));
         return { success: true };
@@ -63,28 +67,21 @@ function App() {
     }
   };
 
-  const register = async (newUser) => {
+  const register = async (formData) => {
     try {
-      // Set some defaults just like the old mock function
-      const payload = {
-        ...newUser,
-        idSeries: newUser.dlsuId || "125",
-        avatar: `https://ui-avatars.com/api/?name=${newUser.username}&background=random&color=fff`,
-      };
-
+      // NOTE: We do NOT set headers here because we are sending FormData (for the image)
       const response = await fetch('http://localhost:5000/api/register', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+        body: formData 
       });
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Update local dbUsers state to immediately show the new user
+      if (data.success) {
+        // Update local dbUsers state so the new user instantly appears in the public list
         setDbUsers([...dbUsers, data.user]); 
         
-        // Auto-login
+        // Auto-login the brand new user
         setUser(data.user);
         localStorage.setItem("currentUser", JSON.stringify(data.user));
         return { success: true };
@@ -97,9 +94,8 @@ function App() {
     }
   };
 
-  // Assuming Owner Application will also hit a backend endpoint later
   const apply = async (applicant) => {
-    // Note: You'll want to wire this up to a fetch request eventually!
+    // Placeholder: You'll eventually wire this up to a POST /api/apply route!
     if (dbUsers.find((u) => u.email === applicant.email)) {
       return { success: false, message: "Email already exists." };
     }
@@ -111,6 +107,7 @@ function App() {
     localStorage.removeItem("currentUser");
   };
 
+  // --- ROUTING ---
   return (
     <BrowserRouter>
       <Routes>

@@ -9,14 +9,19 @@ const LoginPage = ({ onLogin }) => {
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleLogin = (e) => {
+  // Add 'async' here
+  const handleLogin = async (e) => { 
     e.preventDefault();
     setError("");
+    
     if (!username || !password) {
       setError("Please fill in both username and password.");
       return;
     }
-    const result = onLogin(username, password);
+    
+    // Add 'await' here so React pauses until the server replies
+    const result = await onLogin(username, password); 
+    
     if (result.success) {
       navigate("/");
     } else {
