@@ -54,9 +54,13 @@ const BrowsePage = () => {
 
           {/* LEFT SIDEBAR: User Info & Filters */}
           <aside
-            className="col-lg-3 pe-lg-5 sticky-top"
-            style={{ top: '128px', alignSelf: 'start', height: 'fit-content' }}
+            className="col-lg-3 pe-lg-5"
+            style={{ paddingTop: '48px' }}
           >
+            <div
+              className="sticky-top"
+              style={{ top: '128px', alignSelf: 'start', height: 'fit-content' }}
+            >
             {/* Categories Filter */}
             <div className="filter-section mb-4">
               <label className="small opacity-50 fw-bold mb-2 text-uppercase d-block">Categories</label>
@@ -114,6 +118,7 @@ const BrowsePage = () => {
                   </button>
                 ))}
               </div>
+            </div>
             </div>
           </aside>
 
