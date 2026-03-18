@@ -23,6 +23,15 @@ const getRelativeDate = (dateString) => {
     return date.toLocaleDateString();
 };
 
+const getReviewAuthor = (rev) => {
+    const userObj = rev.userId || {};
+    const fullName = userObj.name || userObj.username || rev.user || 'Unknown';
+    const username = userObj.username || rev.username || 'unknown';
+    const avatar = userObj.avatar || rev.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(fullName)}`;
+
+    return { fullName, username, avatar };
+};
+
 export default function EstablishmentReviews({ reviews }) {
     // Create local state for reviews so we can modify them (edit/delete)
     const [localReviews, setLocalReviews] = useState(reviews);
@@ -46,12 +55,14 @@ export default function EstablishmentReviews({ reviews }) {
     }, [reviews]);
 
     // Local state for filtered reviews
-    const filteredReviews = localReviews.filter(
-        (r) =>
+    const filteredReviews = localReviews.filter((r) => {
+        const author = getReviewAuthor(r);
+        return (
             r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
             r.comment.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.user.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+            author.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+    });
 
     // Sorting
     filteredReviews.sort(
@@ -155,12 +166,13 @@ export default function EstablishmentReviews({ reviews }) {
                 <div className="d-flex flex-column flex-grow-1 pe-2">
                     {paginatedReviews.length > 0 ? (
                         paginatedReviews.map((rev, index) => {
+                            const author = getReviewAuthor(rev);
                             const globalIndex = startIndex + index;
                             return (
                                 <div key={index} className="mb-3 position-relative">
                                     <div className="d-flex flex-row align-items-center gap-3">
                                         <img
-                                            src={rev.avatar}
+                                            src={author.avatar}
                                             alt="avatar"
                                             style={{
                                                 width: "50px",
@@ -171,11 +183,11 @@ export default function EstablishmentReviews({ reviews }) {
                                         />
                                         <div className="d-flex flex-column">
                                             <Link
-                                                to={rev.username !== "unknown" ? `/profile/${rev.username}` : "#"}
+                                                to={author.username !== "unknown" ? `/profile/${author.username}` : "#"}
                                                 className="mb-0 text-decoration-none fw-bold"
                                                 style={{ color: "#444646" }}
                                             >
-                                                {rev.user}
+                                                {author.fullName}
                                             </Link>
                                             <div className="d-flex flex-row gap-1">
                                                 {[...Array(5)].map((_, i) => (
@@ -245,7 +257,7 @@ export default function EstablishmentReviews({ reviews }) {
                                     </div>
 
                                     <Link
-                                        to="/review" // Ideally this would link to specific review detail if available
+                                        to={`/review/${rev._id || rev.id}`}
                                         className="text-decoration-none d-block mt-2"
                                         style={{ color: "inherit" }}
                                     >
