@@ -1,0 +1,282 @@
+[
+  {
+    "establishmentId": 6,
+    "userId": 1,
+    "rating": 4,
+    "title": "Pretty nice!",
+    "comment": "The service was okay but a bit crowded during peak hours.",
+    "date": "2026-03-16",
+    "helpfulVotes": 9,
+    "unhelpfulVotes": 3
+  },
+  {
+    "establishmentId": 6,
+    "userId": 2,
+    "rating": 2,
+    "title": "Bad experience.",
+    "comment": "Too many people and slow service. Not recommended on weekends.",
+    "date": "2026-03-13",
+    "helpfulVotes": 3,
+    "unhelpfulVotes": 12
+  },
+  {
+    "establishmentId": 6,
+    "userId": 3,
+    "rating": 5,
+    "title": "Excellent service!",
+    "comment": "Great service and fast turnaround! Highly recommend.",
+    "date": "2026-03-08",
+    "helpfulVotes": 10,
+    "unhelpfulVotes": 2
+  },
+  {
+    "establishmentId": 6,
+    "userId": 4,
+    "rating": 5,
+    "title": "Best laundry in town",
+    "comment": "Quick service and very friendly staff. Will come back again! Also they have free wifi while you wait which is a huge plus for students.",
+    "date": "2026-03-17",
+    "helpfulVotes": 8,
+    "unhelpfulVotes": 1
+  },
+  {
+    "establishmentId": 6,
+    "userId": 5,
+    "rating": 3,
+    "title": "Average experience",
+    "comment": "The service was okay but a bit pricey compared to others nearby.",
+    "date": "2026-02-26",
+    "helpfulVotes": 5,
+    "unhelpfulVotes": 3
+  },
+  {
+    "establishmentId": 6,
+    "userId": 6,
+    "rating": 5,
+    "title": "Reliable and fast",
+    "comment": "Always get my clothes back smelling fresh and neatly folded within 24 hours.",
+    "date": "2026-03-15",
+    "helpfulVotes": 12,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 3,
+    "userId": 1,
+    "rating": 5,
+    "title": "The best budget friendly meals on campus!",
+    "comment": "Ate Rica's remains the gold standard for a quick and affordable meal between classes at Andrew. That signature liquid cheese sauce combined with the smoky bacon bits is an elite flavor combination that never misses.",
+    "date": "2026-03-15",
+    "helpfulVotes": 42,
+    "unhelpfulVotes": 2
+  },
+  {
+    "establishmentId": 3,
+    "userId": 4,
+    "rating": 5,
+    "title": "Always consistent",
+    "comment": "You know what you're getting. Heavy on the rice, heavy on the sauce. Perfect.",
+    "date": "2026-03-17",
+    "helpfulVotes": 15,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 3,
+    "userId": 2,
+    "rating": 4,
+    "title": "Great value for money",
+    "comment": "A little salty for some, but I personally love the cheese sauce. Best to eat while hot!",
+    "date": "2026-03-10",
+    "helpfulVotes": 20,
+    "unhelpfulVotes": 1
+  },
+  {
+    "establishmentId": 3,
+    "userId": 5,
+    "rating": 3,
+    "title": "Too crowded sometimes",
+    "comment": "Love the food, but the queue at Agno can be insane during lunch hour.",
+    "date": "2026-03-16",
+    "helpfulVotes": 6,
+    "unhelpfulVotes": 2
+  },
+  {
+    "establishmentId": 3,
+    "userId": 6,
+    "rating": 5,
+    "title": "Bacsilog is life",
+    "comment": "Literally fueled my entire freshman year. Never gets old.",
+    "date": "2026-03-06",
+    "helpfulVotes": 14,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 1,
+    "userId": 3,
+    "rating": 4,
+    "title": "Convenient but sometimes out of stock",
+    "comment": "It's super convenient being inside the campus, but they run out of yellow pads quickly during exams.",
+    "date": "2026-03-11",
+    "helpfulVotes": 20,
+    "unhelpfulVotes": 1
+  },
+  {
+    "establishmentId": 1,
+    "userId": 1,
+    "rating": 5,
+    "title": "One-stop shop",
+    "comment": "They always have the textbooks I need for my courses. Helpful staff too!",
+    "date": "2026-03-03",
+    "helpfulVotes": 10,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 1,
+    "userId": 7,
+    "rating": 3,
+    "title": "A bit small",
+    "comment": "Very convenient, but it doesn't have as much selection as the branch outside at One Archers.",
+    "date": "2026-03-14",
+    "helpfulVotes": 8,
+    "unhelpfulVotes": 2
+  },
+  {
+    "establishmentId": 1,
+    "userId": 4,
+    "rating": 4,
+    "title": "Essential for exam weeks",
+    "comment": "Lifesaver when you realize you ran out of blue pens 5 minutes before your midterm starts!",
+    "date": "2026-03-16",
+    "helpfulVotes": 25,
+    "unhelpfulVotes": 1
+  },
+  {
+    "establishmentId": 2,
+    "userId": 5,
+    "rating": 5,
+    "title": "Great facility",
+    "comment": "Equipment is always clean and the staff are helpful. It gets busy at 5PM though.",
+    "date": "2026-03-14",
+    "helpfulVotes": 12,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 2,
+    "userId": 6,
+    "rating": 4,
+    "title": "Good for morning workouts",
+    "comment": "Very quiet at 6AM. Perfect for getting your workout done before classes start.",
+    "date": "2026-03-09",
+    "helpfulVotes": 7,
+    "unhelpfulVotes": 1
+  },
+  {
+    "establishmentId": 2,
+    "userId": 2,
+    "rating": 2,
+    "title": "Too small",
+    "comment": "It's a bit cramped during peak hours. Had to wait 20 minutes for a bench.",
+    "date": "2026-03-07",
+    "helpfulVotes": 4,
+    "unhelpfulVotes": 5
+  },
+  {
+    "establishmentId": 2,
+    "userId": 7,
+    "rating": 5,
+    "title": "Best AF branch in the area",
+    "comment": "Better than the Vito Cruz one. Equipment is newer and it's much better ventilated.",
+    "date": "2026-03-16",
+    "helpfulVotes": 16,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 4,
+    "userId": 1,
+    "rating": 4,
+    "title": "Nice but pricey",
+    "comment": "The units are modern and the amenities are great, but the rent is quite high for students.",
+    "date": "2026-02-16",
+    "helpfulVotes": 15,
+    "unhelpfulVotes": 2
+  },
+  {
+    "establishmentId": 4,
+    "userId": 3,
+    "rating": 5,
+    "title": "Best location",
+    "comment": "Literally zero travel time to campus. The study hall is a huge plus during finals week.",
+    "date": "2026-03-08",
+    "helpfulVotes": 22,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 4,
+    "userId": 5,
+    "rating": 3,
+    "title": "Elevator issues",
+    "comment": "Great place, but the elevators can be slow during rush hours. Better to live on lower floors if you can.",
+    "date": "2026-03-13",
+    "helpfulVotes": 30,
+    "unhelpfulVotes": 5
+  },
+  {
+    "establishmentId": 4,
+    "userId": 2,
+    "rating": 4,
+    "title": "Good amenities",
+    "comment": "Pool and gym are always well-maintained. Highly recommended for students who can afford it.",
+    "date": "2026-03-17",
+    "helpfulVotes": 12,
+    "unhelpfulVotes": 1
+  },
+  {
+    "establishmentId": 5,
+    "userId": 1,
+    "rating": 5,
+    "title": "Spanish Latte is the bomb",
+    "comment": "My daily fuel. The app makes ordering so easy.",
+    "date": "2026-03-18",
+    "helpfulVotes": 5,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 5,
+    "userId": 3,
+    "rating": 4,
+    "title": "Nice study haunt",
+    "comment": "Good coffee and relatively fast internet. Can be hard to find a table though.",
+    "date": "2026-03-15",
+    "helpfulVotes": 11,
+    "unhelpfulVotes": 1
+  },
+  {
+    "establishmentId": 5,
+    "userId": 4,
+    "rating": 5,
+    "title": "Try the Buttercreme Latte!",
+    "comment": "Unique and very smooth. My new favorite coffee place in Taft.",
+    "date": "2026-03-12",
+    "helpfulVotes": 18,
+    "unhelpfulVotes": 0
+  },
+  {
+    "establishmentId": 5,
+    "userId": 7,
+    "rating": 3,
+    "title": "Good coffee, but too loud",
+    "comment": "The blender is really loud and they play music a bit too high for studying.",
+    "date": "2026-03-17",
+    "helpfulVotes": 9,
+    "unhelpfulVotes": 3
+  },
+  {
+    "establishmentId": 5,
+    "userId": 6,
+    "rating": 4,
+    "title": "Reasonable prices",
+    "comment": "Cheaper than Starbucks but tastes just as good, if not better. Highly recommended.",
+    "date": "2026-03-13",
+    "helpfulVotes": 14,
+    "unhelpfulVotes": 0
+  }
+]
