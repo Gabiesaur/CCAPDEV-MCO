@@ -32,7 +32,7 @@ const getReviewAuthor = (rev) => {
     return { fullName, username, avatar };
 };
 
-export default function EstablishmentReviews({ reviews }) {
+export default function EstablishmentReviews({ reviews, establishment }) {
     // Create local state for reviews so we can modify them (edit/delete)
     const [localReviews, setLocalReviews] = useState(reviews);
 
@@ -57,17 +57,22 @@ export default function EstablishmentReviews({ reviews }) {
     // Local state for filtered reviews
     const filteredReviews = localReviews.filter((r) => {
         const author = getReviewAuthor(r);
+        const title = (r.title || "").toLowerCase();
+        const comment = (r.comment || "").toLowerCase();
+        const authorName = (author.fullName || "").toLowerCase();
+        const query = searchQuery.toLowerCase();
+
         return (
-            r.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            r.comment.toLowerCase().includes(searchQuery.toLowerCase()) ||
-            author.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+            title.includes(query) ||
+            comment.includes(query) ||
+            authorName.includes(query)
         );
     });
 
     // Sorting
     filteredReviews.sort(
         (a, b) =>
-            b.helpfulVotes - b.unhelpfulVotes - (a.helpfulVotes - a.unhelpfulVotes)
+            ((b.helpfulVotes || 0) - (b.unhelpfulVotes || 0)) - ((a.helpfulVotes || 0) - (a.unhelpfulVotes || 0))
     );
 
     const reviewsPerPage = 3;
@@ -258,6 +263,7 @@ export default function EstablishmentReviews({ reviews }) {
 
                                     <Link
                                         to={`/review/${rev._id || rev.id}`}
+                                        state={{ review: rev, establishment }}
                                         className="text-decoration-none d-block mt-2"
                                         style={{ color: "inherit" }}
                                     >
