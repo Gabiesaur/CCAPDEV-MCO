@@ -193,8 +193,8 @@ const LandingPage = () => {
               {showcaseReviews.map((review) => (
                 <article
                   key={review.id}
-                  className="custom-card p-4 flex-shrink-0"
-                  style={{ width: "380px", scrollSnapAlign: "start" }}
+                  className="custom-card p-4 flex-shrink-0 d-flex flex-column"
+                  style={{ width: "380px", minHeight: "360px", scrollSnapAlign: "start" }}
                 >
                   <div className="d-flex align-items-center mb-3">
                     <img
@@ -246,38 +246,40 @@ const LandingPage = () => {
                     {review.body}
                   </p>
 
-                  <div className="d-flex align-items-center gap-3 mb-3">
-                    <span className="d-inline-flex align-items-center text-muted small">
-                      <ThumbsUp size={14} className="me-1" />
-                      {review.helpfulVotes}
-                    </span>
-                    <span className="d-inline-flex align-items-center text-muted small">
-                      <ThumbsDown size={14} className="me-1" />
-                      {review.unhelpfulVotes}
-                    </span>
-                  </div>
-
-                  <Link
-                    to={`/establishment/${review.establishment.id}`}
-                    state={{ establishment: review.rawEstablishment }}
-                    className="btn btn-light border rounded-pill d-inline-flex align-items-center pe-3 ps-1 py-1 text-decoration-none"
-                    style={{ maxWidth: "100%" }}
-                  >
-                    <img
-                      src={review.establishment.image}
-                      alt="shop"
-                      className="rounded-circle me-2 object-cover"
-                      style={{ width: "28px", height: "28px" }}
-                    />
-                    <div className="lh-1 text-start">
-                      <h6 className="fw-bold mb-0 text-dark" style={{ fontSize: "0.8rem" }}>
-                        {review.establishment.name}
-                      </h6>
-                      <small className="text-muted d-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
-                        <MapPin size={10} /> {review.establishment.location}
-                      </small>
+                  <div className="mt-auto pt-2">
+                    <div className="d-flex align-items-center gap-3 mb-3">
+                      <span className="d-inline-flex align-items-center text-muted small">
+                        <ThumbsUp size={14} className="me-1" />
+                        {review.helpfulVotes}
+                      </span>
+                      <span className="d-inline-flex align-items-center text-muted small">
+                        <ThumbsDown size={14} className="me-1" />
+                        {review.unhelpfulVotes}
+                      </span>
                     </div>
-                  </Link>
+
+                    <Link
+                      to={`/establishment/${review.establishment.id}`}
+                      state={{ establishment: review.rawEstablishment }}
+                      className="btn btn-light border rounded-pill d-inline-flex align-items-center pe-3 ps-1 py-1 text-decoration-none"
+                      style={{ maxWidth: "100%" }}
+                    >
+                      <img
+                        src={review.establishment.image}
+                        alt="shop"
+                        className="rounded-circle me-2 object-cover"
+                        style={{ width: "28px", height: "28px" }}
+                      />
+                      <div className="lh-1 text-start">
+                        <h6 className="fw-bold mb-0 text-dark" style={{ fontSize: "0.8rem" }}>
+                          {review.establishment.name}
+                        </h6>
+                        <small className="text-muted d-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
+                          <MapPin size={10} /> {review.establishment.location}
+                        </small>
+                      </div>
+                    </Link>
+                  </div>
                 </article>
               ))}
             </div>
