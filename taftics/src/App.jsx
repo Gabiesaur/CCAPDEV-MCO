@@ -4,11 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
-  useNavigate,
 } from "react-router-dom";
-
-// --- DATA ---
-import { USERS } from "./data/mockData";
 
 // --- LAYOUTS ---
 import MainLayout from "./components/layout/MainLayout";
@@ -28,61 +24,86 @@ import EstablishmentPage from "./pages/Establishment";
 
 function App() {
   // GLOBAL USER STATE
-  // Check localStorage so user stays logged in if page refreshes
   const [user, setUser] = useState(() => {
     const saved = localStorage.getItem("currentUser");
     return saved ? JSON.parse(saved) : null;
   });
 
-  // Local state for users (to allow new registrations in this session)
-  const [dbUsers, setDbUsers] = useState(USERS);
+  // Local state for users - Now fetched from the database!
+  const [dbUsers, setDbUsers] = useState([]);
 
-  const login = (username, password) => {
-    const foundUser = dbUsers.find(
-      (u) =>
-        (u.username === username || u.email === username) &&
-        u.password === password,
-    );
+  // Fetch all users on mount so PublicProfilePage still works
+  useEffect(() => {
+    fetch('http://localhost:5000/api/users')
+      .then(res => res.json())
+      .then(data => setDbUsers(data))
+      .catch(err => console.error("Failed to fetch users from DB:", err));
+  }, []);
 
-    if (foundUser) {
-      setUser(foundUser);
-      localStorage.setItem("currentUser", JSON.stringify(foundUser));
-      return { success: true };
-    } else {
-      return {
-        success: false,
-        message: "Invalid credentials. Try 'leelanczers' , 'password123'",
+  const login = async (username, password) => {
+    try {
+      const response = await fetch('http://localhost:5000/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      
+      const data = await response.json();
+
+      if (response.ok) {
+        setUser(data.user);
+        localStorage.setItem("currentUser", JSON.stringify(data.user));
+        return { success: true };
+      } else {
+        return { success: false, message: data.message || "Invalid credentials." };
+      }
+    } catch (error) {
+      console.error("Login Error:", error);
+      return { success: false, message: "Server error. Is the backend running?" };
+    }
+  };
+
+  const register = async (newUser) => {
+    try {
+      // Set some defaults just like the old mock function
+      const payload = {
+        ...newUser,
+        idSeries: newUser.dlsuId || "125",
+        avatar: `https://ui-avatars.com/api/?name=${newUser.username}&background=random&color=fff`,
       };
+
+      const response = await fetch('http://localhost:5000/api/register', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        // Update local dbUsers state to immediately show the new user
+        setDbUsers([...dbUsers, data.user]); 
+        
+        // Auto-login
+        setUser(data.user);
+        localStorage.setItem("currentUser", JSON.stringify(data.user));
+        return { success: true };
+      } else {
+        return { success: false, message: data.message || "Registration failed." };
+      }
+    } catch (error) {
+      console.error("Registration Error:", error);
+      return { success: false, message: "Server error. Is the backend running?" };
     }
   };
 
-  const register = (newUser) => {
-    // Check if user exists
-    if (dbUsers.find((u) => u.username === newUser.username)) {
-      return { success: false, message: "Username already taken." };
-    }
-
-    // Create new mock user
-    const createdUser = {
-      ...newUser,
-      id: dbUsers.length + 1,
-      idSeries: newUser.dlsuId || "125", // Default if missing
-      avatar: `https://ui-avatars.com/api/?name=${newUser.username}&background=random&color=fff`,
-    };
-
-    // "Save" to DB (In memory only for demo)
-    setDbUsers([...dbUsers, createdUser]);
-
-    // Auto-login
-    setUser(createdUser);
-    localStorage.setItem("currentUser", JSON.stringify(createdUser));
-    return { success: true };
-  };
-
-  const apply = (applicant) => {
+  // Assuming Owner Application will also hit a backend endpoint later
+  const apply = async (applicant) => {
+    // Note: You'll want to wire this up to a fetch request eventually!
     if (dbUsers.find((u) => u.email === applicant.email)) {
-      return { success: false, message: "Username already taken." };
+      return { success: false, message: "Email already exists." };
     }
+    return { success: true, message: "Application submitted!" };
   };
 
   const logout = () => {
@@ -93,7 +114,6 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        {/* Pass User & Logout to MainLayout */}
         <Route element={<MainLayout user={user} onLogout={logout} />}>
           <Route path="/" element={<LandingPage />} />
           <Route path="/about" element={<AboutUsPage />} />
@@ -101,11 +121,9 @@ function App() {
           <Route path="/review" element={<ReviewPage />} />
           <Route path="/create" element={<CreateReviewPage />} />
 
-          {/* Dynamic Establishment Route */}
           <Route path="/establishment/:id" element={<EstablishmentPage />} />
           <Route path="/establishment" element={<EstablishmentPage />} />
 
-          {/* Protected Route Check */}
           <Route
             path="/profile/me"
             element={
@@ -122,7 +140,6 @@ function App() {
           />
         </Route>
 
-        {/* Pass Auth Functions to Login/Reg */}
         <Route path="/login" element={<LoginPage onLogin={login} />} />
         <Route path="/register" element={<RegPage onRegister={register} />} />
         <Route path="/apply" element={<OwnerAppPage onRegister={apply} />} />

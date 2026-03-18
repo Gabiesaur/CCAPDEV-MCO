@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star, Search } from "lucide-react";
 
 import RatingFilter from "../components/browse/RatingFilter";
 import EstablishmentCard from "../components/browse/EstablishmentCard";
-import { ESTABLISHMENTS } from "../data/mockData";
+
+// ❌ REMOVED: import { ESTABLISHMENTS } from "../data/mockData";
 
 const BrowsePage = () => {
   // 1. Initialize states for each filter group
@@ -13,12 +14,30 @@ const BrowsePage = () => {
   const [activePrice, setActivePrice] = useState('Any');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // 2. NEW: State to hold the fetched establishments
+  const [establishments, setEstablishments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
   const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
   const hours = ['Any', 'Open Now', '24/7'];
   const prices = ['Any', 'P', 'PP', 'PPP'];
 
-  // Filter establishments based on active filters and search query
-  const filteredEstablishments = ESTABLISHMENTS.filter(est => {
+  // 3. NEW: Fetch establishments from the database on component mount
+  useEffect(() => {
+    fetch('http://localhost:5000/api/establishments')
+      .then(res => res.json())
+      .then(data => {
+        setEstablishments(data);
+        setLoading(false);
+      })
+      .catch(err => {
+        console.error("Failed to fetch establishments:", err);
+        setLoading(false);
+      });
+  }, []);
+
+  // Filter establishments based on active filters, search query, AND the live database state
+  const filteredEstablishments = establishments.filter(est => {
     // Category filter
     if (activeCategory !== 'Any' && est.category !== activeCategory) return false;
 
@@ -119,11 +138,15 @@ const BrowsePage = () => {
 
             {/* Establishment Cards Container */}
             <div style={{ paddingTop: '24px', paddingBottom: '80px', width: '720px' }}>
-              {filteredEstablishments.length > 0 ? (
+              {loading ? (
+                <div className="text-center py-5">
+                  <p className="text-muted fs-5">Loading establishments...</p>
+                </div>
+              ) : filteredEstablishments.length > 0 ? (
                 filteredEstablishments.map((store) => (
                   <EstablishmentCard
-                    key={store.id}
-                    id={store.id} // Pass Id
+                    key={store._id}       // ✅ CHANGED: MongoDB uses _id
+                    id={store._id}        // ✅ CHANGED: Passing the MongoDB ID to the card
                     name={store.name}
                     category={store.category}
                     location={store.location}

@@ -1,14 +1,18 @@
-const mongoose = require('mongoose');
+const mongoose = require('mongoose')
 
 const UserSchema = new mongoose.Schema({
     username: { type: String, required: true, unique: true },
+    password: { type: String, required: true }, // In production, hash this!
+    name: String,
     email: { type: String, required: true, unique: true },
-    password: { type: String, required: true }, 
-    profilePic: { type: String, default: "" },
-    createdAt: { type: Date, default: Date.now },
-    savedReviews: [{ 
-    type: mongoose.Schema.Types.ObjectId, 
-    ref: 'Review' }],
-});
+    idSeries: String,
+    bio: String,
+    followers: { type: Number, default: 0 },
+    helpfulCount: { type: Number, default: 0 },
+    contributions: { type: Number, default: 0 },
+    avatar: String,
+    isAdmin: { type: Boolean, default: false }
+})
 
-module.exports = mongoose.model('User', UserSchema);
+const User = mongoose.model('User', UserSchema)
+module.exports = User
