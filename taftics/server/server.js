@@ -15,7 +15,7 @@ app.use(cors()); //
 app.use(express.json()); // Allows the server to accept JSON data
 app.use(express.urlencoded({ extended: true })); //
 app.use(express.static('public')); //
-app.use(fileUpload( {parseNested: true} )); //
+app.use(fileUpload({ parseNested: true })); //
 
 // --- DATABASE CONNECTION ---
 const mongoUri = process.env.MONGO_URI; //
@@ -43,7 +43,7 @@ const Establishment = require('./models/Establishment'); // Adjust path if neede
 app.get('/api/establishments', async (req, res) => {
   try {
     // .find({}) tells Mongoose to get everything in that collection
-    const establishments = await Establishment.find({}); 
+    const establishments = await Establishment.find({});
     res.json(establishments);
   } catch (error) {
     console.error("Error fetching establishments:", error);
@@ -65,8 +65,8 @@ app.post('/api/login', async (req, res) => {
     }
 
     // 3. Success! Send the user data back to React (omitting the password!)
-    res.json({ 
-      success: true, 
+    res.json({
+      success: true,
       user: {
         _id: user._id,
         username: user.username,
@@ -79,7 +79,7 @@ app.post('/api/login', async (req, res) => {
         contributions: user.contributions,
         avatar: user.avatar,
         isAdmin: user.isAdmin
-      } 
+      }
     });
 
   } catch (error) {
@@ -95,8 +95,8 @@ app.post('/api/register', async (req, res) => {
     const { username, email, password, dlsuId } = req.body;
 
     // 1. Check if username or email already exists
-    const existingUser = await User.findOne({ 
-      $or: [{ username: username }, { email: email }] 
+    const existingUser = await User.findOne({
+      $or: [{ username: username }, { email: email }]
     });
 
     if (existingUser) {
@@ -114,7 +114,7 @@ app.post('/api/register', async (req, res) => {
 
       // Move the file to your public/uploads folder
       await avatarFile.mv(uploadPath);
-      
+
       // Set the URL that React will use to display the image
       avatarUrl = `http://localhost:5000/uploads/${fileName}`;
     }
@@ -132,8 +132,8 @@ app.post('/api/register', async (req, res) => {
     await newUser.save();
 
     // 4. Send success response and auto-login the user
-    res.status(201).json({ 
-      success: true, 
+    res.status(201).json({
+      success: true,
       user: {
         _id: newUser._id,
         username: newUser.username,
@@ -155,13 +155,13 @@ app.post('/api/reviews', async (req, res) => {
   console.log("req.body:", req.body);   // Should show userId, rating, title, text
   console.log("req.files:", req.files); // Should show uploaded files if any
   try {
-    const { userId, establishmentId, rating, title, text } = req.body;
+    const { userId, establishmentId, rating, title, body } = req.body;
 
     // 1. Process Images using express-fileupload
     let imageUrls = [];
     if (req.files && req.files.images) {
       const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
-      
+
       for (const file of files) {
         const fileName = `${Date.now()}_${file.name}`;
         const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
@@ -176,7 +176,7 @@ app.post('/api/reviews', async (req, res) => {
       establishmentId,
       rating: Number(rating),
       title,
-      text,
+      body,
       images: imageUrls,
       date: new Date()
     });
@@ -203,11 +203,11 @@ app.get('/api/establishments/:id', async (req, res) => {
   try {
     // Find establishment by its unique MongoDB _id
     const establishment = await Establishment.findById(req.params.id);
-    
+
     if (!establishment) {
       return res.status(404).json({ message: "Establishment not found" });
     }
-    
+
     res.json(establishment);
   } catch (error) {
     console.error("Error fetching establishment:", error);
@@ -221,7 +221,7 @@ app.get('/api/establishments/:id/reviews', async (req, res) => {
     // Find all reviews where establishmentId matches the URL parameter
     const reviews = await Review.find({ establishmentId: req.params.id })
       // .populate() pulls the user details from the User collection!
-      .populate('userId', 'username name avatar') 
+      .populate('userId', 'username name avatar')
       .sort({ date: -1 }); // Sort by newest first
 
     res.json(reviews);
@@ -238,8 +238,8 @@ app.get('/api/users', async (req, res) => {
     // .find({}) tells MongoDB to get every single user document.
     // .select('-password') is CRITICAL: it strips the password field out 
     // before sending the data to the frontend so your users stay secure!
-    const users = await User.find({}).select('-password'); 
-    
+    const users = await User.find({}).select('-password');
+
     res.json(users);
 
   } catch (error) {
@@ -278,7 +278,7 @@ app.get('/api/reviews/:id', async (req, res) => {
       .populate('userId', 'username name avatar')
       .populate('establishmentId', 'name location')
       // THIS IS NEW: It grabs the user info for every comment!
-      .populate('comments.userId', 'username name avatar'); 
+      .populate('comments.userId', 'username name avatar');
 
     if (!review) {
       return res.status(404).json({ message: "Review not found" });
@@ -304,14 +304,14 @@ app.put('/api/users/:id/avatar', async (req, res) => {
 
     // 2. Move the file to your public/uploads folder
     await avatarFile.mv(uploadPath);
-    
+
     // 3. Generate the new URL
     const avatarUrl = `http://localhost:5000/uploads/${fileName}`;
 
     // 4. Find the user and update their avatar in the database
     // { new: true } tells Mongoose to return the UPDATED user document
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id, 
+      req.params.id,
       { avatar: avatarUrl },
       { returnDocument: 'after' } // <-- Replaced { new: true }
     ).select('-password');
@@ -336,7 +336,7 @@ app.put('/api/users/:id/bio', async (req, res) => {
 
     // Find the user by ID and update the bio field
     const updatedUser = await User.findByIdAndUpdate(
-      req.params.id, 
+      req.params.id,
       { bio: bio },
       { returnDocument: 'after' } // <-- Replaced { new: true }
     ).select('-password');

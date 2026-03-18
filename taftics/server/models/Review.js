@@ -6,6 +6,12 @@ const ReviewSchema = new mongoose.Schema({
     rating: Number,
     title: String,
     body: String,
+    images: [String],
+    comments: [{
+        userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+        text: String,
+        date: { type: Date, default: Date.now }
+    }],
     date: { type: Date, default: Date.now },
     helpfulVotes: { type: Number, default: 0 },
     unhelpfulVotes: { type: Number, default: 0 }

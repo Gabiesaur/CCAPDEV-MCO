@@ -1,8 +1,14 @@
 [
   {
-    "_id": { "$oid": "65f200000000000000000001" },
-    "establishmentId": { "$oid": "65f000000000000000000006" },
-    "userId": { "$oid": "65f100000000000000000001" },
+    "_id": {
+      "$oid": "65f200000000000000000001"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000006"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000001"
+    },
     "rating": 4,
     "title": "Pretty nice!",
     "body": "The service was okay but a bit crowded during peak hours.",
@@ -11,9 +17,15 @@
     "unhelpfulVotes": 3
   },
   {
-    "_id": { "$oid": "65f200000000000000000002" },
-    "establishmentId": { "$oid": "65f000000000000000000006" },
-    "userId": { "$oid": "65f100000000000000000002" },
+    "_id": {
+      "$oid": "65f200000000000000000002"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000006"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000002"
+    },
     "rating": 2,
     "title": "Bad experience.",
     "body": "Too many people and slow service. Not recommended on weekends.",
@@ -22,9 +34,15 @@
     "unhelpfulVotes": 12
   },
   {
-    "_id": { "$oid": "65f200000000000000000003" },
-    "establishmentId": { "$oid": "65f000000000000000000006" },
-    "userId": { "$oid": "65f100000000000000000003" },
+    "_id": {
+      "$oid": "65f200000000000000000003"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000006"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000003"
+    },
     "rating": 5,
     "title": "Excellent service!",
     "body": "Great service and fast turnaround! Highly recommend.",
@@ -33,9 +51,15 @@
     "unhelpfulVotes": 2
   },
   {
-    "_id": { "$oid": "65f200000000000000000004" },
-    "establishmentId": { "$oid": "65f000000000000000000006" },
-    "userId": { "$oid": "65f100000000000000000004" },
+    "_id": {
+      "$oid": "65f200000000000000000004"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000006"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000004"
+    },
     "rating": 5,
     "title": "Best laundry in town",
     "body": "Quick service and very friendly staff. Will come back again! Also they have free wifi while you wait which is a huge plus for students.",
@@ -44,9 +68,15 @@
     "unhelpfulVotes": 1
   },
   {
-    "_id": { "$oid": "65f200000000000000000005" },
-    "establishmentId": { "$oid": "65f000000000000000000006" },
-    "userId": { "$oid": "65f100000000000000000005" },
+    "_id": {
+      "$oid": "65f200000000000000000005"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000006"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000005"
+    },
     "rating": 3,
     "title": "Average experience",
     "body": "The service was okay but a bit pricey compared to others nearby.",
@@ -55,9 +85,15 @@
     "unhelpfulVotes": 3
   },
   {
-    "_id": { "$oid": "65f200000000000000000006" },
-    "establishmentId": { "$oid": "65f000000000000000000006" },
-    "userId": { "$oid": "65f100000000000000000006" },
+    "_id": {
+      "$oid": "65f200000000000000000006"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000006"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000006"
+    },
     "rating": 5,
     "title": "Reliable and fast",
     "body": "Always get my clothes back smelling fresh and neatly folded within 24 hours.",
@@ -66,9 +102,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000007" },
-    "establishmentId": { "$oid": "65f000000000000000000003" },
-    "userId": { "$oid": "65f100000000000000000001" },
+    "_id": {
+      "$oid": "65f200000000000000000007"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000003"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000001"
+    },
     "rating": 5,
     "title": "The best budget friendly meals on campus!",
     "body": "Ate Rica's remains the gold standard for a quick and affordable meal between classes at Andrew. That signature liquid cheese sauce combined with the smoky bacon bits is an elite flavor combination that never misses.",
@@ -77,9 +119,15 @@
     "unhelpfulVotes": 2
   },
   {
-    "_id": { "$oid": "65f200000000000000000008" },
-    "establishmentId": { "$oid": "65f000000000000000000003" },
-    "userId": { "$oid": "65f100000000000000000004" },
+    "_id": {
+      "$oid": "65f200000000000000000008"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000003"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000004"
+    },
     "rating": 5,
     "title": "Always consistent",
     "body": "You know what you're getting. Heavy on the rice, heavy on the sauce. Perfect.",
@@ -88,9 +136,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000009" },
-    "establishmentId": { "$oid": "65f000000000000000000003" },
-    "userId": { "$oid": "65f100000000000000000002" },
+    "_id": {
+      "$oid": "65f200000000000000000009"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000003"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000002"
+    },
     "rating": 4,
     "title": "Great value for money",
     "body": "A little salty for some, but I personally love the cheese sauce. Best to eat while hot!",
@@ -99,9 +153,15 @@
     "unhelpfulVotes": 1
   },
   {
-    "_id": { "$oid": "65f200000000000000000010" },
-    "establishmentId": { "$oid": "65f000000000000000000003" },
-    "userId": { "$oid": "65f100000000000000000005" },
+    "_id": {
+      "$oid": "65f200000000000000000010"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000003"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000005"
+    },
     "rating": 3,
     "title": "Too crowded sometimes",
     "body": "Love the food, but the queue at Agno can be insane during lunch hour.",
@@ -110,9 +170,15 @@
     "unhelpfulVotes": 2
   },
   {
-    "_id": { "$oid": "65f200000000000000000011" },
-    "establishmentId": { "$oid": "65f000000000000000000003" },
-    "userId": { "$oid": "65f100000000000000000006" },
+    "_id": {
+      "$oid": "65f200000000000000000011"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000003"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000006"
+    },
     "rating": 5,
     "title": "Bacsilog is life",
     "body": "Literally fueled my entire freshman year. Never gets old.",
@@ -121,9 +187,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000012" },
-    "establishmentId": { "$oid": "65f000000000000000000001" },
-    "userId": { "$oid": "65f100000000000000000003" },
+    "_id": {
+      "$oid": "65f200000000000000000012"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000001"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000003"
+    },
     "rating": 4,
     "title": "Convenient but sometimes out of stock",
     "body": "It's super convenient being inside the campus, but they run out of yellow pads quickly during exams.",
@@ -132,9 +204,15 @@
     "unhelpfulVotes": 1
   },
   {
-    "_id": { "$oid": "65f200000000000000000013" },
-    "establishmentId": { "$oid": "65f000000000000000000001" },
-    "userId": { "$oid": "65f100000000000000000001" },
+    "_id": {
+      "$oid": "65f200000000000000000013"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000001"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000001"
+    },
     "rating": 5,
     "title": "One-stop shop",
     "body": "They always have the textbooks I need for my courses. Helpful staff too!",
@@ -143,9 +221,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000014" },
-    "establishmentId": { "$oid": "65f000000000000000000001" },
-    "userId": { "$oid": "65f100000000000000000007" },
+    "_id": {
+      "$oid": "65f200000000000000000014"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000001"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000007"
+    },
     "rating": 3,
     "title": "A bit small",
     "body": "Very convenient, but it doesn't have as much selection as the branch outside at One Archers.",
@@ -154,9 +238,15 @@
     "unhelpfulVotes": 2
   },
   {
-    "_id": { "$oid": "65f200000000000000000015" },
-    "establishmentId": { "$oid": "65f000000000000000000001" },
-    "userId": { "$oid": "65f100000000000000000004" },
+    "_id": {
+      "$oid": "65f200000000000000000015"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000001"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000004"
+    },
     "rating": 4,
     "title": "Essential for exam weeks",
     "body": "Lifesaver when you realize you ran out of blue pens 5 minutes before your midterm starts!",
@@ -165,9 +255,15 @@
     "unhelpfulVotes": 1
   },
   {
-    "_id": { "$oid": "65f200000000000000000016" },
-    "establishmentId": { "$oid": "65f000000000000000000002" },
-    "userId": { "$oid": "65f100000000000000000005" },
+    "_id": {
+      "$oid": "65f200000000000000000016"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000002"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000005"
+    },
     "rating": 5,
     "title": "Great facility",
     "body": "Equipment is always clean and the staff are helpful. It gets busy at 5PM though.",
@@ -176,9 +272,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000017" },
-    "establishmentId": { "$oid": "65f000000000000000000002" },
-    "userId": { "$oid": "65f100000000000000000006" },
+    "_id": {
+      "$oid": "65f200000000000000000017"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000002"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000006"
+    },
     "rating": 4,
     "title": "Good for morning workouts",
     "body": "Very quiet at 6AM. Perfect for getting your workout done before classes start.",
@@ -187,9 +289,15 @@
     "unhelpfulVotes": 1
   },
   {
-    "_id": { "$oid": "65f200000000000000000018" },
-    "establishmentId": { "$oid": "65f000000000000000000002" },
-    "userId": { "$oid": "65f100000000000000000002" },
+    "_id": {
+      "$oid": "65f200000000000000000018"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000002"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000002"
+    },
     "rating": 2,
     "title": "Too small",
     "body": "It's a bit cramped during peak hours. Had to wait 20 minutes for a bench.",
@@ -198,9 +306,15 @@
     "unhelpfulVotes": 5
   },
   {
-    "_id": { "$oid": "65f200000000000000000019" },
-    "establishmentId": { "$oid": "65f000000000000000000002" },
-    "userId": { "$oid": "65f100000000000000000007" },
+    "_id": {
+      "$oid": "65f200000000000000000019"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000002"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000007"
+    },
     "rating": 5,
     "title": "Best AF branch in the area",
     "body": "Better than the Vito Cruz one. Equipment is newer and it's much better ventilated.",
@@ -209,9 +323,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000020" },
-    "establishmentId": { "$oid": "65f000000000000000000004" },
-    "userId": { "$oid": "65f100000000000000000001" },
+    "_id": {
+      "$oid": "65f200000000000000000020"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000004"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000001"
+    },
     "rating": 4,
     "title": "Nice but pricey",
     "body": "The units are modern and the amenities are great, but the rent is quite high for students.",
@@ -220,9 +340,15 @@
     "unhelpfulVotes": 2
   },
   {
-    "_id": { "$oid": "65f200000000000000000021" },
-    "establishmentId": { "$oid": "65f000000000000000000004" },
-    "userId": { "$oid": "65f100000000000000000003" },
+    "_id": {
+      "$oid": "65f200000000000000000021"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000004"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000003"
+    },
     "rating": 5,
     "title": "Best location",
     "body": "Literally zero travel time to campus. The study hall is a huge plus during finals week.",
@@ -231,9 +357,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000022" },
-    "establishmentId": { "$oid": "65f000000000000000000004" },
-    "userId": { "$oid": "65f100000000000000000005" },
+    "_id": {
+      "$oid": "65f200000000000000000022"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000004"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000005"
+    },
     "rating": 3,
     "title": "Elevator issues",
     "body": "Great place, but the elevators can be slow during rush hours. Better to live on lower floors if you can.",
@@ -242,9 +374,15 @@
     "unhelpfulVotes": 5
   },
   {
-    "_id": { "$oid": "65f200000000000000000023" },
-    "establishmentId": { "$oid": "65f000000000000000000004" },
-    "userId": { "$oid": "65f100000000000000000002" },
+    "_id": {
+      "$oid": "65f200000000000000000023"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000004"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000002"
+    },
     "rating": 4,
     "title": "Good amenities",
     "body": "Pool and gym are always well-maintained. Highly recommended for students who can afford it.",
@@ -253,9 +391,15 @@
     "unhelpfulVotes": 1
   },
   {
-    "_id": { "$oid": "65f200000000000000000024" },
-    "establishmentId": { "$oid": "65f000000000000000000005" },
-    "userId": { "$oid": "65f100000000000000000001" },
+    "_id": {
+      "$oid": "65f200000000000000000024"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000005"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000001"
+    },
     "rating": 5,
     "title": "Spanish Latte is the bomb",
     "body": "My daily fuel. The app makes ordering so easy.",
@@ -264,9 +408,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000025" },
-    "establishmentId": { "$oid": "65f000000000000000000005" },
-    "userId": { "$oid": "65f100000000000000000003" },
+    "_id": {
+      "$oid": "65f200000000000000000025"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000005"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000003"
+    },
     "rating": 4,
     "title": "Nice study haunt",
     "body": "Good coffee and relatively fast internet. Can be hard to find a table though.",
@@ -275,9 +425,15 @@
     "unhelpfulVotes": 1
   },
   {
-    "_id": { "$oid": "65f200000000000000000026" },
-    "establishmentId": { "$oid": "65f000000000000000000005" },
-    "userId": { "$oid": "65f100000000000000000004" },
+    "_id": {
+      "$oid": "65f200000000000000000026"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000005"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000004"
+    },
     "rating": 5,
     "title": "Try the Buttercreme Latte!",
     "body": "Unique and very smooth. My new favorite coffee place in Taft.",
@@ -286,9 +442,15 @@
     "unhelpfulVotes": 0
   },
   {
-    "_id": { "$oid": "65f200000000000000000027" },
-    "establishmentId": { "$oid": "65f000000000000000000005" },
-    "userId": { "$oid": "65f100000000000000000007" },
+    "_id": {
+      "$oid": "65f200000000000000000027"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000005"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000007"
+    },
     "rating": 3,
     "title": "Good coffee, but too loud",
     "body": "The blender is really loud and they play music a bit too high for studying.",
@@ -297,9 +459,15 @@
     "unhelpfulVotes": 3
   },
   {
-    "_id": { "$oid": "65f200000000000000000028" },
-    "establishmentId": { "$oid": "65f000000000000000000005" },
-    "userId": { "$oid": "65f100000000000000000006" },
+    "_id": {
+      "$oid": "65f200000000000000000028"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000005"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000006"
+    },
     "rating": 4,
     "title": "Reasonable prices",
     "body": "Cheaper than Starbucks but tastes just as good, if not better. Highly recommended.",

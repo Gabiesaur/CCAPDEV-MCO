@@ -120,7 +120,7 @@ function CreateReview() {
         formData.append("establishmentId", selectedEstablishment._id);
         formData.append("rating", rating);
         formData.append("title", titleText);
-        formData.append("text", reviewText);
+        formData.append("body", reviewText);
 
         // Append each selected image file
         images.forEach((imgObj) => {

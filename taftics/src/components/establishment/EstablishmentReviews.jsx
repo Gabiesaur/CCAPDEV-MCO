@@ -58,22 +58,19 @@ export default function EstablishmentReviews({ reviews, establishment }) {
     const filteredReviews = localReviews.filter((r) => {
         const author = getReviewAuthor(r);
         const title = (r.title || "").toLowerCase();
-        const comment = (r.comment || "").toLowerCase();
+        const bodyText = (r.body || r.comment || "").toLowerCase();
         const authorName = (author.fullName || "").toLowerCase();
         const query = searchQuery.toLowerCase();
 
         return (
             title.includes(query) ||
-            comment.includes(query) ||
+            bodyText.includes(query) ||
             authorName.includes(query)
         );
     });
 
-    // Sorting
-    filteredReviews.sort(
-        (a, b) =>
-            ((b.helpfulVotes || 0) - (b.unhelpfulVotes || 0)) - ((a.helpfulVotes || 0) - (a.unhelpfulVotes || 0))
-    );
+    // Sorting by date as default
+    filteredReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     const reviewsPerPage = 3;
     const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
@@ -285,7 +282,7 @@ export default function EstablishmentReviews({ reviews, establishment }) {
                                                 WebkitBoxOrient: "vertical",
                                             }}
                                         >
-                                            {rev.comment}
+                                            {rev.body || rev.comment}
                                         </p>
                                     </Link>
 
