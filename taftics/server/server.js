@@ -155,7 +155,7 @@ app.post('/api/reviews', async (req, res) => {
   console.log("req.body:", req.body);   // Should show userId, rating, title, text
   console.log("req.files:", req.files); // Should show uploaded files if any
   try {
-    const { userId, establishmentId, rating, title, text } = req.body;
+    const { userId, establishmentId, rating, title, body } = req.body;
 
     // 1. Process Images using express-fileupload
     let imageUrls = [];
@@ -176,7 +176,7 @@ app.post('/api/reviews', async (req, res) => {
       establishmentId,
       rating: Number(rating),
       title,
-      text,
+      body,
       images: imageUrls,
       date: new Date()
     });
