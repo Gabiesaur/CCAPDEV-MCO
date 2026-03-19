@@ -67,7 +67,7 @@ const LandingPage = () => {
           rating: Number(review.rating || 0),
           date: getRelativeDate(review.date),
           title: review.title || "Untitled Review",
-          body: review.comment || review.text || "",
+          body: review.comment || review.body || "",
           helpfulVotes: Number(review.helpfulVotes || 0),
           unhelpfulVotes: Number(review.unhelpfulVotes || 0),
           establishment: {

@@ -3,8 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const fileUpload = require('express-fileupload'); // Moved up
 require('dotenv').config({ path: path.resolve(__dirname, 'taftics.env') }); //
+const Establishment = require('./models/Establishment');
 const User = require('./models/User'); // Adjust the path if needed
 const Review = require('./models/Review');
+const Comment = require('./models/Comment');
 
 const express = require('express');
 const app = express();
@@ -16,6 +18,8 @@ app.use(express.json()); // Allows the server to accept JSON data
 app.use(express.urlencoded({ extended: true })); //
 app.use(express.static('public')); //
 app.use(fileUpload({ parseNested: true })); //
+// Expose the 'public/uploads' directory to the web under the '/uploads' URL path
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // --- DATABASE CONNECTION ---
 const mongoUri = process.env.MONGO_URI; //
@@ -32,10 +36,6 @@ mongoose.connect(mongoUri) //
 app.get('/', (req, res) => { //
   res.send('API is running...'); //
 });
-
-// Your API routes (like app.post('/api/register')) will go here!
-// Import your new Mongoose Model
-const Establishment = require('./models/Establishment'); // Adjust path if needed
 
 // --- API ROUTES ---
 
@@ -55,11 +55,11 @@ app.get('/api/establishments', async (req, res) => {
         $addFields: {
           reviewCount: { $size: "$reviews" },
           rating: {
-             $cond: {
-               if: { $gt: [{ $size: "$reviews" }, 0] },
-               then: { $round: [{ $avg: "$reviews.rating" }, 1] },
-               else: 0
-             }
+            $cond: {
+              if: { $gt: [{ $size: "$reviews" }, 0] },
+              then: { $round: [{ $avg: "$reviews.rating" }, 1] },
+              else: 0
+            }
           }
         }
       },
@@ -78,7 +78,13 @@ app.get('/api/establishments', async (req, res) => {
 
 // --- LOGIN ROUTE ---
 app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
+  // Grab the input, whether the frontend sent it as 'username' or 'email'
+  const loginIdentifier = req.body.username || req.body.email;
+  const password = req.body.password;
+
+  if (!loginIdentifier || !password) {
+    return res.status(400).json({ success: false, message: "Please provide credentials" });
+  }
 
   try {
     const users = await User.aggregate([
@@ -109,7 +115,7 @@ app.post('/api/login', async (req, res) => {
 
     // 2. Check if user exists AND password matches
     if (!user || user.password !== password) {
-      return res.status(401).json({ success: false, message: "Invalid username or password" });
+      return res.status(401).json({ success: false, message: "Invalid username/email or password" });
     }
 
     // 3. Success! Send the user data back to React (omitting the password!)
@@ -247,7 +253,7 @@ app.put('/api/reviews/:id', async (req, res) => {
   try {
     const { rating, title, body, comment, existingImages } = req.body;
     const reviewText = body || comment; // support both from frontend
-    
+
     // 1. Find existing review
     const existingReview = await Review.findById(req.params.id);
     if (!existingReview) {
@@ -258,7 +264,7 @@ app.put('/api/reviews/:id', async (req, res) => {
     // 3. Process Images
     let imageUrls = [];
     if (existingImages) {
-        imageUrls = Array.isArray(existingImages) ? existingImages : [existingImages];
+      imageUrls = Array.isArray(existingImages) ? existingImages : [existingImages];
     }
 
     if (req.files && req.files.images) {
@@ -277,12 +283,12 @@ app.put('/api/reviews/:id', async (req, res) => {
     if (title !== undefined) existingReview.title = title;
     if (reviewText !== undefined) existingReview.body = reviewText;
     existingReview.isEdited = true;
-    
+
     await existingReview.save();
 
     // Populate user to return fully formed review for frontend state
     await existingReview.populate('userId', 'username name avatar');
-    
+
     res.json({ success: true, review: existingReview });
   } catch (error) {
     console.error("Error updating review:", error);
@@ -293,8 +299,8 @@ app.put('/api/reviews/:id', async (req, res) => {
 // --- TOGGLE REVIEW VOTE ---
 app.put('/api/reviews/:id/vote', async (req, res) => {
   try {
-    const { userId, type } = req.body; 
-    
+    const { userId, type } = req.body;
+
     if (!userId) return res.status(401).json({ success: false, message: "Unauthorized. Please login to vote." });
 
     const reviewId = req.params.id;
@@ -386,7 +392,7 @@ app.get('/api/establishments/:id/reviews', async (req, res) => {
 app.put('/api/establishments/:id', async (req, res) => {
   try {
     const { name, category, startTime, endTime } = req.body;
-    
+
     const formatTime = (timeStr) => {
       if (!timeStr) return '';
       const [hourStr, minStr] = timeStr.split(':');
@@ -396,7 +402,7 @@ app.put('/api/establishments/:id', async (req, res) => {
       hour = hour ? hour : 12;
       return `${hour}:${minStr} ${ampm}`;
     };
-    
+
     const formattedHours = `${formatTime(startTime)} - ${formatTime(endTime)}`;
 
     const establishment = await Establishment.findByIdAndUpdate(
@@ -442,7 +448,7 @@ app.get('/api/users', async (req, res) => {
         }
       },
       {
-         $project: { password: 0, userReviews: 0 }
+        $project: { password: 0, userReviews: 0 }
       }
     ]);
 
@@ -482,7 +488,7 @@ app.get('/api/users/:username', async (req, res) => {
         }
       },
       {
-         $project: { password: 0, userReviews: 0 }
+        $project: { password: 0, userReviews: 0 }
       }
     ]);
 
@@ -508,10 +514,10 @@ app.put('/api/users/:id/bookmark', async (req, res) => {
     const { establishmentId } = req.body;
     const user = await User.findById(req.params.id);
     if (!user) return res.status(404).json({ success: false, message: "User not found" });
-    
+
     // Check if establishment is already saved
     const isSaved = user.savedEstablishments && user.savedEstablishments.includes(establishmentId);
-    
+
     if (isSaved) {
       // Remove it
       user.savedEstablishments = user.savedEstablishments.filter(id => id.toString() !== establishmentId);
@@ -520,7 +526,7 @@ app.put('/api/users/:id/bookmark', async (req, res) => {
       if (!user.savedEstablishments) user.savedEstablishments = [];
       user.savedEstablishments.push(establishmentId);
     }
-    
+
     await user.save();
     res.json({ success: true, isBookmarked: !isSaved, savedEstablishments: user.savedEstablishments });
   } catch (error) {
@@ -562,9 +568,9 @@ app.get('/api/users/:id/bookmarks', async (req, res) => {
 app.get('/api/users/:id/reviews', async (req, res) => {
   try {
     const reviews = await Review.find({ userId: req.params.id })
-                                .populate('userId', 'username name avatar')
-                                .populate('establishmentId', 'name image location')
-                                .sort({ date: -1 });
+      .populate('userId', 'username name avatar')
+      .populate('establishmentId', 'name image location')
+      .sort({ date: -1 });
     res.json(reviews);
   } catch (error) {
     console.error("Error fetching user reviews:", error);
@@ -576,9 +582,9 @@ app.get('/api/users/:id/reviews', async (req, res) => {
 app.get('/api/users/:id/helpful-reviews', async (req, res) => {
   try {
     const reviews = await Review.find({ helpfulVoters: req.params.id })
-                                .populate('userId', 'username name avatar')
-                                .populate('establishmentId', 'name image location')
-                                .sort({ date: -1 });
+      .populate('userId', 'username name avatar')
+      .populate('establishmentId', 'name image location')
+      .sort({ date: -1 });
     res.json(reviews);
   } catch (error) {
     console.error("Error fetching helpful reviews:", error);
@@ -590,9 +596,9 @@ app.get('/api/users/:id/helpful-reviews', async (req, res) => {
 app.get('/api/users/:id/unhelpful-reviews', async (req, res) => {
   try {
     const reviews = await Review.find({ unhelpfulVoters: req.params.id })
-                                .populate('userId', 'username name avatar')
-                                .populate('establishmentId', 'name image location')
-                                .sort({ date: -1 });
+      .populate('userId', 'username name avatar')
+      .populate('establishmentId', 'name image location')
+      .sort({ date: -1 });
     res.json(reviews);
   } catch (error) {
     console.error("Error fetching unhelpful reviews:", error);
@@ -679,6 +685,46 @@ app.put('/api/users/:id/bio', async (req, res) => {
   } catch (error) {
     console.error("Bio update error:", error);
     res.status(500).json({ success: false, message: "Server error updating bio" });
+  }
+});
+
+// ==========================================
+//              COMMENT ROUTES
+// ==========================================
+
+// 1. GET ALL COMMENTS FOR A SPECIFIC REVIEW
+app.get('/api/reviews/:id/comments', async (req, res) => {
+  try {
+    // Find all comments where the reviewId matches the URL parameter
+    // We populate the userId so the frontend gets the commenter's name & avatar
+    const comments = await Comment.find({ reviewId: req.params.id })
+      .populate('userId', 'username name avatar')
+      .sort({ date: -1 }); // Sort by newest comments first
+
+    res.json(comments);
+  } catch (error) {
+    console.error("Error fetching comments for review:", error);
+    res.status(500).json({ message: "Server error while fetching comments" });
+  }
+});
+
+// 2. GET A SPECIFIC COMMENT FROM A SPECIFIC REVIEW
+app.get('/api/reviews/:reviewId/comments/:commentId', async (req, res) => {
+  try {
+    // Find a single comment ensuring both the comment ID and review ID match
+    const comment = await Comment.findOne({
+      _id: req.params.commentId,
+      reviewId: req.params.reviewId
+    }).populate('userId', 'username name avatar');
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    res.json(comment);
+  } catch (error) {
+    console.error("Error fetching specific comment:", error);
+    res.status(500).json({ message: "Server error while fetching specific comment" });
   }
 });
 
