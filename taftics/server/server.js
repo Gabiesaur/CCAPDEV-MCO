@@ -79,7 +79,7 @@ app.get('/api/establishments', async (req, res) => {
 // --- LOGIN ROUTE ---
 app.post('/api/login', async (req, res) => {
   // Grab the input, whether the frontend sent it as 'username' or 'email'
-  const loginIdentifier = req.body.username || req.body.email;
+  const loginIdentifier = req.body.username || req.body.email; 
   const password = req.body.password;
 
   if (!loginIdentifier || !password) {
@@ -87,17 +87,28 @@ app.post('/api/login', async (req, res) => {
   }
 
   try {
+    // 1. Find the user and calculate their stats dynamically using aggregation
     const users = await User.aggregate([
-      { $match: { username: username } },
+      { 
+        // Match by EITHER username OR email
+        $match: { 
+          $or: [
+            { username: loginIdentifier },
+            { email: loginIdentifier }
+          ] 
+        } 
+      },
       {
+        // Join with the reviews collection to find all reviews by this user
         $lookup: {
-          from: 'reviews',
+          from: 'reviews', // Note: Make sure your MongoDB collection is named 'reviews'
           localField: '_id',
           foreignField: 'userId',
           as: 'userReviews'
         }
       },
       {
+        // Calculate the dynamic stats based on the joined reviews
         $addFields: {
           contributions: { $size: "$userReviews" },
           helpfulCount: {
@@ -111,6 +122,7 @@ app.post('/api/login', async (req, res) => {
       }
     ]);
 
+    // Since aggregation returns an array, grab the first (and only) matched user
     const user = users[0];
 
     // 2. Check if user exists AND password matches
@@ -128,10 +140,11 @@ app.post('/api/login', async (req, res) => {
         email: user.email,
         idSeries: user.idSeries,
         bio: user.bio,
-        helpfulCount: user.helpfulCount,
-        contributions: user.contributions,
+        followers: user.followers,
+        helpfulCount: user.helpfulCount,       // Now dynamically calculated!
+        contributions: user.contributions,     // Now dynamically calculated!
         avatar: user.avatar,
-        ownedEstablishmentId: user.ownedEstablishmentId,
+        ownedEstablishmentId: user.ownedEstablishmentId, // Keeps the Owner Dashboard working
         isAdmin: user.isAdmin
       }
     });
