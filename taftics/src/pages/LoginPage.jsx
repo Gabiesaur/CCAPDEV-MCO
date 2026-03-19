@@ -7,6 +7,7 @@ const LoginPage = ({ onLogin }) => {
   const navigate = useNavigate();
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [rememberMe, setRememberMe] = useState(false); // <-- ADDED STATE
   const [error, setError] = useState("");
 
   // Add 'async' here
@@ -20,7 +21,7 @@ const LoginPage = ({ onLogin }) => {
     }
     
     // Add 'await' here so React pauses until the server replies
-    const result = await onLogin(username, password); 
+    const result = await onLogin(username, password, rememberMe); 
     
     if (result.success) {
       navigate("/");
@@ -95,6 +96,8 @@ const LoginPage = ({ onLogin }) => {
               type="checkbox"
               id="rememberMe"
               className="styled-checkbox"
+              checked={rememberMe} // <-- BIND TO STATE
+              onChange={(e) => setRememberMe(e.target.checked)} // <-- UPDATE STATE
             />
             <label htmlFor="rememberMe">Remember me</label>
           </div>

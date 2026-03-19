@@ -25,26 +25,32 @@ import OwnerProfilePage from "./pages/OwnerProfilePage";
 
 function App() {
   // --- GLOBAL STATE ---
-  // Check localStorage so user stays logged in if they refresh the page
+  // Check BOTH storages so user stays logged in correctly
   const [user, setUser] = useState(() => {
-    const saved = localStorage.getItem("currentUser");
-    return saved ? JSON.parse(saved) : null;
+    const savedLocal = localStorage.getItem("currentUser");
+    const savedSession = sessionStorage.getItem("currentUser");
+    
+    if (savedSession) return JSON.parse(savedSession);
+    if (savedLocal) return JSON.parse(savedLocal);
+    
+    return null;
   });
 
-  // Local state for all users (needed so PublicProfilePage can view other people)
+  // Local state for all users
   const [dbUsers, setDbUsers] = useState([]);
 
-  // Fetch all users on mount so PublicProfilePage still works seamlessly
+  // Fetch all users on mount
   useEffect(() => {
     fetch('http://localhost:5000/api/users')
       .then(res => res.json())
       .then(data => setDbUsers(data))
-      .catch(err => console.error("Failed to fetch users from DB:", err));
+      .catch(err => console.error("Error fetching users:", err));
   }, []);
 
   // --- AUTHENTICATION FUNCTIONS ---
   
-  const login = async (username, password) => {
+  // Note the new 'rememberMe' parameter
+  const login = async (username, password, rememberMe) => {
     try {
       const response = await fetch('http://localhost:5000/api/login', {
         method: 'POST',
@@ -52,20 +58,33 @@ function App() {
         body: JSON.stringify({ username, password })
       });
 
-      const data = await response.json();
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData.user);
 
-      if (data.success) {
-        // Save to state and localStorage
-        setUser(data.user);
-        localStorage.setItem("currentUser", JSON.stringify(data.user));
+        // Save to the correct storage based on the checkbox
+        if (rememberMe) {
+          localStorage.setItem("currentUser", JSON.stringify(userData.user));
+        } else {
+          sessionStorage.setItem("currentUser", JSON.stringify(userData.user));
+        }
+
         return { success: true };
       } else {
-        return { success: false, message: data.message || "Invalid credentials." };
+        const errorData = await response.json();
+        return { success: false, message: errorData.message || "Invalid username or password" };
       }
     } catch (error) {
-      console.error("Login Error:", error);
-      return { success: false, message: "Server error. Is the backend running?" };
+      console.error("Login error:", error);
+      return { success: false, message: "Server error. Please try again later." };
     }
+  };
+
+  const logout = () => {
+    setUser(null);
+    // Clear both storages just to be safe
+    localStorage.removeItem("currentUser");
+    sessionStorage.removeItem("currentUser");
   };
 
   const register = async (formData) => {
@@ -80,7 +99,7 @@ function App() {
       if (data.success) {
         // Auto-login the user after successful registration
         setUser(data.user);
-        localStorage.setItem("currentUser", JSON.stringify(data.user));
+        sessionStorage.setItem("currentUser", JSON.stringify(data.user));
         return { success: true };
       } else {
         return { success: false, message: data.message };
@@ -97,11 +116,6 @@ function App() {
       return { success: false, message: "Email already exists." };
     }
     return { success: true, message: "Application submitted!" };
-  };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("currentUser");
   };
 
   // --- ROUTING ---

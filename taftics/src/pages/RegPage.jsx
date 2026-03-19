@@ -75,7 +75,7 @@ const RegPage = ({ onRegister }) => {
           Home
         </Link>
         <div className="auth-header">
-          <div class="header-brand-row">
+          <div className="header-brand-row">
             <img
               src={logoImage}
               alt="Taftics Logo"
