@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Search, Star, MapPin, ThumbsUp, ThumbsDown } from "lucide-react";
 
 import EstablishmentCardSmall from "../components/landing/EstablishmentCardSmall";
@@ -7,6 +7,7 @@ import EstablishmentCardSmall from "../components/landing/EstablishmentCardSmall
 // ❌ REMOVED: import { ESTABLISHMENTS } from "../data/mockData";
 
 const LandingPage = () => {
+  const navigate = useNavigate();
   const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
 
   const getRelativeDate = (dateString) => {
@@ -30,6 +31,12 @@ const LandingPage = () => {
   const [topRatedEstablishments, setTopRatedEstablishments] = useState([]);
   const [showcaseReviews, setShowcaseReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    navigate('/browse', { state: { searchQuery: searchQuery.trim() } });
+  };
 
   // 2. NEW: Fetch, sort, and slice data from the database
   useEffect(() => {
@@ -106,7 +113,7 @@ const LandingPage = () => {
           Find the best services and essentials around Taft with peer-verified reviews.
         </p>
         <div className="mx-auto mt-5 px-3" style={{ maxWidth: "800px" }}>
-          <div className="input-group shadow-lg rounded-pill overflow-hidden bg-white p-2 border border-light">
+          <form onSubmit={handleSearchSubmit} className="input-group shadow-lg rounded-pill overflow-hidden bg-white p-2 border border-light">
             <span className="input-group-text bg-white border-0 ps-4">
               <Search size={22} className="text-dlsu-primary" />
             </span>
@@ -114,12 +121,14 @@ const LandingPage = () => {
               type="text"
               className="form-control border-0 py-3 fs-5 bg-white shadow-none"
               placeholder="Search for laundry, printing, groceries..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               style={{ paddingLeft: '10px' }}
             />
-            <Link to="/browse" className="btn btn-dlsu-dark rounded-pill px-5 fw-bold shadow-sm ms-2 d-flex align-items-center">
+            <button type="submit" className="btn btn-dlsu-dark rounded-pill px-5 fw-bold shadow-sm ms-2 d-flex align-items-center">
               Search
-            </Link>
-          </div>
+            </button>
+          </form>
 
           {/* Quick Shortcuts / Popular Tags */}
           <div className="d-flex justify-content-center gap-3 mt-3 opacity-75">
@@ -141,7 +150,11 @@ const LandingPage = () => {
         <div className="row g-3 justify-content-center row-cols-2 row-cols-md-3 row-cols-lg-5">
           {categories.map((cat) => (
             <div key={cat} className="col">
-              <Link className="btn bg-dlsu-primary w-100 text-white py-2 rounded-pill fw-semibold" to="/browse">
+              <Link
+                className="btn bg-dlsu-primary w-100 text-white py-2 rounded-pill fw-semibold"
+                to="/browse"
+                state={{ selectedCategory: cat }}
+              >
                 {cat}
               </Link>
             </div>
@@ -289,8 +302,8 @@ const LandingPage = () => {
         </div>
 
         <div>
-          <Link className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold text-decoration-none" to="/create">
-            Have a spot you love? Write a review ↗
+          <Link className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold text-decoration-none" to="/browse">
+            Need a specific service? We'll help find it! ↗
           </Link>
         </div>
       </section>

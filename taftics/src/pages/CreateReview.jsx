@@ -24,6 +24,40 @@ function CreateReview() {
 
     const selectedEstablishment = location.state?.establishment;
     const selectedReviews = Array.isArray(location.state?.reviews) ? location.state.reviews : [];
+    const [establishmentReviews, setEstablishmentReviews] = React.useState(selectedReviews);
+
+    React.useEffect(() => {
+        let ignore = false;
+
+        const loadEstablishmentReviews = async () => {
+            if (!selectedEstablishment?._id) {
+                setEstablishmentReviews([]);
+                return;
+            }
+
+            try {
+                const response = await fetch(`http://localhost:5000/api/establishments/${selectedEstablishment._id}/reviews`);
+                if (!response.ok) {
+                    throw new Error("Failed to fetch establishment reviews");
+                }
+
+                const data = await response.json();
+                if (!ignore) {
+                    setEstablishmentReviews(Array.isArray(data) ? data : []);
+                }
+            } catch {
+                if (!ignore) {
+                    setEstablishmentReviews(Array.isArray(selectedReviews) ? selectedReviews : []);
+                }
+            }
+        };
+
+        loadEstablishmentReviews();
+
+        return () => {
+            ignore = true;
+        };
+    }, [selectedEstablishment?._id]);
 
     const fallbackData = {
         name: "Select an establishment",
@@ -80,21 +114,21 @@ function CreateReview() {
         });
     }
 
-    const starCounts = selectedReviews.reduce(
+    const starCounts = establishmentReviews.reduce(
         (acc, rev) => {
-            const normalizedRating = Number(rev?.rating || 0);
+            const normalizedRating = Math.round(Number(rev?.rating || 0));
             if (normalizedRating >= 1 && normalizedRating <= 5) {
-                acc[normalizedRating - 1] += 1;
+                acc[5 - normalizedRating] += 1;
             }
             return acc;
         },
         [0, 0, 0, 0, 0]
     );
 
-    const totalReviews = selectedReviews.length || establishmentData.totalReviews || 0;
+    const totalReviews = establishmentReviews.length || establishmentData.totalReviews || 0;
 
-    const average = selectedReviews.length > 0
-        ? selectedReviews.reduce((sum, rev) => sum + Number(rev?.rating || 0), 0) / selectedReviews.length
+    const average = establishmentReviews.length > 0
+        ? establishmentReviews.reduce((sum, rev) => sum + Number(rev?.rating || 0), 0) / establishmentReviews.length
         : Number(establishmentData.rating || 0);
 
     const handleSubmit = async (e) => {

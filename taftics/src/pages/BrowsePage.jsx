@@ -1,26 +1,47 @@
 import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Star, Search } from "lucide-react";
+import { useLocation } from "react-router-dom";
 
 import RatingFilter from "../components/browse/RatingFilter";
 import EstablishmentCard from "../components/browse/EstablishmentCard";
 
 // ❌ REMOVED: import { ESTABLISHMENTS } from "../data/mockData";
 
+const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
+
 const BrowsePage = () => {
+  const location = useLocation();
+
   // 1. Initialize states for each filter group
-  const [activeCategory, setActiveCategory] = useState('Any');
+  const selectedCategoryFromState = location.state?.selectedCategory;
+  const selectedSearchFromState = location.state?.searchQuery;
+  const initialCategory = categories.includes(selectedCategoryFromState) ? selectedCategoryFromState : 'Any';
+  const initialSearchQuery = typeof selectedSearchFromState === 'string' ? selectedSearchFromState : '';
+
+  const [activeCategory, setActiveCategory] = useState(initialCategory);
   const [activeHour, setActiveHour] = useState('Any');
   const [activePrice, setActivePrice] = useState('Any');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
 
   // 2. NEW: State to hold the fetched establishments
   const [establishments, setEstablishments] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
   const hours = ['Any', 'Open Now', '24/7'];
   const prices = ['Any', 'P', 'PP', 'PPP'];
+
+  useEffect(() => {
+    if (categories.includes(selectedCategoryFromState)) {
+      setActiveCategory(selectedCategoryFromState);
+    }
+  }, [selectedCategoryFromState, categories]);
+
+  useEffect(() => {
+    if (typeof selectedSearchFromState === 'string') {
+      setSearchQuery(selectedSearchFromState);
+    }
+  }, [selectedSearchFromState]);
 
   // 3. NEW: Fetch establishments from the database on component mount
   useEffect(() => {
