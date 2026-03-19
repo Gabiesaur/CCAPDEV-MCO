@@ -62,6 +62,10 @@ const ReviewPage = () => {
   const [userVote, setUserVote] = useState(null);
   const [counts, setCounts] = useState({ up: 0, down: 0 });
 
+  // Comment State
+  const [commentText, setCommentText] = useState("");
+  const [isSubmittingComment, setIsSubmittingComment] = useState(false);
+
   // Toast State
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -140,12 +144,53 @@ const ReviewPage = () => {
     });
   };
 
-  const handleCommentSubmit = (e) => {
+  const handleCommentSubmit = async (e) => {
     e.preventDefault();
-    triggerToast("Comment submitted! Redirecting...");
-    setTimeout(() => {
-      navigate(`/review/${id}`);
-    }, 2000);
+
+    // Get user
+    const storedUser = localStorage.getItem("currentUser");
+    const currentUser = storedUser ? JSON.parse(storedUser) : null;
+
+    // Check if logged in
+    if (!currentUser?._id) {
+      triggerToast("You must be logged in to comment.");
+      return;
+    }
+
+    if (!commentText.trim()) return;
+
+    setIsSubmittingComment(true);
+    try {
+      const res = await fetch(`http://localhost:5000/api/reviews/${id}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id, text: commentText.trim() }),
+      });
+
+      // Check for errors
+      let data;
+      try {
+        data = await res.json();
+      } catch (_) {
+        triggerToast("Server error.");
+        return;
+      }
+
+      if (!res.ok) {
+        triggerToast(data.message || "Failed to post comment.");
+        return;
+      }
+
+      // Adds the comment to the top
+      setComments((prev) => [data.comment, ...prev]);
+      setCommentText("");
+      triggerToast("Comment posted!");
+    } catch (error) {
+      // Check for errors
+      triggerToast(`Network error: ${error.message}`);
+    } finally {
+      setIsSubmittingComment(false);
+    }
   };
 
   // Show a loading spinner while waiting for the backend
@@ -334,10 +379,17 @@ const ReviewPage = () => {
               className="form-control border-0 bg-light rounded-4 py-3 px-4 fs-6 shadow-sm"
               placeholder="Leave a comment"
               style={{ paddingRight: '60px' }}
+              value={commentText}
+              onChange={(e) => setCommentText(e.target.value)}
+              disabled={isSubmittingComment}
               required
             />
-            <button type="submit" className="btn position-absolute top-50 end-0 translate-middle-y me-2 text-success shadow-none">
-              <Send size={20} />
+            <button
+              type="submit"
+              className="btn position-absolute top-50 end-0 translate-middle-y me-2 text-success shadow-none"
+              disabled={isSubmittingComment || !commentText.trim()}
+            >
+              {isSubmittingComment ? <Loader2 size={20} className="spin" /> : <Send size={20} />}
             </button>
           </form>
         </div>

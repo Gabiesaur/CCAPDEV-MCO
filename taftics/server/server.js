@@ -762,6 +762,35 @@ app.get('/api/users/:id/comments', async (req, res) => {
   }
 });
 
+// 3. CREATE A NEW COMMENT FOR A SPECIFIC REVIEW
+app.post('/api/reviews/:id/comments', async (req, res) => {
+  try {
+    const { userId, text } = req.body;
+
+    // Check if logged in
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "You must be logged in to post a comment." });
+    }
+
+    // Create and save the new comment
+    const newComment = new Comment({
+      reviewId: req.params.id,
+      userId,
+      text: text.trim(),
+      date: new Date(),
+    });
+
+    await newComment.save();
+
+    const populatedComment = await Comment.findById(newComment._id)
+      .populate('userId', 'username name avatar');
+
+    res.status(201).json({ success: true, comment: populatedComment });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
 // --- START SERVER ---
 app.listen(PORT, () => { //
   console.log(`🚀 Server running on http://localhost:${PORT}`); //
