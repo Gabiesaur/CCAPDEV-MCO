@@ -16,6 +16,8 @@ app.use(express.json()); // Allows the server to accept JSON data
 app.use(express.urlencoded({ extended: true })); //
 app.use(express.static('public')); //
 app.use(fileUpload({ parseNested: true })); //
+// Expose the 'public/uploads' directory to the web under the '/uploads' URL path
+app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // --- DATABASE CONNECTION ---
 const mongoUri = process.env.MONGO_URI; //
@@ -78,15 +80,26 @@ app.get('/api/establishments', async (req, res) => {
 
 // --- LOGIN ROUTE ---
 app.post('/api/login', async (req, res) => {
-  const { username, password } = req.body;
+  // Grab the input, whether the frontend sent it as 'username' or 'email'
+  const loginIdentifier = req.body.username || req.body.email; 
+  const password = req.body.password;
+
+  if (!loginIdentifier || !password) {
+    return res.status(400).json({ success: false, message: "Please provide credentials" });
+  }
 
   try {
-    // 1. Find the user by username
-    const user = await User.findOne({ username: username });
+    // 1. Find the user by matching EITHER the username OR the email
+    const user = await User.findOne({ 
+      $or: [
+        { username: loginIdentifier },
+        { email: loginIdentifier }
+      ]
+    });
 
     // 2. Check if user exists AND password matches
     if (!user || user.password !== password) {
-      return res.status(401).json({ success: false, message: "Invalid username or password" });
+      return res.status(401).json({ success: false, message: "Invalid username/email or password" });
     }
 
     // 3. Success! Send the user data back to React (omitting the password!)
@@ -103,6 +116,7 @@ app.post('/api/login', async (req, res) => {
         helpfulCount: user.helpfulCount,
         contributions: user.contributions,
         avatar: user.avatar,
+        ownedEstablishmentId: user.ownedEstablishmentId, // <-- ADDED THIS! Dashboard will work now.
         isAdmin: user.isAdmin
       }
     });
