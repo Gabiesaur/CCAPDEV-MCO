@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useParams, Link, useOutletContext, useNavigate, useLocation } from "react-router-dom";
+import { Star, BookMarked } from "lucide-react";
+import addressIcon from "../assets/address.png";
 import EstablishmentGallery from "../components/establishment/EstablishmentGallery";
-import EstablishmentHeader from "../components/establishment/EstablishmentHeader";
-import EstablishmentInfo from "../components/establishment/EstablishmentInfo";
 import EstablishmentReviews from "../components/establishment/EstablishmentReviews";
-import EstablishmentSidebar from "../components/establishment/EstablishmentSidebar";
 
 // ❌ REMOVED: import { ESTABLISHMENTS, REVIEWS, USERS } from "../data/mockData";
 
@@ -108,6 +107,10 @@ function Establishment() {
     }
 
     // --- Main UI ---
+    const averageRating = reviews.length > 0 
+        ? (reviews.reduce((sum, rev) => sum + Number(rev.rating || 0), 0) / reviews.length).toFixed(1)
+        : "0.0";
+
     return (
         <div className="bg-white min-vh-100">
             <div className="container-fluid" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
@@ -122,20 +125,168 @@ function Establishment() {
                             className="d-flex flex-column"
                             style={{ width: "66%", gap: "1rem" }}
                         >
-                            <EstablishmentHeader
-                                establishment={establishment}
-                                isBookmarked={isBookmarked}
-                                onBookmarkToggle={() => setIsBookmarked(!isBookmarked)}
-                            />
+                            {/* --- HEADER COMPONENT --- */}
+                            <div
+                                className="custom-card d-flex flex-row p-3 justify-content-between"
+                                style={{ height: "100px" }}
+                            >
+                                <div className="d-flex flex-row align-items-end justify-content-between">
+                                    <div className="d-flex flex-column">
+                                        <p className="h3 mb-0 fw-bold">{establishment.name}</p>
+                                        <div
+                                            className="d-flex flex-row align-items-center me-2"
+                                            style={{ height: "30px" }}
+                                        >
+                                            <div className="rating-box p-1" style={{ width: "60px" }}>
+                                                <p
+                                                    className="mb-0 text-center fw-bold d-flex align-items-center justify-content-center"
+                                                    style={{ color: "#00441B" }}
+                                                >
+                                                    <Star size={20} fill="#41AB5D" style={{ color: "#41AB5D" }} />
+                                                    <span className="ms-2">{averageRating}</span>
+                                                </p>
+                                            </div>
+                                            <span className="mx-3">&bull;</span>
+                                            <p
+                                                className="mb-0 fw-bold"
+                                                style={{ color: "#444646", fontSize: "20px" }}
+                                            >
+                                                {reviews.length} reviews
+                                            </p>
+                                            <span className="mx-3">&bull;</span>
+                                            <p
+                                                className="mb-0 fw-bold"
+                                                style={{ color: "#444646", fontSize: "20px" }}
+                                            >
+                                                {establishment.category}
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <button
+                                    className="btn p-0 border-0 bg-transparent"
+                                    onClick={() => setIsBookmarked(!isBookmarked)}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <BookMarked
+                                        size={30}
+                                        fill={isBookmarked ? "#41AB5D" : "none"}
+                                        style={{ color: isBookmarked ? "#00441B" : "#000000" }}
+                                    />
+                                </button>
+                            </div>
 
-                            <EstablishmentInfo description={establishment.description} />
+                            {/* --- INFO COMPONENT --- */}
+                            <div
+                                className="custom-card d-flex flex-column p-3 h-auto"
+                                style={{ minHeight: "100px" }}
+                            >
+                                <div className="d-flex flex-column">
+                                    <p className="h3 mb-2 fw-bold">About us</p>
+                                    <p
+                                        className="mb-0 fw-bold text-wrap text-break"
+                                        style={{ color: "#444646", fontSize: "14px", lineHeight: "1.5" }}
+                                    >
+                                        {establishment.description}
+                                    </p>
+                                </div>
+                            </div>
 
-                            <EstablishmentReviews reviews={reviews} establishment={establishment} />
+                            <EstablishmentReviews reviews={reviews} establishment={establishment} currentUser={currentUser} />
                         </div>
 
                         {/* Right Column: Sidebar */}
                         <div style={{ width: "32%" }}>
-                            <EstablishmentSidebar establishment={establishment} reviews={reviews} />
+                            {/* --- SIDEBAR COMPONENT --- */}
+                            <div
+                                className="custom-card d-flex flex-column p-4"
+                                style={{ width: "100%", minHeight: "500px" }}
+                            >
+                                <div className="d-flex flex-row align-items-center mb-3">
+                                    <div
+                                        className="rating-box p-1 d-flex align-items-center justify-content-center"
+                                        style={{ width: "70px", height: "30px" }}
+                                    >
+                                        <p
+                                            className="mb-0 text-center fw-bold"
+                                            style={{ color: "#00441B" }}
+                                        >
+                                            OPEN
+                                        </p>
+                                    </div>
+                                    <p
+                                        className="mb-0 ms-1 fw-bold"
+                                        style={{ color: "#444646", fontSize: "16px" }}
+                                    >
+                                        {establishment.businessHours}
+                                    </p>
+                                </div>
+
+                                <p
+                                    className="mb-0 fw-bold"
+                                    style={{ color: "#444646", fontSize: "16px" }}
+                                >
+                                    Contact Information:
+                                </p>
+                                <p
+                                    className="mb-0 mt-2 fw-bold"
+                                    style={{ color: "#444646", fontSize: "14px" }}
+                                >
+                                    {establishment.contactNumber}
+                                </p>
+                                <p
+                                    className="mb-0 mt-2 fw-bold text-break" 
+                                    style={{ color: "#444646", fontSize: "14px" }}
+                                >
+                                    {establishment.email}
+                                </p>
+
+                                <div
+                                    className="w-100 my-2"
+                                    style={{
+                                        height: "150px", 
+                                        overflow: "hidden",
+                                        borderRadius: "5px",
+                                    }}
+                                >
+                                    <img
+                                        src={addressIcon}
+                                        alt="address"
+                                        style={{
+                                            width: "100%",
+                                            height: "100%",
+                                            objectFit: "cover",
+                                        }}
+                                    />
+                                </div>
+
+                                <p
+                                    className="mb-0 fw-bold text-wrap" 
+                                    style={{ color: "#444646", fontSize: "14px", lineHeight: "1.4" }}
+                                >
+                                    {establishment.address}
+                                </p>
+
+                                <a
+                                    href={establishment.website ? (establishment.website.startsWith('http') ? establishment.website : `http://${establishment.website}`) : '#'}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="mb-0 mt-2 text-break" 
+                                    style={{ color: "#0b08bd", fontSize: "14px" }}
+                                >
+                                    {establishment.website}
+                                </a>
+
+                                <Link
+                                    to="/create"
+                                    state={{ establishment, reviews }}
+                                    className="button btn mt-auto d-flex align-items-center justify-content-center py-2" 
+                                    style={{ background: "#00441B", border: "none", color: "white" }}
+                                >
+                                    <Star size={20} fill="#41AB5D" style={{ color: "#41AB5D" }} />
+                                    <span className="ms-2">Create a review</span>
+                                </Link>
+                            </div>
                         </div>
                     </div>
                 </div>

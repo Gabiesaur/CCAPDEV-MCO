@@ -13,8 +13,9 @@ const ReviewSchema = new mongoose.Schema({
         date: { type: Date, default: Date.now }
     }],
     date: { type: Date, default: Date.now },
-    helpfulVotes: { type: Number, default: 0 },
-    unhelpfulVotes: { type: Number, default: 0 }
+    isEdited: { type: Boolean, default: false },
+    helpfulVoters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+    unhelpfulVoters: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }]
 })
 
 const Review = mongoose.model('Review', ReviewSchema)

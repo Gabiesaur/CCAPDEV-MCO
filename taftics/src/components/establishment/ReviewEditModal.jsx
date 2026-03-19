@@ -6,19 +6,47 @@ export default function ReviewEditModal({ isOpen, onClose, review, onSave }) {
 
     const [rating, setRating] = useState(review?.rating || 0);
     const [title, setTitle] = useState(review?.title || "");
-    const [comment, setComment] = useState(review?.comment || "");
+    const [body, setBody] = useState(review?.body || review?.comment || "");
+    const [newImages, setNewImages] = useState([]);
+    const [existingImages, setExistingImages] = useState(review?.images || []);
+    const fileInputRef = React.useRef(null);
 
     useEffect(() => {
         if (review) {
             setRating(review.rating);
             setTitle(review.title);
-            setComment(review.comment);
+            setBody(review.body || review.comment || "");
+            setExistingImages(review.images || []);
+            setNewImages([]);
         }
     }, [review]);
 
     const handleSave = () => {
-        onSave({ ...review, rating, title, comment, isEdited: true });
+        onSave({ ...review, rating, title, body, existingImages, newImages, isEdited: true });
         onClose();
+    };
+
+    const handleUploadClick = () => fileInputRef.current?.click();
+
+    const handleFilesChange = (e) => {
+        const currentCount = existingImages.length + newImages.length;
+        const files = Array.from(e.target.files || []).slice(0, 6 - currentCount);
+        const addedImages = files.map((file) => ({ file, url: URL.createObjectURL(file) }));
+        setNewImages((prev) => [...prev, ...addedImages].slice(0, 6 - existingImages.length));
+        e.target.value = null;
+    };
+
+    const removeNewImage = (index) => {
+        setNewImages((prev) => {
+            const copy = [...prev];
+            URL.revokeObjectURL(copy[index].url);
+            copy.splice(index, 1);
+            return copy;
+        });
+    };
+
+    const removeExistingImage = (index) => {
+        setExistingImages((prev) => prev.filter((_, i) => i !== index));
     };
 
     return (
@@ -68,16 +96,46 @@ export default function ReviewEditModal({ isOpen, onClose, review, onSave }) {
                                 />
                             </div>
 
-                            {/* Comment Input */}
+                            {/* Body Input */}
                             <div className="mb-3">
-                                <label htmlFor="reviewComment" className="form-label fw-bold small text-uppercase text-muted">Comment</label>
+                                <label htmlFor="reviewBody" className="form-label fw-bold small text-uppercase text-muted">Body</label>
                                 <textarea
                                     className="form-control rounded-3 bg-light border-0 py-2"
-                                    id="reviewComment"
+                                    id="reviewBody"
                                     rows="4"
-                                    value={comment}
-                                    onChange={(e) => setComment(e.target.value)}
+                                    value={body}
+                                    onChange={(e) => setBody(e.target.value)}
                                 ></textarea>
+                            </div>
+
+                            {/* Media (Photos) */}
+                            <div className="mb-3">
+                                <label className="form-label fw-bold small text-uppercase text-muted d-block">Media (Photos)</label>
+                                <input
+                                    type="file"
+                                    accept="image/*"
+                                    multiple
+                                    ref={fileInputRef}
+                                    onChange={handleFilesChange}
+                                    style={{ display: "none" }}
+                                />
+                                <button type="button" className="btn btn-outline-success rounded-pill px-4 btn-sm mb-2" onClick={handleUploadClick}>
+                                    Upload Photos
+                                </button>
+                                <div className="d-flex flex-wrap gap-2 mt-2">
+                                    {existingImages.map((url, i) => (
+                                        <div key={`exist-${i}`} className="position-relative" style={{ width: 80, height: 80 }}>
+                                            <img src={url} alt={`existing-${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }} />
+                                            <button type="button" className="btn btn-sm btn-danger position-absolute rounded-circle shadow" style={{ top: -8, right: -8, width: 24, height: 24, padding: 0 }} onClick={() => removeExistingImage(i)}>×</button>
+                                        </div>
+                                    ))}
+                                    {newImages.map((img, i) => (
+                                        <div key={`new-${i}`} className="position-relative" style={{ width: 80, height: 80 }}>
+                                            <img src={img.url} alt={`preview-${i}`} style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: 12 }} />
+                                            <button type="button" className="btn btn-sm btn-danger position-absolute rounded-circle shadow" style={{ top: -8, right: -8, width: 24, height: 24, padding: 0 }} onClick={() => removeNewImage(i)}>×</button>
+                                        </div>
+                                    ))}
+                                </div>
                             </div>
                         </div>
 

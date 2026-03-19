@@ -4,8 +4,6 @@ const EstablishmentSchema = new mongoose.Schema({
     name: String,
     category: String,
     location: String,
-    rating: { type: Number, default: 0 },
-    reviewCount: { type: Number, default: 0 },
     image: String,
     description: String,
     businessHours: String,

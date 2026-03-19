@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Star, ThumbsUp, ThumbsDown, MoreVertical, Edit, Trash2, CheckCircle2 } from "lucide-react";
+import { Star, ThumbsUp, ThumbsDown, MoreVertical, Edit, Trash2, CheckCircle2, ChevronDown, Check } from "lucide-react";
 import React, { useState, useEffect } from "react";
 import ReviewEditModal from "./ReviewEditModal";
 
@@ -32,14 +32,17 @@ const getReviewAuthor = (rev) => {
     return { fullName, username, avatar };
 };
 
-export default function EstablishmentReviews({ reviews, establishment }) {
+export default function EstablishmentReviews({ reviews, establishment, currentUser }) {
     // Create local state for reviews so we can modify them (edit/delete)
     const [localReviews, setLocalReviews] = useState(reviews);
 
     const [searchQuery, setSearchQuery] = useState("");
+    const [sortOption, setSortOption] = useState("date_desc");
+    const [maxRating, setMaxRating] = useState(0);
+    const [hoverRating, setHoverRating] = useState(0);
     const [currentPage, setCurrentPage] = useState(1);
-    const [helpfulStatus, setHelpfulStatus] = useState({}); // Track status per review
     const [openMenuId, setOpenMenuId] = useState(null); // Track which review menu is open
+    const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false); // Track sort dropdown
 
     // Edit Modal State
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -61,41 +64,92 @@ export default function EstablishmentReviews({ reviews, establishment }) {
         const bodyText = (r.body || r.comment || "").toLowerCase();
         const authorName = (author.fullName || "").toLowerCase();
         const query = searchQuery.toLowerCase();
+        const rating = Number(r.rating || 0);
 
         return (
-            title.includes(query) ||
-            bodyText.includes(query) ||
-            authorName.includes(query)
+            (maxRating === 0 || rating <= maxRating) &&
+            (title.includes(query) ||
+                bodyText.includes(query) ||
+                authorName.includes(query))
         );
     });
 
-    // Sorting by date as default
-    filteredReviews.sort((a, b) => new Date(b.date) - new Date(a.date));
+    const sortedReviews = [...filteredReviews].sort((a, b) => {
+        const aDate = new Date(a.date).getTime();
+        const bDate = new Date(b.date).getTime();
+        const aRating = Number(a.rating || 0);
+        const bRating = Number(b.rating || 0);
+        const aHelpful = a.helpfulVoters ? a.helpfulVoters.length : 0;
+        const bHelpful = b.helpfulVoters ? b.helpfulVoters.length : 0;
+
+        switch (sortOption) {
+            case "date_asc":
+                return aDate - bDate;
+            case "rating_desc":
+                return bRating - aRating;
+            case "rating_asc":
+                return aRating - bRating;
+            case "helpful_desc":
+                return bHelpful - aHelpful;
+            case "date_desc":
+            default:
+                return bDate - aDate;
+        }
+    });
 
     const reviewsPerPage = 3;
-    const totalPages = Math.ceil(filteredReviews.length / reviewsPerPage);
+    const totalPages = Math.ceil(sortedReviews.length / reviewsPerPage);
     const startIndex = (currentPage - 1) * reviewsPerPage;
-    const paginatedReviews = filteredReviews.slice(
+    const paginatedReviews = sortedReviews.slice(
         startIndex,
         startIndex + reviewsPerPage
     );
 
     useEffect(() => {
         setCurrentPage(1);
-    }, [searchQuery]);
+    }, [searchQuery, sortOption, maxRating]);
 
     // Close menu when clicking outside
     useEffect(() => {
-        const handleClickOutside = () => setOpenMenuId(null);
+        const handleClickOutside = () => {
+            setOpenMenuId(null);
+            setIsSortDropdownOpen(false);
+        };
         document.addEventListener("click", handleClickOutside);
         return () => document.removeEventListener("click", handleClickOutside);
     }, []);
 
-    const toggleHelpful = (index, type) => {
-        setHelpfulStatus((prev) => ({
-            ...prev,
-            [index]: prev[index] === type ? null : type,
-        }));
+    const toggleVote = async (rev, type) => {
+        if (!currentUser) {
+            triggerToast("Please login to vote.");
+            return;
+        }
+        
+        const reviewId = (rev._id && rev._id.$oid) ? rev._id.$oid : (rev._id || rev.id);
+        
+        try {
+            const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}/vote`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ userId: currentUser._id, type })
+            });
+
+            if (!res.ok) {
+                const text = await res.text();
+                throw new Error(text);
+            }
+            
+            const data = await res.json();
+            if (data.success) {
+                data.review.isOwnReview = rev.isOwnReview;
+                setLocalReviews(prev => prev.map(r => ((r._id && r._id.$oid) || r._id || r.id) === reviewId ? { ...r, ...data.review } : r));
+            } else {
+                triggerToast(data.message || "Failed to submit vote");
+            }
+        } catch (error) {
+            console.error("Fetch error:", error);
+            triggerToast("Failed to connect to server");
+        }
     };
 
     const toggleMenu = (e, id) => {
@@ -109,18 +163,64 @@ export default function EstablishmentReviews({ reviews, establishment }) {
         setOpenMenuId(null); // Close the menu
     };
 
-    const handleSaveEdit = (updatedReview) => {
-        setLocalReviews((prev) =>
-            prev.map((r) => (r.id === updatedReview.id ? updatedReview : r))
-        );
-        triggerToast("Review updated successfully!");
-        setOpenMenuId(null);
+    const handleSaveEdit = async (updatedReview) => {
+        try {
+            const reviewId = updatedReview._id || updatedReview.id;
+            
+            const formData = new FormData();
+            formData.append("rating", updatedReview.rating);
+            formData.append("title", updatedReview.title);
+            formData.append("body", updatedReview.body || updatedReview.comment);
+            
+            if (updatedReview.existingImages) {
+                updatedReview.existingImages.forEach(url => formData.append("existingImages", url));
+            }
+            if (updatedReview.newImages) {
+                updatedReview.newImages.forEach(img => formData.append("images", img.file));
+            }
+
+            const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
+                method: "PUT",
+                body: formData
+            });
+            
+            const data = await res.json();
+            if (data.success) {
+                const finalReview = data.review ? { ...updatedReview, ...data.review } : updatedReview;
+                finalReview.isEdited = true;
+                
+                setLocalReviews((prev) =>
+                    prev.map((r) => ((r._id || r.id) === reviewId ? finalReview : r))
+                );
+                triggerToast("Review updated successfully!");
+                setOpenMenuId(null);
+            } else {
+                triggerToast(data.message || "Failed to update review");
+            }
+        } catch (error) {
+            console.error("Failed to update review:", error);
+            triggerToast("Failed to connect to server");
+        }
     };
 
-    const handleDelete = (id) => {
-        setLocalReviews((prev) => prev.filter((r) => r.id !== id));
-        triggerToast("Review deleted successfully!");
-        setOpenMenuId(null);
+    const handleDelete = async (id) => {
+        try {
+            const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
+                method: "DELETE"
+            });
+            const data = await res.json();
+            
+            if (data.success) {
+                setLocalReviews((prev) => prev.filter((r) => (r._id || r.id) !== id));
+                triggerToast("Review deleted successfully!");
+                setOpenMenuId(null);
+            } else {
+                triggerToast(data.message || "Failed to delete review");
+            }
+        } catch (error) {
+            console.error("Failed to delete review:", error);
+            triggerToast("Failed to connect to server");
+        }
     };
 
     const triggerToast = (message) => {
@@ -155,14 +255,157 @@ export default function EstablishmentReviews({ reviews, establishment }) {
             <div className="d-flex flex-column h-100">
                 <div className="d-flex flex-row align-items-center justify-content-between mb-3">
                     <p className="h3 mb-0 fw-bold">Reviews</p>
-                    <input
-                        type="text"
-                        placeholder="Search reviews..."
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        className="form-control"
-                        style={{ fontSize: "14px", width: "50%" }}
-                    />
+                    <div className="d-flex flex-column gap-2" style={{ width: "70%" }}>
+                        <div className="d-flex flex-row align-items-center gap-2">
+                            <div className="position-relative" style={{ minWidth: "220px" }}>
+                                <button
+                                    className="btn d-flex align-items-center justify-content-between w-100"
+                                    style={{
+                                        background: "#ffffff",
+                                        border: "1px solid",
+                                        borderColor: isSortDropdownOpen ? "#41AB5D" : "#dee2e6",
+                                        borderRadius: "6px",
+                                        color: "#444646",
+                                        fontSize: "14px",
+                                        padding: "8px 12px",
+                                        boxShadow: "0 1px 2px rgba(0,0,0,0.05)",
+                                        transition: "all 0.2s ease"
+                                    }}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIsSortDropdownOpen(!isSortDropdownOpen);
+                                        setOpenMenuId(null);
+                                    }}
+                                    onMouseEnter={(e) => { if (!isSortDropdownOpen) e.currentTarget.style.borderColor = '#41AB5D'; }}
+                                    onMouseLeave={(e) => { if (!isSortDropdownOpen) e.currentTarget.style.borderColor = '#dee2e6'; }}
+                                >
+                                    <div className="d-flex align-items-center gap-2">
+                                        <span className="fw-bold" style={{ color: "#444646" }}>Sort by:</span>
+                                        <span style={{ color: "#6b7280" }}>
+                                            {sortOption === "date_desc" && "Newest"}
+                                            {sortOption === "date_asc" && "Oldest"}
+                                            {sortOption === "rating_desc" && "Highest rating"}
+                                            {sortOption === "rating_asc" && "Lowest rating"}
+                                            {sortOption === "helpful_desc" && "Most helpful"}
+                                        </span>
+                                    </div>
+                                    <ChevronDown
+                                        size={16}
+                                        style={{
+                                            color: "#9ca3af",
+                                            transform: isSortDropdownOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+                                            transition: 'transform 0.2s ease'
+                                        }}
+                                    />
+                                </button>
+
+                                {isSortDropdownOpen && (
+                                    <div
+                                        className="position-absolute bg-white shadow rounded mt-1 w-100 py-1"
+                                        style={{
+                                            zIndex: 20,
+                                            top: "100%",
+                                            left: 0,
+                                            border: "1px solid #e5e7eb",
+                                            boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+                                        }}
+                                    >
+                                        {[
+                                            { value: "date_desc", label: "Newest" },
+                                            { value: "date_asc", label: "Oldest" },
+                                            { value: "rating_desc", label: "Highest rating" },
+                                            { value: "rating_asc", label: "Lowest rating" },
+                                            { value: "helpful_desc", label: "Most helpful" },
+                                        ].map((option) => (
+                                            <button
+                                                key={option.value}
+                                                className="btn btn-sm w-100 text-start px-3 py-2 border-0 d-flex justify-content-between align-items-center"
+                                                style={{
+                                                    fontSize: "14px",
+                                                    backgroundColor: sortOption === option.value ? "#f0fdf4" : "transparent",
+                                                    color: sortOption === option.value ? "#166534" : "#444646",
+                                                    fontWeight: sortOption === option.value ? "600" : "normal",
+                                                    transition: "background-color 0.15s ease",
+                                                    borderRadius: "0"
+                                                }}
+                                                onMouseEnter={(e) => {
+                                                    if (sortOption !== option.value) e.currentTarget.style.backgroundColor = '#f3f4f6';
+                                                }}
+                                                onMouseLeave={(e) => {
+                                                    if (sortOption !== option.value) e.currentTarget.style.backgroundColor = 'transparent';
+                                                }}
+                                                onClick={() => {
+                                                    setSortOption(option.value);
+                                                    setIsSortDropdownOpen(false);
+                                                }}
+                                            >
+                                                {option.label}
+                                                {sortOption === option.value && <Check size={14} color="#166534" />}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
+                            </div>
+
+                            <input
+                                type="text"
+                                placeholder="Search reviews..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="form-control"
+                                style={{ fontSize: "14px" }}
+                            />
+                        </div>
+
+                        <div className="d-flex flex-column align-items-end justify-content-center mt-2 mt-md-0">
+                            <div className="d-flex flex-row align-items-center gap-1">
+                                <span className="fw-bold me-2" style={{ fontSize: "14px", color: "#444646", whiteSpace: "nowrap" }}>
+                                    Rating
+                                </span>
+                                <div className="d-flex align-items-center gap-1">
+                                    {[1, 2, 3, 4, 5].map((star) => (
+                                        <button
+                                            key={star}
+                                            type="button"
+                                            className="btn btn-link p-0 border-0 text-decoration-none transition-all"
+                                            onClick={() => setMaxRating(star)}
+                                            onMouseEnter={() => setHoverRating(star)}
+                                            onMouseLeave={() => setHoverRating(0)}
+                                            style={{ outline: "none", boxShadow: "none" }}
+                                        >
+                                            <Star
+                                                size={20}
+                                                fill={(hoverRating || maxRating) >= star ? "#41AB5D" : "none"}
+                                                stroke={(hoverRating || maxRating) >= star ? "#41AB5D" : "#ced4da"}
+                                                className="transition-all"
+                                                style={{ cursor: "pointer" }}
+                                            />
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                            <div 
+                                className="d-flex justify-content-end align-items-center mt-1 w-100"
+                                style={{ 
+                                    minHeight: "18px", 
+                                    opacity: maxRating > 0 ? 1 : 0, 
+                                    transition: "opacity 0.2s ease",
+                                    pointerEvents: maxRating > 0 ? "auto" : "none"
+                                }}
+                            >
+                                <span className="small fw-bold text-success" style={{ fontSize: "12px", whiteSpace: "nowrap", paddingRight: "4px" }}>
+                                    Up to {maxRating || 1} Stars
+                                </span>
+                                <button
+                                    className="btn btn-link btn-sm p-0 text-muted text-decoration-none"
+                                    style={{ fontSize: "12px" }}
+                                    onClick={() => setMaxRating(0)}
+                                >
+                                    Clear
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
 
                 <div className="d-flex flex-column flex-grow-1 pe-2">
@@ -220,16 +463,16 @@ export default function EstablishmentReviews({ reviews, establishment }) {
                                             </div>
 
                                             {/* Edit/Delete Menu for Own Reviews */}
-                                            {rev.isOwnReview && (
+                                            {(rev.isOwnReview || (currentUser && (rev.userId?._id === currentUser._id || rev.userId === currentUser._id))) && (
                                                 <div className="position-relative">
                                                     <button
                                                         className="btn btn-sm btn-link text-muted p-0"
-                                                        onClick={(e) => toggleMenu(e, rev.id)}
+                                                        onClick={(e) => toggleMenu(e, rev._id || rev.id)}
                                                     >
                                                         <MoreVertical size={16} />
                                                     </button>
 
-                                                    {openMenuId === rev.id && (
+                                                    {openMenuId === (rev._id || rev.id) && (
                                                         <div
                                                             className="position-absolute bg-white shadow-sm rounded border p-1"
                                                             style={{
@@ -247,7 +490,7 @@ export default function EstablishmentReviews({ reviews, establishment }) {
                                                             </button>
                                                             <button
                                                                 className="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 text-danger"
-                                                                onClick={() => handleDelete(rev.id)}
+                                                                onClick={() => handleDelete(rev._id || rev.id)}
                                                             >
                                                                 <Trash2 size={14} /> Delete
                                                             </button>
@@ -286,35 +529,50 @@ export default function EstablishmentReviews({ reviews, establishment }) {
                                         </p>
                                     </Link>
 
+                                    {/* Render Images if available */}
+                                    {rev.images && rev.images.length > 0 && (
+                                        <div className="d-flex flex-wrap gap-2 mt-3">
+                                            {rev.images.map((imgUrl, i) => (
+                                                <div key={i} style={{ width: '80px', height: '80px' }}>
+                                                    <img 
+                                                        src={imgUrl} 
+                                                        alt={`review-img-${i}`} 
+                                                        style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '8px' }}
+                                                    />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
+
                                     <div className="d-flex flex-row gap-3 mt-2">
                                         <button
                                             className="btn btn-sm p-0 border-0 d-flex align-items-center bg-transparent"
-                                            onClick={() => toggleHelpful(globalIndex, "helpful")}
+                                            onClick={() => toggleVote(rev, "helpful")}
                                             style={{
                                                 color:
-                                                    helpfulStatus[globalIndex] === "helpful"
+                                                    currentUser && rev.helpfulVoters?.includes(currentUser._id)
                                                         ? "#41AB5D"
                                                         : "#9ca3af",
                                             }}
                                         >
                                             <ThumbsUp size={16} />
                                             <span className="ms-2" style={{ fontSize: "14px" }}>
-                                                Helpful ({rev.helpfulVotes})
+                                                Helpful ({rev.helpfulVoters?.length || 0})
                                             </span>
                                         </button>
                                         <button
                                             className="btn btn-sm p-0 border-0 d-flex align-items-center bg-transparent"
-                                            onClick={() => toggleHelpful(globalIndex, "unhelpful")}
+                                            onClick={() => toggleVote(rev, "unhelpful")}
                                             style={{
                                                 color:
-                                                    helpfulStatus[globalIndex] === "unhelpful"
+                                                    currentUser && rev.unhelpfulVoters?.includes(currentUser._id)
                                                         ? "#41AB5D"
                                                         : "#9ca3af",
                                             }}
                                         >
                                             <ThumbsDown size={16} />
                                             <span className="ms-2" style={{ fontSize: "14px" }}>
-                                                Unhelpful ({rev.unhelpfulVotes})
+                                                Unhelpful ({rev.unhelpfulVoters?.length || 0})
                                             </span>
                                         </button>
                                     </div>

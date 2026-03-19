@@ -142,7 +142,7 @@ const BrowsePage = () => {
             </div>
 
             {/* Establishment Cards Container */}
-            <div style={{ paddingTop: '24px', paddingBottom: '80px', width: '720px' }}>
+            <div style={{ paddingTop: '24px', paddingBottom: '80px', width: '720px', minHeight: '100vh' }}>
               {loading ? (
                 <div className="text-center py-5">
                   <p className="text-muted fs-5">Loading establishments...</p>

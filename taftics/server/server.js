@@ -42,8 +42,33 @@ const Establishment = require('./models/Establishment'); // Adjust path if neede
 // 1. GET ALL ESTABLISHMENTS
 app.get('/api/establishments', async (req, res) => {
   try {
-    // .find({}) tells Mongoose to get everything in that collection
-    const establishments = await Establishment.find({});
+    const establishments = await Establishment.aggregate([
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'establishmentId',
+          as: 'reviews'
+        }
+      },
+      {
+        $addFields: {
+          reviewCount: { $size: "$reviews" },
+          rating: {
+             $cond: {
+               if: { $gt: [{ $size: "$reviews" }, 0] },
+               then: { $round: [{ $avg: "$reviews.rating" }, 1] },
+               else: 0
+             }
+          }
+        }
+      },
+      {
+        $project: {
+          reviews: 0
+        }
+      }
+    ]);
     res.json(establishments);
   } catch (error) {
     console.error("Error fetching establishments:", error);
@@ -183,18 +208,118 @@ app.post('/api/reviews', async (req, res) => {
 
     await newReview.save();
 
-    // 3. Update Establishment star counts automatically
-    const starFields = ["oneStar", "twoStar", "threeStar", "fourStar", "fiveStar"];
-    const fieldToUpdate = starFields[Number(rating) - 1];
-
-    await Establishment.findByIdAndUpdate(establishmentId, {
-      $inc: { [fieldToUpdate]: 1, totalReviews: 1 }
-    });
-
     res.status(201).json({ success: true, review: newReview });
   } catch (error) {
     console.error("Error creating review:", error);
     res.status(500).json({ success: false, message: "Failed to save review." });
+  }
+});
+
+// --- UPDATE REVIEW ---
+app.put('/api/reviews/:id', async (req, res) => {
+  try {
+    const { rating, title, body, comment, existingImages } = req.body;
+    const reviewText = body || comment; // support both from frontend
+    
+    // 1. Find existing review
+    const existingReview = await Review.findById(req.params.id);
+    if (!existingReview) {
+      return res.status(404).json({ success: false, message: "Review not found" });
+    }
+    const newRating = Number(rating);
+
+    // 3. Process Images
+    let imageUrls = [];
+    if (existingImages) {
+        imageUrls = Array.isArray(existingImages) ? existingImages : [existingImages];
+    }
+
+    if (req.files && req.files.images) {
+      const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+      for (const file of files) {
+        const fileName = `${Date.now()}_${file.name}`;
+        const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+        await file.mv(uploadPath);
+        imageUrls.push(`http://localhost:5000/uploads/${fileName}`);
+      }
+    }
+    existingReview.images = imageUrls;
+
+    // 4. Update the review
+    existingReview.rating = newRating;
+    if (title !== undefined) existingReview.title = title;
+    if (reviewText !== undefined) existingReview.body = reviewText;
+    existingReview.isEdited = true;
+    
+    await existingReview.save();
+
+    // Populate user to return fully formed review for frontend state
+    await existingReview.populate('userId', 'username name avatar');
+    
+    res.json({ success: true, review: existingReview });
+  } catch (error) {
+    console.error("Error updating review:", error);
+    res.status(500).json({ success: false, message: "Failed to update review" });
+  }
+});
+
+// --- TOGGLE REVIEW VOTE ---
+app.put('/api/reviews/:id/vote', async (req, res) => {
+  try {
+    const { userId, type } = req.body; 
+    
+    if (!userId) return res.status(401).json({ success: false, message: "Unauthorized. Please login to vote." });
+
+    const reviewId = req.params.id;
+    const review = await Review.findById(reviewId);
+    if (!review) return res.status(404).json({ success: false, message: "Review not found" });
+
+    // initialize arrays if undefined
+    if (!review.helpfulVoters) review.helpfulVoters = [];
+    if (!review.unhelpfulVoters) review.unhelpfulVoters = [];
+
+    const hasVotedHelpful = review.helpfulVoters.map(id => id.toString()).includes(userId.toString());
+    const hasVotedUnhelpful = review.unhelpfulVoters.map(id => id.toString()).includes(userId.toString());
+
+    if (type === 'helpful') {
+      if (hasVotedHelpful) {
+        review.helpfulVoters.pull(userId);
+      } else {
+        review.helpfulVoters.push(userId);
+        if (hasVotedUnhelpful) review.unhelpfulVoters.pull(userId);
+      }
+    } else if (type === 'unhelpful') {
+      if (hasVotedUnhelpful) {
+        review.unhelpfulVoters.pull(userId);
+      } else {
+        review.unhelpfulVoters.push(userId);
+        if (hasVotedHelpful) review.helpfulVoters.pull(userId);
+      }
+    }
+
+    await review.save();
+    await review.populate('userId', 'username name avatar');
+    res.json({ success: true, review });
+  } catch (error) {
+    console.error("Error submitting vote:", error);
+    res.status(500).json({ success: false, message: "Failed to submit vote." });
+  }
+});
+
+// --- DELETE REVIEW ---
+app.delete('/api/reviews/:id', async (req, res) => {
+  try {
+    const existingReview = await Review.findById(req.params.id);
+    if (!existingReview) {
+      return res.status(404).json({ success: false, message: "Review not found" });
+    }
+
+    await Review.findByIdAndDelete(req.params.id);
+
+    res.json({ success: true, message: "Review deleted successfully" });
+  } catch (error) {
+    console.error("Error deleting review:", error);
+    res.status(500).json({ success: false, message: "Failed to delete review" });
   }
 });
 
