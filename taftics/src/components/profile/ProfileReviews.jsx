@@ -73,7 +73,7 @@ export default function ProfileReviews({ review }) {
       </div>
 
       {/* Content */}
-      <Link to="/review" className="text-decoration-none">
+      <Link to={`/review/${review._id}`} className="text-decoration-none">
         <h5 className="fw-bold text-dlsu-dark mb-2 hover-underline">{review.title}</h5>
       </Link>
       <p className="text-secondary small mb-3">{review.body}</p>

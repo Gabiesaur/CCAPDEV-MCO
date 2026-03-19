@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom';
-import { Star, Send, MapPin, ThumbsUp, ThumbsDown, CheckCircle2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
+import { Star, Send, MapPin, ThumbsUp, ThumbsDown, CheckCircle2, Loader2 } from 'lucide-react';
 
 const getRelativeDate = (dateString) => {
   if (!dateString) return "";
@@ -32,6 +32,7 @@ const getEntityId = (value) => {
   if (!value) return null;
   if (typeof value === 'string') return value;
   if (typeof value === 'object' && value.$oid) return value.$oid;
+  if (typeof value === 'object' && value._id) return value._id;
   return null;
 };
 
@@ -46,33 +47,20 @@ const getAuthorFromComment = (comment) => {
 
 const ReviewPage = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { id } = useParams();
+  const { id } = useParams(); // URL ID is the ultimate source of truth
 
-  const stateReview = location.state?.review || null;
-  const stateEstablishment = location.state?.establishment || null;
-
-  const storageKey = `review-page:${id || "unknown"}`;
-  const storedState = useMemo(() => {
-    try {
-      const raw = sessionStorage.getItem(storageKey);
-      return raw ? JSON.parse(raw) : null;
-    } catch {
-      return null;
-    }
-  }, [storageKey]);
-
-  const [review, setReview] = useState(stateReview || storedState?.review || null);
-  const [establishment, setEstablishment] = useState(stateEstablishment || storedState?.establishment || null);
-  const [comments, setComments] = useState(stateReview?.comments || storedState?.review?.comments || []);
+  // Core Data States
+  const [review, setReview] = useState(null);
+  const [establishment, setEstablishment] = useState(null);
+  const [comments, setComments] = useState([]);
+  
+  // Loading States
+  const [isLoading, setIsLoading] = useState(true);
   const [loadingComments, setLoadingComments] = useState(false);
 
-  // 1. STATE FOR VOTING
-  const [userVote, setUserVote] = useState(null); // 'up', 'down', or null
-  const [counts, setCounts] = useState({
-    up: stateReview?.helpfulVotes || storedState?.review?.helpfulVotes || 0,
-    down: stateReview?.unhelpfulVotes || storedState?.review?.unhelpfulVotes || 0,
-  });
+  // Voting State
+  const [userVote, setUserVote] = useState(null);
+  const [counts, setCounts] = useState({ up: 0, down: 0 });
 
   // Toast State
   const [showToast, setShowToast] = useState(false);
@@ -84,55 +72,70 @@ const ReviewPage = () => {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  // MAIN FETCH HOOK: Runs whenever the URL ID changes
   useEffect(() => {
-    if (stateReview) {
-      setReview(stateReview);
-      setCounts({
-        up: stateReview.helpfulVotes || 0,
-        down: stateReview.unhelpfulVotes || 0,
-      });
-      setUserVote(null);
-    }
+    if (!id) return;
 
-    if (stateEstablishment) {
-      setEstablishment(stateEstablishment);
-    }
-  }, [stateReview, stateEstablishment]);
+    const fetchPageData = async () => {
+      setIsLoading(true);
+      try {
+        // 1. Fetch the Review
+        const reviewRes = await fetch(`http://localhost:5000/api/reviews/${id}`);
+        if (!reviewRes.ok) throw new Error("Review not found");
+        
+        const reviewData = await reviewRes.json();
+        setReview(reviewData);
+        setCounts({
+          up: reviewData.helpfulVotes || 0,
+          down: reviewData.unhelpfulVotes || 0,
+        });
 
-  useEffect(() => {
-    if (!review) return;
+        // 2. Safely extract Establishment ID and fetch Establishment details
+        const estId = getEntityId(reviewData.establishmentId);
+        if (estId) {
+          const estRes = await fetch(`http://localhost:5000/api/establishments/${estId}`);
+          if (estRes.ok) {
+            const estData = await estRes.json();
+            setEstablishment(estData);
+          }
+        }
 
-    try {
-      sessionStorage.setItem(
-        storageKey,
-        JSON.stringify({ review, establishment })
-      );
-    } catch {
-      // Ignore session storage failures
-    }
-  }, [review, establishment, storageKey]);
+        // 3. Fetch the Comments for this review
+        setLoadingComments(true);
+        const commentsRes = await fetch(`http://localhost:5000/api/reviews/${id}/comments`);
+        if (commentsRes.ok) {
+          const commentsData = await commentsRes.json();
+          setComments(Array.isArray(commentsData) ? commentsData : []);
+        } else {
+          setComments([]);
+        }
+
+      } catch (error) {
+        console.error("Error fetching review data:", error);
+        setReview(null);
+      } finally {
+        setIsLoading(false);
+        setLoadingComments(false);
+      }
+    };
+
+    fetchPageData();
+  }, [id]);
 
   const handleVote = (type) => {
     setCounts((prev) => {
       const newCounts = { ...prev };
-
-      // Case 1: Clicking the same button again (Undo)
       if (userVote === type) {
         newCounts[type] -= 1;
         setUserVote(null);
-      }
-      // Case 2: Switching from one vote to another (e.g., Up -> Down)
-      else if (userVote && userVote !== type) {
+      } else if (userVote && userVote !== type) {
         newCounts[userVote] -= 1;
         newCounts[type] += 1;
         setUserVote(type);
-      }
-      // Case 3: First time voting
-      else {
+      } else {
         newCounts[type] += 1;
         setUserVote(type);
       }
-
       return newCounts;
     });
   };
@@ -141,72 +144,46 @@ const ReviewPage = () => {
     e.preventDefault();
     triggerToast("Comment submitted! Redirecting...");
     setTimeout(() => {
-      navigate(`/review/${review?._id || review?.id || id}`);
+      navigate(`/review/${id}`);
     }, 2000);
   };
 
-  const author = getAuthorFromReview(review);
-  const reviewTitle = review?.title || "Review";
-  const reviewBody = review?.body || "No review content available.";
-  const reviewDate = getRelativeDate(review?.date);
-  const reviewRating = Number(review?.rating || 0);
-  const reviewId = getEntityId(review?._id) || review?.id || id;
+  // Show a loading spinner while waiting for the backend
+  if (isLoading) {
+    return (
+      <div className="bg-white min-vh-100 d-flex align-items-center justify-content-center">
+        <Loader2 className="spin text-success" size={48} />
+      </div>
+    );
+  }
 
-  const establishmentName = establishment?.name || "Establishment";
-  const establishmentLocation = establishment?.location || "Unknown location";
-  const establishmentImage = establishment?.image || "https://ui-avatars.com/api/?name=Establishment";
-  const establishmentId = getEntityId(establishment?._id) || getEntityId(review?.establishmentId) || review?.establishmentId;
-
-  useEffect(() => {
-    const fetchComments = async () => {
-      if (!reviewId) {
-        setComments([]);
-        return;
-      }
-
-      setLoadingComments(true);
-      try {
-        const commentsRes = await fetch(`http://localhost:5000/api/reviews/${reviewId}/comments`);
-
-        if (commentsRes.ok) {
-          const commentsData = await commentsRes.json();
-          setComments(Array.isArray(commentsData) ? commentsData : []);
-          return;
-        }
-
-        // Fallback to the review payload if comments endpoint fails.
-        const reviewRes = await fetch(`http://localhost:5000/api/reviews/${reviewId}`);
-        if (reviewRes.ok) {
-          const reviewData = await reviewRes.json();
-          setComments(Array.isArray(reviewData?.comments) ? reviewData.comments : []);
-        } else {
-          setComments([]);
-        }
-      } catch {
-        setComments([]);
-      } finally {
-        setLoadingComments(false);
-      }
-    };
-
-    fetchComments();
-  }, [reviewId]);
-
+  // Show the Not Found page ONLY if loading finished and no review was found
   if (!review) {
     return (
       <div className="bg-white min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
           <h1 className="fw-bold fs-3">Review not found</h1>
-          <p className="text-muted mb-4">Open a review from an establishment page to load it here.</p>
+          <p className="text-muted mb-4">This review may have been deleted or the URL is incorrect.</p>
           <Link to="/browse" className="btn btn-success">Back to Browse</Link>
         </div>
       </div>
     );
   }
 
+  const author = getAuthorFromReview(review);
+  const reviewTitle = review?.title || "Review";
+  const reviewBody = review?.body || review?.content || "No review content available.";
+  const reviewDate = getRelativeDate(review?.date || review?.createdAt);
+  const reviewRating = Number(review?.rating || 0);
+
+  const establishmentName = establishment?.name || "Establishment";
+  const establishmentLocation = establishment?.location || "Unknown location";
+  const establishmentImage = establishment?.image || "https://ui-avatars.com/api/?name=Establishment";
+  const establishmentId = getEntityId(establishment?._id) || getEntityId(review?.establishmentId);
+
   return (
     <div className="bg-white min-vh-100 d-flex flex-column position-relative">
-      {/* Toast Notification (Matching MyProfilePage style) */}
+      {/* Toast Notification */}
       {showToast && (
         <div className="toast-success-custom fw-bold" style={{ zIndex: 9999 }}>
           <CheckCircle2 size={24} />
@@ -271,7 +248,6 @@ const ReviewPage = () => {
               <div className="lh-1">
                 <Link
                   to={establishmentId ? `/establishment/${establishmentId}` : "/browse"}
-                  state={establishment ? { establishment } : undefined}
                   className="fw-bold text-decoration-none text-dark"
                   style={{ fontSize: "0.85rem" }}
                 >
@@ -283,7 +259,7 @@ const ReviewPage = () => {
               </div>
             </div>
 
-            {/* Voting Buttons with Counts */}
+            {/* Voting Buttons */}
             <div className="d-flex gap-3 align-items-center px-2">
               <button
                 className="btn p-0 border-0 shadow-none d-flex align-items-center gap-2 transition-all"
@@ -311,12 +287,14 @@ const ReviewPage = () => {
           <h1 className="fs-3 fw-bold mb-4">Comments</h1>
           <div className="mb-5 ps-1">
             {loadingComments ? (
-              <p className="text-muted mb-0">Loading comments...</p>
+              <div className="d-flex align-items-center gap-2 text-muted">
+                 <Loader2 size={16} className="spin" /> Loading comments...
+              </div>
             ) : comments.length === 0 ? (
               <p className="text-muted mb-0">No comments yet.</p>
             ) : (
               comments.map((comment, index) => {
-                const commentId = getEntityId(comment?._id) || comment?.id || `${reviewId}-comment-${index}`;
+                const commentId = getEntityId(comment?._id) || comment?.id || `${id}-comment-${index}`;
                 const commentAuthor = getAuthorFromComment(comment);
                 const commentDate = getRelativeDate(comment?.date);
 
