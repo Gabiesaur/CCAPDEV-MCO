@@ -28,6 +28,22 @@ const getAuthorFromReview = (review) => {
   return { displayName, username, avatar };
 };
 
+const getEntityId = (value) => {
+  if (!value) return null;
+  if (typeof value === 'string') return value;
+  if (typeof value === 'object' && value.$oid) return value.$oid;
+  return null;
+};
+
+const getAuthorFromComment = (comment) => {
+  const userObj = comment?.userId || {};
+  const displayName = userObj.name || userObj.username || comment?.user || "Unknown User";
+  const username = userObj.username || comment?.username || null;
+  const avatar = userObj.avatar || comment?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}`;
+
+  return { displayName, username, avatar };
+};
+
 const ReviewPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -48,6 +64,8 @@ const ReviewPage = () => {
 
   const [review, setReview] = useState(stateReview || storedState?.review || null);
   const [establishment, setEstablishment] = useState(stateEstablishment || storedState?.establishment || null);
+  const [comments, setComments] = useState(stateReview?.comments || storedState?.review?.comments || []);
+  const [loadingComments, setLoadingComments] = useState(false);
 
   // 1. STATE FOR VOTING
   const [userVote, setUserVote] = useState(null); // 'up', 'down', or null
@@ -129,15 +147,50 @@ const ReviewPage = () => {
 
   const author = getAuthorFromReview(review);
   const reviewTitle = review?.title || "Review";
-  const reviewBody = review?.comment || "No review content available.";
+  const reviewBody = review?.body || "No review content available.";
   const reviewDate = getRelativeDate(review?.date);
   const reviewRating = Number(review?.rating || 0);
-  const reviewId = review?._id || review?.id || id;
+  const reviewId = getEntityId(review?._id) || review?.id || id;
 
   const establishmentName = establishment?.name || "Establishment";
   const establishmentLocation = establishment?.location || "Unknown location";
   const establishmentImage = establishment?.image || "https://ui-avatars.com/api/?name=Establishment";
-  const establishmentId = establishment?._id || review?.establishmentId;
+  const establishmentId = getEntityId(establishment?._id) || getEntityId(review?.establishmentId) || review?.establishmentId;
+
+  useEffect(() => {
+    const fetchComments = async () => {
+      if (!reviewId) {
+        setComments([]);
+        return;
+      }
+
+      setLoadingComments(true);
+      try {
+        const commentsRes = await fetch(`http://localhost:5000/api/reviews/${reviewId}/comments`);
+
+        if (commentsRes.ok) {
+          const commentsData = await commentsRes.json();
+          setComments(Array.isArray(commentsData) ? commentsData : []);
+          return;
+        }
+
+        // Fallback to the review payload if comments endpoint fails.
+        const reviewRes = await fetch(`http://localhost:5000/api/reviews/${reviewId}`);
+        if (reviewRes.ok) {
+          const reviewData = await reviewRes.json();
+          setComments(Array.isArray(reviewData?.comments) ? reviewData.comments : []);
+        } else {
+          setComments([]);
+        }
+      } catch {
+        setComments([]);
+      } finally {
+        setLoadingComments(false);
+      }
+    };
+
+    fetchComments();
+  }, [reviewId]);
 
   if (!review) {
     return (
@@ -257,7 +310,44 @@ const ReviewPage = () => {
         <div style={{ marginTop: '48px' }}>
           <h1 className="fs-3 fw-bold mb-4">Comments</h1>
           <div className="mb-5 ps-1">
-            <p className="text-muted mb-0">No comments yet.</p>
+            {loadingComments ? (
+              <p className="text-muted mb-0">Loading comments...</p>
+            ) : comments.length === 0 ? (
+              <p className="text-muted mb-0">No comments yet.</p>
+            ) : (
+              comments.map((comment, index) => {
+                const commentId = getEntityId(comment?._id) || comment?.id || `${reviewId}-comment-${index}`;
+                const commentAuthor = getAuthorFromComment(comment);
+                const commentDate = getRelativeDate(comment?.date);
+
+                return (
+                  <div key={commentId} className="mb-4 p-4 bg-light rounded-4 shadow-sm">
+                    <div className="d-flex align-items-center mb-3">
+                      <img
+                        src={commentAuthor.avatar}
+                        className="rounded-circle me-3"
+                        style={{ width: "40px", height: "40px", objectFit: "cover" }}
+                        alt={commentAuthor.displayName}
+                      />
+                      <div>
+                        {commentAuthor.username ? (
+                          <Link to={`/profile/${commentAuthor.username}`} className="text-decoration-none text-dark fw-bold" style={{ marginBottom: '-4px' }}>
+                            {commentAuthor.displayName}
+                          </Link>
+                        ) : (
+                          <div className="text-dark fw-bold" style={{ marginBottom: '-4px' }}>
+                            {commentAuthor.displayName}
+                          </div>
+                        )}
+                        <small className="text-muted d-block">{commentDate}</small>
+                      </div>
+                    </div>
+
+                    <p className="text-dark fs-6 mb-0">{comment?.text || ""}</p>
+                  </div>
+                );
+              })
+            )}
           </div>
 
           <form onSubmit={handleCommentSubmit} className="position-relative">
