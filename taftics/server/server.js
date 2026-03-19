@@ -3,8 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const fileUpload = require('express-fileupload'); // Moved up
 require('dotenv').config({ path: path.resolve(__dirname, 'taftics.env') }); //
+const Establishment = require('./models/Establishment');
 const User = require('./models/User'); // Adjust the path if needed
 const Review = require('./models/Review');
+const Comment = require('./models/Comment');
 
 const express = require('express');
 const app = express();
@@ -34,10 +36,6 @@ mongoose.connect(mongoUri) //
 app.get('/', (req, res) => { //
   res.send('API is running...'); //
 });
-
-// Your API routes (like app.post('/api/register')) will go here!
-// Import your new Mongoose Model
-const Establishment = require('./models/Establishment'); // Adjust path if needed
 
 // --- API ROUTES ---
 
@@ -489,6 +487,46 @@ app.put('/api/users/:id/bio', async (req, res) => {
   } catch (error) {
     console.error("Bio update error:", error);
     res.status(500).json({ success: false, message: "Server error updating bio" });
+  }
+});
+
+// ==========================================
+//              COMMENT ROUTES
+// ==========================================
+
+// 1. GET ALL COMMENTS FOR A SPECIFIC REVIEW
+app.get('/api/reviews/:id/comments', async (req, res) => {
+  try {
+    // Find all comments where the reviewId matches the URL parameter
+    // We populate the userId so the frontend gets the commenter's name & avatar
+    const comments = await Comment.find({ reviewId: req.params.id })
+      .populate('userId', 'username name avatar')
+      .sort({ date: -1 }); // Sort by newest comments first
+
+    res.json(comments);
+  } catch (error) {
+    console.error("Error fetching comments for review:", error);
+    res.status(500).json({ message: "Server error while fetching comments" });
+  }
+});
+
+// 2. GET A SPECIFIC COMMENT FROM A SPECIFIC REVIEW
+app.get('/api/reviews/:reviewId/comments/:commentId', async (req, res) => {
+  try {
+    // Find a single comment ensuring both the comment ID and review ID match
+    const comment = await Comment.findOne({ 
+      _id: req.params.commentId,
+      reviewId: req.params.reviewId
+    }).populate('userId', 'username name avatar');
+
+    if (!comment) {
+      return res.status(404).json({ message: "Comment not found" });
+    }
+
+    res.json(comment);
+  } catch (error) {
+    console.error("Error fetching specific comment:", error);
+    res.status(500).json({ message: "Server error while fetching specific comment" });
   }
 });
 
