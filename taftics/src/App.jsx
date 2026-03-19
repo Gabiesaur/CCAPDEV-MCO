@@ -4,6 +4,7 @@ import {
   Routes,
   Route,
   Navigate,
+  useLocation,
 } from "react-router-dom";
 
 // --- LAYOUTS ---
@@ -22,6 +23,16 @@ import RegPage from "./pages/RegPage";
 import OwnerAppPage from "./pages/OwnerAppPage";
 import EstablishmentPage from "./pages/Establishment";
 import OwnerProfilePage from "./pages/OwnerProfilePage";
+
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
 
 function App() {
   // --- GLOBAL STATE ---
@@ -121,6 +132,7 @@ function App() {
   // --- ROUTING ---
   return (
     <BrowserRouter>
+      <ScrollToTop />
       <Routes>
         <Route element={<MainLayout user={user} onLogout={logout} />}>
           <Route path="/" element={<LandingPage />} />
