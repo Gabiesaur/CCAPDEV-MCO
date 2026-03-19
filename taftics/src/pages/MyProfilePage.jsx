@@ -36,6 +36,7 @@ export default function MyProfilePage({ user, setUser }) {
   const [savedEstablishments, setSavedEstablishments] = useState([]);
   const [helpfulReviews, setHelpfulReviews] = useState([]);
   const [unhelpfulReviews, setUnhelpfulReviews] = useState([]);
+  const [myComments, setMyComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
 
   // Toast State
@@ -66,13 +67,15 @@ export default function MyProfilePage({ user, setUser }) {
       fetch(`http://localhost:5000/api/users/${user._id}/bookmarks`).then(res => res.json()),
       fetch(`http://localhost:5000/api/users/${user._id}/helpful-reviews`).then(res => res.json()),
       fetch(`http://localhost:5000/api/users/${user._id}/unhelpful-reviews`).then(res => res.json()),
-      fetch(`http://localhost:5000/api/users/${user._id}/reviews`).then(res => res.json())
+      fetch(`http://localhost:5000/api/users/${user._id}/reviews`).then(res => res.json()),
+      fetch(`http://localhost:5000/api/users/${user._id}/comments`).then(res => res.json())
     ])
-      .then(([savedData, helpfulData, unhelpfulData, revData]) => {
+      .then(([savedData, helpfulData, unhelpfulData, revData, commentData]) => {
         setSavedEstablishments(Array.isArray(savedData) ? savedData : []);
         setHelpfulReviews(Array.isArray(helpfulData) ? helpfulData : []);
         setUnhelpfulReviews(Array.isArray(unhelpfulData) ? unhelpfulData : []);
         setMyReviews(Array.isArray(revData) ? revData : []);
+        setMyComments(Array.isArray(commentData) ? commentData : []);
         setIsLoading(false);
       })
       .catch((err) => {
@@ -158,9 +161,27 @@ export default function MyProfilePage({ user, setUser }) {
 
                   {activeTab === "comments" && (
                     <div className="py-3">
-                      <h6 className="text-muted mb-4 border-bottom pb-2">Your Authored Comments</h6>
-                      <ProfileComments comment={mockComment} isOwnProfile={true} />
-                      <ProfileComments comment={mockComment} isOwnProfile={true} />
+                      <h6 className="text-muted mb-4 border-bottom pb-2">Your Comments</h6>
+                      
+                      {myComments.length === 0 ? (
+                        <p className="text-muted">You haven't posted any comments yet.</p>
+                      ) : (
+                        myComments.map((comment) => (
+                          <ProfileComments 
+                            key={comment._id} 
+                            isOwnProfile={true}
+                            comment={{
+                              _id: comment._id,
+                              // Pull the original review details populated from the backend
+                              postTitle: comment.reviewId?.title || "Deleted Review",
+                              postAuthor: comment.reviewId?.userId?.username || "Unknown User",
+                              postRating: comment.reviewId?.rating || 0,
+                              date: new Date(comment.date).toLocaleDateString(),
+                              body: comment.text || comment.body // Fallback depending on your schema
+                            }} 
+                          />
+                        ))
+                      )}
                     </div>
                   )}
 

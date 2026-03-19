@@ -741,6 +741,27 @@ app.get('/api/reviews/:reviewId/comments/:commentId', async (req, res) => {
   }
 });
 
+// --- GET ALL COMMENTS BY A SPECIFIC USER ---
+app.get('/api/users/:id/comments', async (req, res) => {
+  try {
+    const comments = await Comment.find({ userId: req.params.id })
+      .populate({
+        path: 'reviewId', // Get the review this comment belongs to
+        select: 'title rating userId',
+        populate: {
+          path: 'userId', // Get the user who wrote the original review
+          select: 'username'
+        }
+      })
+      .sort({ date: -1 }); // Newest first
+
+    res.json(comments);
+  } catch (error) {
+    console.error("Error fetching user comments:", error);
+    res.status(500).json({ message: "Server error while fetching user comments" });
+  }
+});
+
 // --- START SERVER ---
 app.listen(PORT, () => { //
   console.log(`🚀 Server running on http://localhost:${PORT}`); //
