@@ -7,10 +7,9 @@ const UserSchema = new mongoose.Schema({
     email: { type: String, required: true, unique: true },
     idSeries: String,
     bio: String,
-    followers: { type: Number, default: 0 },
-    helpfulCount: { type: Number, default: 0 },
-    contributions: { type: Number, default: 0 },
     avatar: String,
+    ownedEstablishmentId: { type: mongoose.Schema.Types.ObjectId, ref: 'Establishment' },
+    savedEstablishments: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Establishment' }],
     isAdmin: { type: Boolean, default: false }
 })
 

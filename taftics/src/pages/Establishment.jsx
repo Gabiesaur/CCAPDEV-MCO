@@ -20,11 +20,37 @@ function Establishment() {
     // States for live data
     const [establishment, setEstablishment] = useState(establishmentFromState || null);
     const [reviews, setReviews] = useState([]);
-    const [isBookmarked, setIsBookmarked] = useState(false);
     
     // States for UI handling
     const [loading, setLoading] = useState(!establishmentFromState);
     const [error, setError] = useState("");
+
+    // Bookmark Check & Handler
+    const [isBookmarked, setIsBookmarked] = useState(false);
+
+    useEffect(() => {
+        if (currentUser && currentUser.savedEstablishments) {
+            const savedIds = currentUser.savedEstablishments.map(e => e._id || e);
+            if (savedIds.includes(id)) {
+                setIsBookmarked(true);
+            }
+        }
+    }, [currentUser, id]);
+
+    const handleBookmark = async () => {
+        if (!currentUser) return alert("Please log in to bookmark.");
+        try {
+            const res = await fetch(`http://localhost:5000/api/users/${currentUser._id}/bookmark`, {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ establishmentId: id })
+            });
+            const data = await res.json();
+            if (data.success) setIsBookmarked(data.isBookmarked);
+        } catch (err) {
+            console.error("Failed to bookmark", err);
+        }
+    };
 
     useEffect(() => {
         // If someone navigates to /establishment without an ID, send them back to browse
@@ -113,7 +139,7 @@ function Establishment() {
 
     return (
         <div className="bg-white min-vh-100">
-            <div className="container-fluid" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
+            <div className="container-fluid" style={{ paddingTop: '30px', paddingBottom: '100px' }}>
                 <div className="d-flex flex-column align-items-center w-75 mx-auto">
                     {/* Gallery Section */}
                     <EstablishmentGallery image={establishment.image} />
@@ -165,7 +191,7 @@ function Establishment() {
                                 </div>
                                 <button
                                     className="btn p-0 border-0 bg-transparent"
-                                    onClick={() => setIsBookmarked(!isBookmarked)}
+                                    onClick={handleBookmark}
                                     style={{ cursor: "pointer" }}
                                 >
                                     <BookMarked

@@ -81,8 +81,31 @@ app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    // 1. Find the user by username
-    const user = await User.findOne({ username: username });
+    const users = await User.aggregate([
+      { $match: { username: username } },
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'userReviews'
+        }
+      },
+      {
+        $addFields: {
+          contributions: { $size: "$userReviews" },
+          helpfulCount: {
+            $reduce: {
+              input: "$userReviews",
+              initialValue: 0,
+              in: { $add: ["$$value", { $size: { $ifNull: ["$$this.helpfulVoters", []] } }] }
+            }
+          }
+        }
+      }
+    ]);
+
+    const user = users[0];
 
     // 2. Check if user exists AND password matches
     if (!user || user.password !== password) {
@@ -99,10 +122,10 @@ app.post('/api/login', async (req, res) => {
         email: user.email,
         idSeries: user.idSeries,
         bio: user.bio,
-        followers: user.followers,
         helpfulCount: user.helpfulCount,
         contributions: user.contributions,
         avatar: user.avatar,
+        ownedEstablishmentId: user.ownedEstablishmentId,
         isAdmin: user.isAdmin
       }
     });
@@ -163,9 +186,13 @@ app.post('/api/register', async (req, res) => {
         _id: newUser._id,
         username: newUser.username,
         email: newUser.email,
+        name: newUser.name,
         idSeries: newUser.idSeries,
         avatar: newUser.avatar,
-        isAdmin: newUser.isAdmin
+        ownedEstablishmentId: newUser.ownedEstablishmentId,
+        isAdmin: newUser.isAdmin,
+        helpfulCount: 0,
+        contributions: 0
       }
     });
 
@@ -355,15 +382,69 @@ app.get('/api/establishments/:id/reviews', async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 });
+// --- UPDATE SPECIFIC ESTABLISHMENT ---
+app.put('/api/establishments/:id', async (req, res) => {
+  try {
+    const { name, category, startTime, endTime } = req.body;
+    
+    const formatTime = (timeStr) => {
+      if (!timeStr) return '';
+      const [hourStr, minStr] = timeStr.split(':');
+      let hour = parseInt(hourStr, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12;
+      hour = hour ? hour : 12;
+      return `${hour}:${minStr} ${ampm}`;
+    };
+    
+    const formattedHours = `${formatTime(startTime)} - ${formatTime(endTime)}`;
+
+    const establishment = await Establishment.findByIdAndUpdate(
+      req.params.id,
+      { name, category, businessHours: formattedHours },
+      { new: true }
+    );
+
+    if (!establishment) {
+      return res.status(404).json({ success: false, message: "Establishment not found" });
+    }
+
+    res.json({ success: true, establishment });
+  } catch (error) {
+    console.error("Error updating establishment:", error);
+    res.status(500).json({ success: false, message: "Failed to update establishment details" });
+  }
+});
 
 // --- GET ALL USERS ---
 // Used by App.jsx to load users for the Browse/Public Profile features
 app.get('/api/users', async (req, res) => {
   try {
-    // .find({}) tells MongoDB to get every single user document.
-    // .select('-password') is CRITICAL: it strips the password field out 
-    // before sending the data to the frontend so your users stay secure!
-    const users = await User.find({}).select('-password');
+    const users = await User.aggregate([
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'userReviews'
+        }
+      },
+      {
+        $addFields: {
+          contributions: { $size: "$userReviews" },
+          helpfulCount: {
+            $reduce: {
+              input: "$userReviews",
+              initialValue: 0,
+              in: { $add: ["$$value", { $size: { $ifNull: ["$$this.helpfulVoters", []] } }] }
+            }
+          }
+        }
+      },
+      {
+         $project: { password: 0, userReviews: 0 }
+      }
+    ]);
 
     res.json(users);
 
@@ -376,11 +457,36 @@ app.get('/api/users', async (req, res) => {
 // --- GET SPECIFIC USER PROFILE ---
 app.get('/api/users/:username', async (req, res) => {
   try {
-    // Grab the username from the URL (e.g., "leelanczers" from /api/users/leelanczers)
     const targetUsername = req.params.username;
 
-    // Search the database for that exact username, excluding the password field
-    const user = await User.findOne({ username: targetUsername }).select('-password');
+    const users = await User.aggregate([
+      { $match: { username: targetUsername } },
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'userId',
+          as: 'userReviews'
+        }
+      },
+      {
+        $addFields: {
+          contributions: { $size: "$userReviews" },
+          helpfulCount: {
+            $reduce: {
+              input: "$userReviews",
+              initialValue: 0,
+              in: { $add: ["$$value", { $size: { $ifNull: ["$$this.helpfulVoters", []] } }] }
+            }
+          }
+        }
+      },
+      {
+         $project: { password: 0, userReviews: 0 }
+      }
+    ]);
+
+    const user = users[0];
 
     // If no user is found, send back a 404 error
     if (!user) {
@@ -391,8 +497,106 @@ app.get('/api/users/:username', async (req, res) => {
     res.json({ success: true, user: user });
 
   } catch (error) {
-    console.error("Error fetching user profile:", error);
-    res.status(500).json({ success: false, message: "Server error while fetching profile." });
+    console.error("Error fetching specific user:", error);
+    res.status(500).json({ message: "Server error while fetching user." });
+  }
+});
+
+// --- TOGGLE BOOKMARK ROUTE ---
+app.put('/api/users/:id/bookmark', async (req, res) => {
+  try {
+    const { establishmentId } = req.body;
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+    
+    // Check if establishment is already saved
+    const isSaved = user.savedEstablishments && user.savedEstablishments.includes(establishmentId);
+    
+    if (isSaved) {
+      // Remove it
+      user.savedEstablishments = user.savedEstablishments.filter(id => id.toString() !== establishmentId);
+    } else {
+      // Add it
+      if (!user.savedEstablishments) user.savedEstablishments = [];
+      user.savedEstablishments.push(establishmentId);
+    }
+    
+    await user.save();
+    res.json({ success: true, isBookmarked: !isSaved, savedEstablishments: user.savedEstablishments });
+  } catch (error) {
+    console.error("Error toggling bookmark:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// --- GET BOOKMARKS ROUTE ---
+app.get('/api/users/:id/bookmarks', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    if (!user.savedEstablishments || user.savedEstablishments.length === 0) {
+      return res.json([]);
+    }
+
+    const establishments = await Establishment.aggregate([
+      { $match: { _id: { $in: user.savedEstablishments } } },
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'establishmentId',
+          as: 'reviews'
+        }
+      }
+    ]);
+
+    res.json(establishments);
+  } catch (error) {
+    console.error("Error fetching bookmarks:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// --- GET OWNED REVIEWS ROUTE ---
+app.get('/api/users/:id/reviews', async (req, res) => {
+  try {
+    const reviews = await Review.find({ userId: req.params.id })
+                                .populate('userId', 'username name avatar')
+                                .populate('establishmentId', 'name image location')
+                                .sort({ date: -1 });
+    res.json(reviews);
+  } catch (error) {
+    console.error("Error fetching user reviews:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// --- GET HELPFUL REVIEWS ROUTE ---
+app.get('/api/users/:id/helpful-reviews', async (req, res) => {
+  try {
+    const reviews = await Review.find({ helpfulVoters: req.params.id })
+                                .populate('userId', 'username name avatar')
+                                .populate('establishmentId', 'name image location')
+                                .sort({ date: -1 });
+    res.json(reviews);
+  } catch (error) {
+    console.error("Error fetching helpful reviews:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
+// --- GET UNHELPFUL REVIEWS ROUTE ---
+app.get('/api/users/:id/unhelpful-reviews', async (req, res) => {
+  try {
+    const reviews = await Review.find({ unhelpfulVoters: req.params.id })
+                                .populate('userId', 'username name avatar')
+                                .populate('establishmentId', 'name image location')
+                                .sort({ date: -1 });
+    res.json(reviews);
+  } catch (error) {
+    console.error("Error fetching unhelpful reviews:", error);
+    res.status(500).json({ success: false, message: "Server error" });
   }
 });
 

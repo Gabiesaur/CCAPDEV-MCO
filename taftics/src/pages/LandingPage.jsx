@@ -154,7 +154,7 @@ const LandingPage = () => {
         <h2 className="fw-bold text-center mb-5">
           See the <span className="text-dlsu-dark">top rated</span> establishments
         </h2>
-        
+
         {/* 3. NEW: Conditional rendering while data loads */}
         {loading ? (
           <div className="text-center py-5">
@@ -165,7 +165,7 @@ const LandingPage = () => {
             {topRatedEstablishments.map((store) => (
               <div key={store._id} className="col-md-4"> {/* ✅ CHANGED: store._id */}
                 <EstablishmentCardSmall
-                  id={store._id}                         
+                  id={store._id}
                   name={store.name}
                   category={store.category}
                   location={store.location}

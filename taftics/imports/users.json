@@ -9,9 +9,6 @@
     "email": "lee@dlsu.edu.ph",
     "idSeries": "124",
     "bio": "CS Student @ DLSU | Love coffee and coding",
-    "followers": 67,
-    "helpfulCount": 42,
-    "contributions": 15,
     "avatar": "https://ui-avatars.com/api/?name=Leelancze+Pacomio&background=0D8ABC&color=fff",
     "isAdmin": true
   },
@@ -25,9 +22,6 @@
     "email": "archer@dlsu.edu.ph",
     "idSeries": "121",
     "bio": "Just a regular Archer",
-    "followers": 12,
-    "helpfulCount": 5,
-    "contributions": 3,
     "avatar": "https://ui-avatars.com/api/?name=Archer+Dela+Cruz&background=00441B&color=fff",
     "isAdmin": false
   },
@@ -41,9 +35,6 @@
     "email": "maria@dlsu.edu.ph",
     "idSeries": "123",
     "bio": "Dean's Lister",
-    "followers": 150,
-    "helpfulCount": 89,
-    "contributions": 34,
     "avatar": "https://ui-avatars.com/api/?name=Maria+Santos&background=800000&color=fff",
     "isAdmin": false
   },
@@ -57,9 +48,6 @@
     "email": "jk@dlsu.edu.ph",
     "idSeries": "122",
     "bio": "Living for Agno food trips",
-    "followers": 230,
-    "helpfulCount": 150,
-    "contributions": 80,
     "avatar": "https://ui-avatars.com/api/?name=Juan+Karlos&background=C70039&color=fff",
     "isAdmin": false
   },
@@ -73,9 +61,6 @@
     "email": "sam@dlsu.edu.ph",
     "idSeries": "120",
     "bio": "Gains over grades (jk)",
-    "followers": 45,
-    "helpfulCount": 20,
-    "contributions": 10,
     "avatar": "https://ui-avatars.com/api/?name=Sam+Smith&background=900C3F&color=fff",
     "isAdmin": false
   },
@@ -89,9 +74,6 @@
     "email": "nik@dlsu.edu.ph",
     "idSeries": "119",
     "bio": "Building the future, one line at a time.",
-    "followers": 55,
-    "helpfulCount": 30,
-    "contributions": 12,
     "avatar": "https://ui-avatars.com/api/?name=Nikolai+Tesla&background=2C3E50&color=fff",
     "isAdmin": false
   },
@@ -105,27 +87,91 @@
     "email": "isabella@dlsu.edu.ph",
     "idSeries": "125",
     "bio": "Lover of all things caffeine.",
-    "followers": 88,
-    "helpfulCount": 60,
-    "contributions": 20,
     "avatar": "https://ui-avatars.com/api/?name=Isabella+Garcia&background=795548&color=fff",
     "isAdmin": false
   },
   {
     "_id": {
-      "$oid": "65f100000000000000000008"
+      "$oid": "65f300000000000000000001"
     },
-    "username": "boss_rica",
+    "username": "national_book_store_admin",
     "password": "password123",
-    "name": "Ate Rica's Bacsilog",
-    "email": "rica@gmail.com",
+    "name": "National Book Store Management",
+    "email": "national_book_store_admin@gmail.com",
     "idSeries": "owner",
-    "bio": "The home of the famous Bacsilog. Affordable and delicious student meals.",
-    "followers": 1200,
-    "helpfulCount": 50,
-    "contributions": 5,
-    "avatar": "https://pbs.twimg.com/media/GAeKw8KaYAAis3s.jpg",
+    "bio": "The official management team of National Book Store.",
+    "avatar": "https://ui-avatars.com/api/?name=National%20Book%20Store%20Management&background=random&color=fff",
+    "ownedEstablishmentId": "65f000000000000000000001",
+    "isAdmin": false
+  },
+  {
+    "_id": {
+      "$oid": "65f300000000000000000002"
+    },
+    "username": "anytime_fitness_admin",
+    "password": "password123",
+    "name": "Anytime Fitness Management",
+    "email": "anytime_fitness_admin@gmail.com",
+    "idSeries": "owner",
+    "bio": "The official management team of Anytime Fitness.",
+    "avatar": "https://ui-avatars.com/api/?name=Anytime%20Fitness%20Management&background=random&color=fff",
+    "ownedEstablishmentId": "65f000000000000000000002",
+    "isAdmin": false
+  },
+  {
+    "_id": {
+      "$oid": "65f300000000000000000003"
+    },
+    "username": "ate_ricas_bacsilog_admin",
+    "password": "password123",
+    "name": "Ate Ricas Bacsilog Management",
+    "email": "ate_ricas_bacsilog_admin@gmail.com",
+    "idSeries": "owner",
+    "bio": "The official management team of Ate Rica's Bacsilog.",
+    "avatar": "https://ui-avatars.com/api/?name=Ate%20Ricas%20Bacsilog%20Management&background=random&color=fff",
     "ownedEstablishmentId": "65f000000000000000000003",
+    "isAdmin": false
+  },
+  {
+    "_id": {
+      "$oid": "65f300000000000000000004"
+    },
+    "username": "green_residences_admin",
+    "password": "password123",
+    "name": "Green Residences Management",
+    "email": "green_residences_admin@gmail.com",
+    "idSeries": "owner",
+    "bio": "The official management team of Green Residences.",
+    "avatar": "https://ui-avatars.com/api/?name=Green%20Residences%20Management&background=random&color=fff",
+    "ownedEstablishmentId": "65f000000000000000000004",
+    "isAdmin": false
+  },
+  {
+    "_id": {
+      "$oid": "65f300000000000000000005"
+    },
+    "username": "zus_coffee_admin",
+    "password": "password123",
+    "name": "ZUS Coffee Management",
+    "email": "zus_coffee_admin@gmail.com",
+    "idSeries": "owner",
+    "bio": "The official management team of ZUS Coffee.",
+    "avatar": "https://ui-avatars.com/api/?name=ZUS%20Coffee%20Management&background=random&color=fff",
+    "ownedEstablishmentId": "65f000000000000000000005",
+    "isAdmin": false
+  },
+  {
+    "_id": {
+      "$oid": "65f300000000000000000006"
+    },
+    "username": "de_la_salle_laundry_admin",
+    "password": "password123",
+    "name": "De La Salle Laundry Management",
+    "email": "de_la_salle_laundry_admin@gmail.com",
+    "idSeries": "owner",
+    "bio": "The official management team of De La Salle Laundry.",
+    "avatar": "https://ui-avatars.com/api/?name=De%20La%20Salle%20Laundry%20Management&background=random&color=fff",
+    "ownedEstablishmentId": "65f000000000000000000006",
     "isAdmin": false
   }
 ]

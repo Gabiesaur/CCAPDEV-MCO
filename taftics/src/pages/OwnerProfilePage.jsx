@@ -1,15 +1,19 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Star, Settings, Store, BarChart3, Edit, Trash2, ExternalLink, CheckCircle2 } from "lucide-react";
+import { useEffect } from "react";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import ImageUploadModal from "../components/profile/ImageUploadModal";
-import { REVIEWS, COMMENTS, USERS, ESTABLISHMENTS } from "../data/mockData";
 
 export default function OwnerProfilePage({ user, setUser }) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditingStore, setIsEditingStore] = useState(false);
+  const [loading, setLoading] = useState(true);
   
+  const [establishment, setEstablishment] = useState(null);
+  const [reviews, setReviews] = useState([]);
+
   // Toast State
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
@@ -20,43 +24,103 @@ export default function OwnerProfilePage({ user, setUser }) {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  // Fetch real mock establishment from the mock DB
-  const mockEstablishment = ESTABLISHMENTS.find(e => 
-      String(e.id) === String(user.ownedEstablishmentId) || e._id?.$oid === user.ownedEstablishmentId
-  ) || ESTABLISHMENTS[2]; 
-
   const [storeForm, setStoreForm] = useState({
-    name: mockEstablishment.name,
-    category: mockEstablishment.category,
+    name: "",
+    category: "Food",
     startTime: "07:00",
     endTime: "19:00"
   });
 
-  const handleSaveStore = () => {
-    // In a real app, you would make an API call here.
-    triggerToast("Establishment details updated!");
-    setIsEditingStore(false);
+  useEffect(() => {
+    if (!user || (!user.ownedEstablishmentId && !user.ownedEstablishmentId?.$oid)) {
+      setLoading(false);
+      return;
+    }
+
+    const targetId = user.ownedEstablishmentId?.$oid || user.ownedEstablishmentId;
+
+    Promise.all([
+      fetch(`http://localhost:5000/api/establishments/${targetId}`).then(r => r.json()),
+      fetch(`http://localhost:5000/api/establishments/${targetId}/reviews`).then(r => r.json())
+    ]).then(([estData, revData]) => {
+      setEstablishment(estData);
+      setReviews(Array.isArray(revData) ? revData : []);
+      
+      const convertTo24Hour = (timeStr) => {
+        if (!timeStr) return "00:00";
+        const [time, modifier] = timeStr.split(' ');
+        if (!modifier) return timeStr;
+        let [hours, minutes] = time.split(':');
+        if (hours === '12') hours = '00';
+        if (modifier === 'PM') hours = parseInt(hours, 10) + 12;
+        return `${hours.toString().padStart(2, '0')}:${minutes}`;
+      };
+
+      let sTime = "07:00";
+      let eTime = "19:00";
+
+      if (estData.businessHours) {
+         if (estData.businessHours.includes("-")) {
+            const parts = estData.businessHours.split("-");
+            if (parts.length === 2) {
+                sTime = convertTo24Hour(parts[0].trim());
+                eTime = convertTo24Hour(parts[1].trim());
+            }
+         } else if (estData.businessHours.includes("to")) {
+            const parts = estData.businessHours.split(" to ");
+            if (parts.length === 2) {
+                sTime = parts[0].trim();
+                eTime = parts[1].trim();
+            }
+         }
+      }
+
+      setStoreForm({
+        name: estData.name || "",
+        category: estData.category || "Food",
+        startTime: sTime,
+        endTime: eTime
+      });
+      setLoading(false);
+    }).catch(err => {
+      console.error(err);
+      setLoading(false);
+    });
+  }, [user]);
+
+  const handleSaveStore = async () => {
+    try {
+      const targetId = user.ownedEstablishmentId?.$oid || user.ownedEstablishmentId;
+      const res = await fetch(`http://localhost:5000/api/establishments/${targetId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(storeForm)
+      });
+      const data = await res.json();
+      if (data.success) {
+        setEstablishment(data.establishment);
+        triggerToast("Establishment details updated!");
+        setIsEditingStore(false);
+      } else {
+        triggerToast("Failed: " + data.message);
+      }
+    } catch {
+      triggerToast("Failed to connect to server");
+    }
   };
 
-  // Fetch reviews for this establishment
-  const establishmentReviews = REVIEWS.filter(r => 
-      String(r.establishmentId) === String(mockEstablishment.id) || 
-      (r.establishmentId?.$oid && r.establishmentId.$oid === mockEstablishment._id?.$oid)
-  );
-
-  // Map them into the shape the UI expects
-  const mockReviews = establishmentReviews.map(rev => {
-    const reviewer = USERS.find(u => String(u.id) === String(rev.userId) || u._id?.$oid === rev.userId?.$oid);
-    // Find if there's an owner reply in COMMENTS (comment by the establishment owner)
-    const ownerReply = COMMENTS.find(c => String(c.reviewId) === String(rev.id) && String(c.userId) === String(user.id));
+  const formattedReviews = reviews.map(rev => {
+    const ownerReply = (rev.comments || []).find(c => 
+       c.userId?._id === user._id || c.userId === user._id
+    );
 
     return {
-      id: rev.id,
-      rating: rev.rating,
-      date: typeof rev.date === "string" ? rev.date.split("T")[0] : "Recently",
+      id: rev._id,
+      rating: rev.rating || 0,
+      date: new Date(rev.date).toLocaleDateString(),
       title: rev.title,
-      body: rev.comment,
-      user: { name: reviewer?.name || "Unknown User" },
+      body: rev.body,
+      user: { name: rev.userId?.name || rev.userId?.username || "Unknown User" },
       hasOwnerReply: !!ownerReply,
       ownerReplyText: ownerReply?.text || "",
     };
@@ -108,6 +172,11 @@ export default function OwnerProfilePage({ user, setUser }) {
       )}
 
       <div className="container mt-4">
+        {loading ? (
+             <div className="text-center p-5"><span className="text-muted fw-bold">Loading dashboard...</span></div>
+        ) : !establishment ? (
+             <div className="text-center p-5"><span className="text-danger fw-bold">Warning: User is not linked to an active Business Entity.</span></div>
+        ) : (
         <div className="row g-4">
           {/* LEFT SIDEBAR: Owner Summary */}
           <div className="col-lg-3">
@@ -120,12 +189,12 @@ export default function OwnerProfilePage({ user, setUser }) {
               </div>
               <h6 className="fw-bold mb-1">{user.name}</h6>
               <p className="small text-muted mb-4 opacity-75">
-                Managing: <strong className="text-dlsu-dark">{mockEstablishment.name}</strong>
+                Managing: <strong className="text-dlsu-dark">{establishment.name}</strong>
               </p>
 
               <hr className="opacity-10 mb-4" />
 
-              <Link to={`/establishment/${mockEstablishment.id}`} className="btn btn-dark w-100 d-flex justify-content-center align-items-center gap-2 text-decoration-none">
+              <Link to={`/establishment/${establishment._id || establishment.id}`} className="btn btn-dark w-100 d-flex justify-content-center align-items-center gap-2 text-decoration-none">
                 <ExternalLink size={16} /> View Establishment
               </Link>
             </div>
@@ -137,7 +206,7 @@ export default function OwnerProfilePage({ user, setUser }) {
             <div className="d-flex flex-wrap gap-2 mb-4 p-2 bg-white rounded-4 shadow-sm border">
               <TabButton id="dashboard" icon={BarChart3} label="Analytics" />
               <TabButton id="manage" icon={Store} label="Manage Store" />
-              <TabButton id="inbox" icon={Star} label={`Reviews Inbox (${mockReviews.filter(r => !r.hasOwnerReply).length})`} />
+              <TabButton id="inbox" icon={Star} label={`Reviews Inbox (${formattedReviews.filter(r => !r.hasOwnerReply).length})`} />
             </div>
 
             {/* CONTENT: DASHBOARD */}
@@ -146,7 +215,7 @@ export default function OwnerProfilePage({ user, setUser }) {
                 <div className="col-md-4">
                   <div className="custom-card p-4 text-center h-100 d-flex flex-column justify-content-center">
                     <h1 className="fw-bold text-dlsu-dark mb-1" style={{ fontSize: "3rem" }}>
-                      {mockEstablishment.rating}
+                      {reviews.length > 0 ? (reviews.reduce((s, r) => s + (r.rating || 0), 0) / reviews.length).toFixed(1) : "0.0"}
                     </h1>
                     <p className="text-muted fw-bold mb-0">Average Rating</p>
                   </div>
@@ -154,7 +223,7 @@ export default function OwnerProfilePage({ user, setUser }) {
                 <div className="col-md-4">
                   <div className="custom-card p-4 text-center h-100 d-flex flex-column justify-content-center">
                     <h1 className="fw-bold text-dlsu-dark mb-1" style={{ fontSize: "3rem" }}>
-                      {mockEstablishment.reviewCount}
+                      {reviews.length}
                     </h1>
                     <p className="text-muted fw-bold mb-0">Total Reviews</p>
                   </div>
@@ -162,7 +231,7 @@ export default function OwnerProfilePage({ user, setUser }) {
                 <div className="col-md-4">
                   <div className="custom-card p-4 text-center h-100 d-flex flex-column justify-content-center bg-dlsu-light border border-success">
                     <h1 className="fw-bold text-dlsu-dark mb-1" style={{ fontSize: "3rem" }}>
-                      {mockReviews.filter(r => !r.hasOwnerReply).length}
+                      {formattedReviews.filter(r => !r.hasOwnerReply).length}
                     </h1>
                     <p className="text-success fw-bold mb-0">Unanswered Reviews</p>
                   </div>
@@ -193,7 +262,7 @@ export default function OwnerProfilePage({ user, setUser }) {
                           onChange={(e) => setStoreForm({...storeForm, name: e.target.value})} 
                         />
                       ) : (
-                        <div className="form-control bg-light fw-bold text-muted border-0 py-2">{mockEstablishment.name}</div>
+                        <div className="form-control bg-light fw-bold text-muted border-0 py-2">{establishment.name}</div>
                       )}
                     </div>
                     
@@ -214,7 +283,7 @@ export default function OwnerProfilePage({ user, setUser }) {
                           <option value="Dorms/Condos">Dorms/Condos</option>
                         </select>
                       ) : (
-                        <div className="form-control bg-light text-muted border-0 py-2">{mockEstablishment.category}</div>
+                        <div className="form-control bg-light text-muted border-0 py-2">{establishment.category}</div>
                       )}
                     </div>
 
@@ -238,7 +307,7 @@ export default function OwnerProfilePage({ user, setUser }) {
                            />
                         </div>
                       ) : (
-                        <div className="form-control bg-light text-muted border-0 py-2">{mockEstablishment.businessHours}</div>
+                        <div className="form-control bg-light text-muted border-0 py-2">{establishment.businessHours}</div>
                       )}
                     </div>
                   </div>
@@ -269,13 +338,13 @@ export default function OwnerProfilePage({ user, setUser }) {
             {/* CONTENT: REVIEWS INBOX */}
             {activeTab === "inbox" && (
               <div className="d-flex flex-column gap-3">
-                {mockReviews.filter(r => !r.hasOwnerReply).length > 0 && (
+                {formattedReviews.filter(r => !r.hasOwnerReply).length > 0 && (
                   <div className="alert alert-warning border border-warning rounded-4 small mb-1 shadow-sm d-flex align-items-center gap-2">
-                    <strong className="fs-6">Action required:</strong> You have {mockReviews.filter(r => !r.hasOwnerReply).length} unanswered reviews. Engaging with customers improves your rating!
+                    <strong className="fs-6">Action required:</strong> You have {formattedReviews.filter(r => !r.hasOwnerReply).length} unanswered reviews. Engaging with customers improves your rating!
                   </div>
                 )}
 
-                {mockReviews.map((rev) => (
+                {formattedReviews.map((rev) => (
                   <div key={rev.id} className="custom-card p-4 border shadow-sm">
                     <div className="d-flex justify-content-between mb-3 align-items-start">
                       <div className="d-flex gap-3 align-items-center">
@@ -336,6 +405,7 @@ export default function OwnerProfilePage({ user, setUser }) {
             )}
           </div>
         </div>
+        )}
       </div>
     </div>
   );

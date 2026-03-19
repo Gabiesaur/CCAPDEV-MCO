@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import {
   Star,
   MessageSquare,
@@ -15,11 +15,28 @@ import ProfileStatistics from "../components/profile/ProfileStatistics";
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 import ImageUploadModal from "../components/profile/ImageUploadModal";
+import ProfileSavedEstablishmentCard from "../components/profile/ProfileSavedEstablishmentCard";
 
 export default function MyProfilePage({ user, setUser }) {
   // UI State
   const [activeTab, setActiveTab] = useState("reviews");
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Mock Comment Data
+  const mockComment = {
+    postTitle: "Where to print?",
+    postAuthor: "Archer123",
+    postRating: 5,
+    date: "2 hours ago",
+    body: "Try PixelPro at One Archers, they are open 24/7.",
+  };
+
+  // Live Backend State
+  const [myReviews, setMyReviews] = useState([]);
+  const [savedEstablishments, setSavedEstablishments] = useState([]);
+  const [helpfulReviews, setHelpfulReviews] = useState([]);
+  const [unhelpfulReviews, setUnhelpfulReviews] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Toast State
   const [showToast, setShowToast] = useState(false);
@@ -40,35 +57,38 @@ export default function MyProfilePage({ user, setUser }) {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  // --- MOCK DATA ---
-  const mockReview = {
-    rating: 4,
-    date: "3 days ago",
-    title: "Great study spot!",
-    body: "Quiet and cold AC. The wifi is decent but sometimes disconnects.",
-    establishment: {
-      id: 5,
-      name: "Coffee Bean",
-      location: "Henry Sy Hall",
-      image: "https://ui-avatars.com/api/?name=CB",
-    },
-  };
+  useEffect(() => {
+    if (!user || !user._id) return;
+    setIsLoading(true);
 
-  const mockComment = {
-    postTitle: "Where to print?",
-    postAuthor: "Archer123",
-    postRating: 5,
-    date: "2 hours ago",
-    body: "Try PixelPro at One Archers, they are open 24/7.",
-  };
+    // Fetch Review Arrays
+    Promise.all([
+      fetch(`http://localhost:5000/api/users/${user._id}/bookmarks`).then(res => res.json()),
+      fetch(`http://localhost:5000/api/users/${user._id}/helpful-reviews`).then(res => res.json()),
+      fetch(`http://localhost:5000/api/users/${user._id}/unhelpful-reviews`).then(res => res.json()),
+      fetch(`http://localhost:5000/api/users/${user._id}/reviews`).then(res => res.json())
+    ])
+      .then(([savedData, helpfulData, unhelpfulData, revData]) => {
+        setSavedEstablishments(Array.isArray(savedData) ? savedData : []);
+        setHelpfulReviews(Array.isArray(helpfulData) ? helpfulData : []);
+        setUnhelpfulReviews(Array.isArray(unhelpfulData) ? unhelpfulData : []);
+        setMyReviews(Array.isArray(revData) ? revData : []);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed fetching profile tabs data:", err);
+        setIsLoading(false);
+      });
+  }, [user]);
 
   // Tab Button Helper
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
-      className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${activeTab === id
-        ? "bg-dlsu-light text-dlsu-dark border-0"
-        : "btn-light border text-muted"
-        }`}
+      className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${
+        activeTab === id
+          ? "bg-dlsu-light text-dlsu-dark border-0"
+          : "btn-light border text-muted"
+      }`}
       onClick={() => setActiveTab(id)}
     >
       <Icon size={16} /> {label}
@@ -77,7 +97,6 @@ export default function MyProfilePage({ user, setUser }) {
 
   return (
     <div className="min-vh-100 pb-5 bg-light">
-      {/* 1. Header Section */}
       <ProfileHeader
         name={user.name}
         username={user.username}
@@ -86,19 +105,13 @@ export default function MyProfilePage({ user, setUser }) {
         onCameraClick={() => setIsModalOpen(true)}
       />
 
-      {/* 2. Modals & Notifications */}
       <ImageUploadModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        userId={user._id} // Pass the ID down to the modal!
+        userId={user._id}
         onUploadSuccess={(updatedUser) => {
-          // 1. Update the global user state (this makes the image change instantly!)
           setUser(updatedUser);
-          
-          // 2. Update localStorage so the image stays if they refresh the page
           localStorage.setItem("currentUser", JSON.stringify(updatedUser));
-          
-          // 3. Close modal and show success toast
           setIsModalOpen(false);
           triggerToast("Profile picture updated successfully!", "success");
         }}
@@ -116,48 +129,80 @@ export default function MyProfilePage({ user, setUser }) {
         <div className="row g-4">
           {/* LEFT COLUMN: Feed */}
           <div className="col-lg-8">
-            {/* Navigation Tabs */}
             <div className="d-flex flex-wrap gap-2 mb-4">
               <TabButton id="reviews" icon={Star} label="My Reviews" />
-              <TabButton
-                id="comments"
-                icon={MessageSquare}
-                label="My Comments"
-              />
+              <TabButton id="comments" icon={MessageSquare} label="My Comments" />
               <TabButton id="saved" icon={BookMarked} label="Saved" />
-              <TabButton id="helpful" icon={ThumbsUp} label="Helpful" />
-              <TabButton id="unhelpful" icon={ThumbsDown} label="Unhelpful" />
+              <TabButton id="helpful" icon={ThumbsUp} label="Helpful Reviews" />
+              <TabButton id="unhelpful" icon={ThumbsDown} label="Unhelpful Reviews" />
             </div>
 
             {/* Dynamic Content Rendering */}
             <div>
-              {activeTab === "reviews" && (
+              {isLoading ? (
+                  <div className="text-muted py-3">Loading active data...</div>
+              ) : (
                 <>
-                  <ProfileReviews review={mockReview} />
-                  <ProfileReviews
-                    review={{
-                      ...mockReview,
-                      title: "Standard Taft Food",
-                      rating: 5,
-                    }}
-                  />
-                </>
-              )}
+                  {activeTab === "reviews" && (
+                    <div className="py-3">
+                      <h6 className="text-muted mb-4 border-bottom pb-2">Your Authored Reviews</h6>
+                      {myReviews.length === 0 ? (
+                        <p className="text-muted">You haven't written any reviews yet.</p>
+                      ) : (
+                        myReviews.map((rev) => (
+                           <ProfileReviews key={rev._id} review={rev} />
+                        ))
+                      )}
+                    </div>
+                  )}
 
-              {activeTab === "comments" && (
-                <>
-                  <ProfileComments comment={mockComment} isOwnProfile={true} />
-                  <ProfileComments comment={mockComment} isOwnProfile={true} />
-                </>
-              )}
+                  {activeTab === "comments" && (
+                    <div className="py-3">
+                      <h6 className="text-muted mb-4 border-bottom pb-2">Your Authored Comments</h6>
+                      <ProfileComments comment={mockComment} isOwnProfile={true} />
+                      <ProfileComments comment={mockComment} isOwnProfile={true} />
+                    </div>
+                  )}
 
-              {["saved", "helpful", "unhelpful"].includes(activeTab) && (
-                <div className="py-3">
-                  <h6 className="text-muted mb-4 text-capitalize border-bottom pb-2">
-                    Your {activeTab} posts
-                  </h6>
-                  <ProfileReviews review={mockReview} />
-                </div>
+                  {activeTab === "saved" && (
+                    <div className="py-3">
+                      <h6 className="text-muted mb-4 text-capitalize border-bottom pb-2">Your Saved Establishments</h6>
+                      {savedEstablishments.length === 0 ? (
+                        <p className="text-muted">You haven't saved any establishments yet.</p>
+                      ) : (
+                        savedEstablishments.map((est) => (
+                           <ProfileSavedEstablishmentCard key={est._id} establishment={est} />
+                        ))
+                      )}
+                    </div>
+                  )}
+
+                  {activeTab === "helpful" && (
+                    <div className="py-3">
+                      <h6 className="text-muted mb-4 border-bottom pb-2">Reviews You Marked as Helpful</h6>
+                      {helpfulReviews.length === 0 ? (
+                        <p className="text-muted">You haven't marked any reviews as helpful.</p>
+                      ) : (
+                        helpfulReviews.map((rev) => (
+                           <ProfileReviews key={rev._id} review={rev} />
+                        ))
+                      )}
+                    </div>
+                  )}
+
+                  {activeTab === "unhelpful" && (
+                    <div className="py-3">
+                      <h6 className="text-muted mb-4 border-bottom pb-2">Reviews You Marked as Unhelpful</h6>
+                      {unhelpfulReviews.length === 0 ? (
+                        <p className="text-muted">You haven't marked any reviews as unhelpful.</p>
+                      ) : (
+                        unhelpfulReviews.map((rev) => (
+                           <ProfileReviews key={rev._id} review={rev} />
+                        ))
+                      )}
+                    </div>
+                  )}
+                </>
               )}
             </div>
           </div>
