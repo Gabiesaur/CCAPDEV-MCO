@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, Navigate, useNavigate } from "react-router-dom"; // Added Navigate, useNavigate
 import { Star, MessageSquare, Link as LinkIcon, CheckCircle2 } from "lucide-react";
 
@@ -13,6 +13,9 @@ export default function PublicProfilePage({ db, currentUser }) {
   const [activeTab, setActiveTab] = useState("reviews");
 
   // Toast State
+  const [publicReviews, setPublicReviews] = useState([]);
+  const [publicComments, setPublicComments] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastIcon, setToastIcon] = useState(null);
@@ -50,21 +53,26 @@ export default function PublicProfilePage({ db, currentUser }) {
     );
   }
 
-  // 2. Safely access the comments array (Default to empty if missing)
-  const userComments = publicUser.comments || [];
-
-  // MOCK REVIEW (You can also move this to DB later)
-  const mockReview = {
-    rating: 5,
-    date: "1 week ago",
-    title: `Best spot for ${publicUser.name}!`,
-    body: "Honestly, for the price, you can't beat this.",
-    establishment: {
-      name: "Ate Rica's Bacsilog",
-      location: "Agno Food Court",
-      image: "https://ui-avatars.com/api/?name=AR",
-    },
-  };
+  useEffect(() => {
+      if (!publicUser || !publicUser._id) return;
+      setIsLoading(true);
+  
+      // Fetch Review Arrays
+      Promise.all([
+        fetch(`http://localhost:5000/api/users/${publicUser._id}/reviews`).then(res => res.json()),
+        fetch(`http://localhost:5000/api/users/${publicUser._id}/comments`).then(res => res.json())
+      ])
+        .then(([revData, commentData]) => {
+          setPublicReviews(Array.isArray(revData) ? revData : []);
+          setPublicComments(Array.isArray(commentData) ? commentData : []);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed fetching profile tabs data:", err);
+          setIsLoading(false);
+        });
+    }, [publicUser]);
+  
 
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
@@ -104,27 +112,38 @@ export default function PublicProfilePage({ db, currentUser }) {
             </div>
 
             <div>
-              {activeTab === "reviews" ? (
-                <ProfileReviews review={mockReview} />
-              ) : (
-                /* 3. Dynamic Comment Rendering */
-                <div className="d-flex flex-column gap-3">
-                  {userComments.length > 0 ? (
-                    userComments.map((commentData, index) => (
-                      <ProfileComments
-                        key={index}
+              {activeTab === "reviews" && (
+                <div className="py-3">
+                  {publicReviews.length === 0 ? (
+                    <p className="text-muted">This user hasn't written any reviews yet.</p>
+                  ) : (
+                    publicReviews.map((rev) => (
+                        <ProfileReviews key={rev._id} review={rev} />
+                    ))
+                  )}
+                </div>
+              )}
+
+              {activeTab === "comments" && (
+                <div className="py-3">
+                  {publicComments.length === 0 ? (
+                    <p className="text-muted">This user hasn't posted any comments yet.</p>
+                  ) : (
+                    publicComments.map((comment) => (
+                      <ProfileComments 
+                        key={comment._id} 
+                        isOwnProfile={true}
                         comment={{
-                          ...commentData,
-                          user: publicUser.username,
-                        }}
-                        isOwnProfile={false}
+                          _id: comment._id,
+                          // Pull the original review details populated from the backend
+                          postTitle: comment.reviewId?.title || "Deleted Review",
+                          postAuthor: comment.reviewId?.userId?.username || "Unknown User",
+                          postRating: comment.reviewId?.rating || 0,
+                          date: new Date(comment.date).toLocaleDateString(),
+                          body: comment.text || comment.body // Fallback depending on your schema
+                        }} 
                       />
                     ))
-                  ) : (
-                    <div className="text-center py-5 text-muted border rounded-3 bg-white">
-                      <MessageSquare className="mb-2 opacity-25" size={40} />
-                      <p className="mb-0">No comments yet.</p>
-                    </div>
                   )}
                 </div>
               )}
