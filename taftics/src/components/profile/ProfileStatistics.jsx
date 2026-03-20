@@ -15,7 +15,7 @@ export default function ProfileStatistics({ user, isOwnProfile, setUser, onShare
 
     try {
       // 1. Send the updated bio to the backend
-      const response = await fetch(`http://localhost:5000/api/users/${user._id}/bio`, {
+      const response = await fetch(`http://localhost:3000/api/users/${user._id}/bio`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",

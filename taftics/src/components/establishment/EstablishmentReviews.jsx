@@ -128,7 +128,7 @@ export default function EstablishmentReviews({ reviews, establishment, currentUs
         const reviewId = (rev._id && rev._id.$oid) ? rev._id.$oid : (rev._id || rev.id);
         
         try {
-            const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}/vote`, {
+            const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}/vote`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ userId: currentUser._id, type })
@@ -179,7 +179,7 @@ export default function EstablishmentReviews({ reviews, establishment, currentUs
                 updatedReview.newImages.forEach(img => formData.append("images", img.file));
             }
 
-            const res = await fetch(`http://localhost:5000/api/reviews/${reviewId}`, {
+            const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}`, {
                 method: "PUT",
                 body: formData
             });
@@ -205,7 +205,7 @@ export default function EstablishmentReviews({ reviews, establishment, currentUs
 
     const handleDelete = async (id) => {
         try {
-            const res = await fetch(`http://localhost:5000/api/reviews/${id}`, {
+            const res = await fetch(`http://localhost:3000/api/reviews/${id}`, {
                 method: "DELETE"
             });
             const data = await res.json();

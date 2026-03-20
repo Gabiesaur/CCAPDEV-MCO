@@ -52,7 +52,7 @@ function App() {
 
   // Fetch all users on mount
   useEffect(() => {
-    fetch('http://localhost:5000/api/users')
+    fetch('http://localhost:3000/api/users')
       .then(res => res.json())
       .then(data => setDbUsers(data))
       .catch(err => console.error("Error fetching users:", err));
@@ -63,7 +63,7 @@ function App() {
   // Note the new 'rememberMe' parameter
   const login = async (username, password, rememberMe) => {
     try {
-      const response = await fetch('http://localhost:5000/api/login', {
+      const response = await fetch('http://localhost:3000/api/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -100,7 +100,7 @@ function App() {
 
   const register = async (formData) => {
     try {
-      const response = await fetch('http://localhost:5000/api/register', {
+      const response = await fetch('http://localhost:3000/api/register', {
         method: 'POST',
         body: formData // No headers needed for FormData!
       });

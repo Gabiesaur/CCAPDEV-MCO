@@ -101,7 +101,7 @@ export default function ImageUploadModal({ isOpen, onClose, onUploadSuccess, use
     formData.append("avatar", file);
 
     try {
-      const response = await fetch(`http://localhost:5000/api/users/${userId}/avatar`, {
+      const response = await fetch(`http://localhost:3000/api/users/${userId}/avatar`, {
         method: "PUT",
         body: formData,
       });

@@ -42,7 +42,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchLandingData = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/establishments');
+        const res = await fetch('http://localhost:3000/api/establishments');
         const data = await res.json();
 
         const sortedByRating = [...data].sort((a, b) => (b.rating || 0) - (a.rating || 0));
@@ -52,7 +52,7 @@ const LandingPage = () => {
         const reviewResults = await Promise.all(
           sortedByRating.map(async (est) => {
             try {
-              const reviewsRes = await fetch(`http://localhost:5000/api/establishments/${est._id}/reviews`);
+              const reviewsRes = await fetch(`http://localhost:3000/api/establishments/${est._id}/reviews`);
               if (!reviewsRes.ok) return [];
 
               const reviews = await reviewsRes.json();

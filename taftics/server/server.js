@@ -10,7 +10,7 @@ const Comment = require('./models/Comment');
 
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 5000; //
+const PORT = process.env.PORT || 3000; //
 
 // --- MIDDLEWARE ---
 app.use(cors()); //
@@ -183,7 +183,7 @@ app.post('/api/register', async (req, res) => {
       await avatarFile.mv(uploadPath);
 
       // Set the URL that React will use to display the image
-      avatarUrl = `http://localhost:5000/uploads/${fileName}`;
+      avatarUrl = `http://localhost:3000/uploads/${fileName}`;
     }
 
     // 3. Create and save the new user
@@ -237,7 +237,7 @@ app.post('/api/reviews', async (req, res) => {
         const fileName = `${Date.now()}_${file.name}`;
         const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
         await file.mv(uploadPath);
-        imageUrls.push(`http://localhost:5000/uploads/${fileName}`);
+        imageUrls.push(`http://localhost:3000/uploads/${fileName}`);
       }
     }
 
@@ -286,7 +286,7 @@ app.put('/api/reviews/:id', async (req, res) => {
         const fileName = `${Date.now()}_${file.name}`;
         const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
         await file.mv(uploadPath);
-        imageUrls.push(`http://localhost:5000/uploads/${fileName}`);
+        imageUrls.push(`http://localhost:3000/uploads/${fileName}`);
       }
     }
     existingReview.images = imageUrls;
@@ -654,7 +654,7 @@ app.put('/api/users/:id/avatar', async (req, res) => {
     await avatarFile.mv(uploadPath);
 
     // 3. Generate the new URL
-    const avatarUrl = `http://localhost:5000/uploads/${fileName}`;
+    const avatarUrl = `http://localhost:3000/uploads/${fileName}`;
 
     // 4. Find the user and update their avatar in the database
     // { new: true } tells Mongoose to return the UPDATED user document

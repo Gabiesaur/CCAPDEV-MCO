@@ -36,7 +36,7 @@ function CreateReview() {
             }
 
             try {
-                const response = await fetch(`http://localhost:5000/api/establishments/${selectedEstablishment._id}/reviews`);
+                const response = await fetch(`http://localhost:3000/api/establishments/${selectedEstablishment._id}/reviews`);
                 if (!response.ok) {
                     throw new Error("Failed to fetch establishment reviews");
                 }
@@ -162,7 +162,7 @@ function CreateReview() {
         });
 
         try {
-            const response = await fetch("http://localhost:5000/api/reviews", {
+            const response = await fetch("http://localhost:3000/api/reviews", {
                 method: "POST",
                 body: formData,
             });
