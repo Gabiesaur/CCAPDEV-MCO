@@ -23,6 +23,7 @@ const BrowsePage = () => {
   const [activeHour, setActiveHour] = useState('Any');
   const [activePrice, setActivePrice] = useState('Any');
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
+  const [minimumRating, setMinimumRating] = useState(0);
 
   // 2. NEW: State to hold the fetched establishments
   const [establishments, setEstablishments] = useState([]);
@@ -61,6 +62,9 @@ const BrowsePage = () => {
   const filteredEstablishments = establishments.filter(est => {
     // Category filter
     if (activeCategory !== 'Any' && est.category !== activeCategory) return false;
+
+    // Minimum rating filter
+    if (minimumRating > 0 && Number(est.rating || 0) < minimumRating) return false;
 
     // Search query filter
     if (searchQuery && !est.name.toLowerCase().includes(searchQuery.toLowerCase())) return false;
@@ -101,7 +105,7 @@ const BrowsePage = () => {
               </div>
             </div>
 
-            <RatingFilter />
+            <RatingFilter selectedRating={minimumRating} onChange={setMinimumRating} />
 
             {/* Hours Filter */}
             <div className="filter-section mb-4">
