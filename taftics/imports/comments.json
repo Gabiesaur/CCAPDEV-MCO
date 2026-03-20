@@ -47,5 +47,12 @@
     "userId": { "$oid": "65f100000000000000000001" },
     "text": "Thanks for the recommendation! The portion size was huge.",
     "date": "2026-03-20"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000008" },
+    "reviewId": { "$oid": "65f200000000000000000019" },
+    "userId": { "$oid": "65f100000000000000000007" },
+    "text": "The gym was so refreshing.",
+    "date": "2026-07-17"
   }
 ]
