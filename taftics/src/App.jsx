@@ -60,7 +60,6 @@ function App() {
 
   // --- AUTHENTICATION FUNCTIONS ---
   
-  // Note the new 'rememberMe' parameter
   const login = async (username, password, rememberMe) => {
     try {
       const response = await fetch('http://localhost:3000/api/login', {
@@ -73,7 +72,6 @@ function App() {
         const userData = await response.json();
         setUser(userData.user);
 
-        // Save to the correct storage based on the checkbox
         if (rememberMe) {
           localStorage.setItem("currentUser", JSON.stringify(userData.user));
         } else {
@@ -93,7 +91,6 @@ function App() {
 
   const logout = () => {
     setUser(null);
-    // Clear both storages just to be safe
     localStorage.removeItem("currentUser");
     sessionStorage.removeItem("currentUser");
   };
@@ -102,7 +99,7 @@ function App() {
     try {
       const response = await fetch('http://localhost:3000/api/register', {
         method: 'POST',
-        body: formData // No headers needed for FormData!
+        body: formData
       });
 
       const data = await response.json();
@@ -122,7 +119,6 @@ function App() {
   };
 
   const apply = async (applicant) => {
-    // Placeholder: You'll eventually wire this up to a POST /api/apply route!
     if (dbUsers.find((u) => u.email === applicant.email)) {
       return { success: false, message: "Email already exists." };
     }

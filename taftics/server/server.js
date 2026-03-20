@@ -1,40 +1,39 @@
 const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
-const fileUpload = require('express-fileupload'); // Moved up
-require('dotenv').config({ path: path.resolve(__dirname, 'taftics.env') }); //
+const fileUpload = require('express-fileupload');
+require('dotenv').config({ path: path.resolve(__dirname, 'taftics.env') });
 const Establishment = require('./models/Establishment');
-const User = require('./models/User'); // Adjust the path if needed
+const User = require('./models/User');
 const Review = require('./models/Review');
 const Comment = require('./models/Comment');
 
 const express = require('express');
 const app = express();
-const PORT = process.env.PORT || 3000; //
+const PORT = process.env.PORT || 3000;
 
 // --- MIDDLEWARE ---
-app.use(cors()); //
-app.use(express.json()); // Allows the server to accept JSON data
-app.use(express.urlencoded({ extended: true })); //
-app.use(express.static('public')); //
-app.use(fileUpload({ parseNested: true })); //
-// Expose the 'public/uploads' directory to the web under the '/uploads' URL path
+app.use(cors());
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(fileUpload({ parseNested: true }));
 app.use('/uploads', express.static(path.join(__dirname, 'public', 'uploads')));
 
 // --- DATABASE CONNECTION ---
-const mongoUri = process.env.MONGO_URI; //
-if (!mongoUri) { //
-  console.error("❌ Missing MONGO_URI environment variable. Please set it in taftics.env."); //
-  process.exit(1); //
+const mongoUri = process.env.MONGO_URI;
+if (!mongoUri) {
+  console.error("❌ Missing MONGO_URI environment variable. Please set it in taftics.env.");
+  process.exit(1);
 }
 
-mongoose.connect(mongoUri) //
-  .then(() => console.log("✅ Connected to MongoDB via Compass")) //
-  .catch(err => console.error("❌ Connection error:", err)); //
+mongoose.connect(mongoUri)
+  .then(() => console.log("✅ Connected to MongoDB via Compass"))
+  .catch(err => console.error("❌ Connection error:", err));
 
 // --- ROUTES ---
-app.get('/', (req, res) => { //
-  res.send('API is running...'); //
+app.get('/', (req, res) => {
+  res.send('API is running...');
 });
 
 // --- API ROUTES ---
@@ -78,7 +77,6 @@ app.get('/api/establishments', async (req, res) => {
 
 // --- LOGIN ROUTE ---
 app.post('/api/login', async (req, res) => {
-  // Grab the input, whether the frontend sent it as 'username' or 'email'
   const loginIdentifier = req.body.username || req.body.email; 
   const password = req.body.password;
 
@@ -101,7 +99,7 @@ app.post('/api/login', async (req, res) => {
       {
         // Join with the reviews collection to find all reviews by this user
         $lookup: {
-          from: 'reviews', // Note: Make sure your MongoDB collection is named 'reviews'
+          from: 'reviews',
           localField: '_id',
           foreignField: 'userId',
           as: 'userReviews'
@@ -141,10 +139,10 @@ app.post('/api/login', async (req, res) => {
         idSeries: user.idSeries,
         bio: user.bio,
         followers: user.followers,
-        helpfulCount: user.helpfulCount,       // Now dynamically calculated!
-        contributions: user.contributions,     // Now dynamically calculated!
+        helpfulCount: user.helpfulCount,
+        contributions: user.contributions,
         avatar: user.avatar,
-        ownedEstablishmentId: user.ownedEstablishmentId, // Keeps the Owner Dashboard working
+        ownedEstablishmentId: user.ownedEstablishmentId,
         isAdmin: user.isAdmin
       }
     });
@@ -190,7 +188,7 @@ app.post('/api/register', async (req, res) => {
     const newUser = new User({
       username,
       email,
-      password, // Again, hash this in a real production app!
+      password,
       idSeries: dlsuId,
       avatar: avatarUrl,
       isAdmin: false
@@ -223,8 +221,8 @@ app.post('/api/register', async (req, res) => {
 
 // Create review
 app.post('/api/reviews', async (req, res) => {
-  console.log("req.body:", req.body);   // Should show userId, rating, title, text
-  console.log("req.files:", req.files); // Should show uploaded files if any
+  console.log("req.body:", req.body);
+  console.log("req.files:", req.files);
   try {
     const { userId, establishmentId, rating, title, body } = req.body;
 
@@ -265,7 +263,7 @@ app.post('/api/reviews', async (req, res) => {
 app.put('/api/reviews/:id', async (req, res) => {
   try {
     const { rating, title, body, comment, existingImages } = req.body;
-    const reviewText = body || comment; // support both from frontend
+    const reviewText = body || comment;
 
     // 1. Find existing review
     const existingReview = await Review.findById(req.params.id);
@@ -391,7 +389,6 @@ app.get('/api/establishments/:id/reviews', async (req, res) => {
   try {
     // Find all reviews where establishmentId matches the URL parameter
     const reviews = await Review.find({ establishmentId: req.params.id })
-      // .populate() pulls the user details from the User collection!
       .populate('userId', 'username name avatar')
       .sort({ date: -1 }); // Sort by newest first
 
@@ -436,7 +433,6 @@ app.put('/api/establishments/:id', async (req, res) => {
 });
 
 // --- GET ALL USERS ---
-// Used by App.jsx to load users for the Browse/Public Profile features
 app.get('/api/users', async (req, res) => {
   try {
     const users = await User.aggregate([
@@ -625,7 +621,6 @@ app.get('/api/reviews/:id', async (req, res) => {
     const review = await Review.findById(req.params.id)
       .populate('userId', 'username name avatar')
       .populate('establishmentId', 'name location')
-      // THIS IS NEW: It grabs the user info for every comment!
       .populate('comments.userId', 'username name avatar');
 
     if (!review) {
@@ -661,7 +656,7 @@ app.put('/api/users/:id/avatar', async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       { avatar: avatarUrl },
-      { returnDocument: 'after' } // <-- Replaced { new: true }
+      { returnDocument: 'after' }
     ).select('-password');
 
     if (!updatedUser) {
@@ -686,7 +681,7 @@ app.put('/api/users/:id/bio', async (req, res) => {
     const updatedUser = await User.findByIdAndUpdate(
       req.params.id,
       { bio: bio },
-      { returnDocument: 'after' } // <-- Replaced { new: true }
+      { returnDocument: 'after' }
     ).select('-password');
 
     if (!updatedUser) {
@@ -709,7 +704,6 @@ app.put('/api/users/:id/bio', async (req, res) => {
 app.get('/api/reviews/:id/comments', async (req, res) => {
   try {
     // Find all comments where the reviewId matches the URL parameter
-    // We populate the userId so the frontend gets the commenter's name & avatar
     const comments = await Comment.find({ reviewId: req.params.id })
       .populate('userId', 'username name avatar')
       .sort({ date: -1 }); // Sort by newest comments first
@@ -792,6 +786,6 @@ app.post('/api/reviews/:id/comments', async (req, res) => {
 });
 
 // --- START SERVER ---
-app.listen(PORT, () => { //
-  console.log(`🚀 Server running on http://localhost:${PORT}`); //
+app.listen(PORT, () => {
+  console.log(`🚀 Server running on http://localhost:${PORT}`);
 });
