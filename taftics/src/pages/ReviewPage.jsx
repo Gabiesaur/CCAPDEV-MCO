@@ -148,7 +148,7 @@ const ReviewPage = () => {
     e.preventDefault();
 
     // Get user
-    const storedUser = localStorage.getItem("currentUser");
+    const storedUser = sessionStorage.getItem("currentUser") || localStorage.getItem("currentUser");
     const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
     // Check if logged in
