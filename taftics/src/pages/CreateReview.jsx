@@ -1,5 +1,5 @@
 import React from "react";
-import { Star, CheckCircle2 } from "lucide-react";
+import { Star, CheckCircle2, ChevronDown } from "lucide-react";
 import { useNavigate, useLocation, useOutletContext } from "react-router-dom";
 
 function CreateReview() {
@@ -22,9 +22,48 @@ function CreateReview() {
         setTimeout(() => setShowToast(false), 3000);
     };
 
-    const selectedEstablishment = location.state?.establishment;
+    const initialEstablishment = location.state?.establishment || null;
     const selectedReviews = Array.isArray(location.state?.reviews) ? location.state.reviews : [];
+    const [selectedEstablishment, setSelectedEstablishment] = React.useState(initialEstablishment);
+    const [establishments, setEstablishments] = React.useState(
+        initialEstablishment ? [initialEstablishment] : []
+    );
     const [establishmentReviews, setEstablishmentReviews] = React.useState(selectedReviews);
+    const [isDropdownOpen, setIsDropdownOpen] = React.useState(false);
+    const dropdownRef = React.useRef(null);
+
+    React.useEffect(() => {
+        let ignore = false;
+
+        const loadEstablishments = async () => {
+            try {
+                const response = await fetch("http://localhost:3000/api/establishments");
+                if (!response.ok) {
+                    throw new Error("Failed to fetch establishments");
+                }
+
+                const data = await response.json();
+                if (ignore) return;
+
+                const fetchedList = Array.isArray(data) ? data : [];
+                if (initialEstablishment && !fetchedList.some((est) => est?._id === initialEstablishment._id)) {
+                    setEstablishments([initialEstablishment, ...fetchedList]);
+                } else {
+                    setEstablishments(fetchedList);
+                }
+            } catch {
+                if (!ignore) {
+                    setEstablishments(initialEstablishment ? [initialEstablishment] : []);
+                }
+            }
+        };
+
+        loadEstablishments();
+
+        return () => {
+            ignore = true;
+        };
+    }, [initialEstablishment]);
 
     React.useEffect(() => {
         let ignore = false;
@@ -47,7 +86,8 @@ function CreateReview() {
                 }
             } catch {
                 if (!ignore) {
-                    setEstablishmentReviews(Array.isArray(selectedReviews) ? selectedReviews : []);
+                    const sameAsInitial = selectedEstablishment?._id && initialEstablishment?._id && selectedEstablishment._id === initialEstablishment._id;
+                    setEstablishmentReviews(sameAsInitial ? selectedReviews : []);
                 }
             }
         };
@@ -57,7 +97,24 @@ function CreateReview() {
         return () => {
             ignore = true;
         };
-    }, [selectedEstablishment?._id]);
+    }, [selectedEstablishment?._id, initialEstablishment?._id]);
+
+    React.useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+                setIsDropdownOpen(false);
+            }
+        };
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    const handleEstablishmentChange = (selectedId) => {
+        const nextEstablishment = establishments.find((est) => est?._id === selectedId) || null;
+        setSelectedEstablishment(nextEstablishment);
+        setIsDropdownOpen(false);
+    };
 
     const fallbackData = {
         name: "Select an establishment",
@@ -201,6 +258,58 @@ function CreateReview() {
                     <p className="text-muted mb-4">
                         Establishment selected: <span className="fw-bold text-dark">{establishmentData.name}</span>
                     </p>
+                    <div className="mb-4" style={{ maxWidth: "420px" }}>
+                        <label className="form-label fw-bold small text-uppercase text-muted">Change establishment</label>
+                        <div className="position-relative" ref={dropdownRef}>
+                            <button
+                                type="button"
+                                className="btn w-100 border rounded-4 bg-white shadow-sm p-2 text-start d-flex align-items-center justify-content-between"
+                                onClick={() => setIsDropdownOpen((prev) => !prev)}
+                            >
+                                <div className="d-flex align-items-center gap-3">
+                                    <img
+                                        src={selectedEstablishment?.image || "https://ui-avatars.com/api/?name=Establishment"}
+                                        alt={selectedEstablishment?.name || "establishment"}
+                                        style={{ width: "48px", height: "48px", objectFit: "cover", borderRadius: "10px" }}
+                                    />
+                                    <div className="d-flex flex-column lh-sm">
+                                        <span className="fw-bold text-dark">{selectedEstablishment?.name || "Select an establishment"}</span>
+                                        <small className="text-muted">{selectedEstablishment?.location || "Choose where to post your review"}</small>
+                                    </div>
+                                </div>
+                                <ChevronDown size={18} className="text-muted" />
+                            </button>
+
+                            {isDropdownOpen && (
+                                <div
+                                    className="position-absolute w-100 bg-white border rounded-4 shadow-sm mt-2"
+                                    style={{ zIndex: 20, maxHeight: "280px", overflowY: "auto" }}
+                                >
+                                    {establishments.map((est) => (
+                                        <button
+                                            key={est._id}
+                                            type="button"
+                                            className="btn w-100 text-start px-2 py-2 border-0 rounded-0"
+                                            style={{ backgroundColor: selectedEstablishment?._id === est._id ? "#f1f8f4" : "transparent" }}
+                                            onClick={() => handleEstablishmentChange(est._id)}
+                                        >
+                                            <div className="d-flex align-items-center gap-3">
+                                                <img
+                                                    src={est.image || "https://ui-avatars.com/api/?name=Establishment"}
+                                                    alt={est.name || "establishment"}
+                                                    style={{ width: "48px", height: "48px", objectFit: "cover", borderRadius: "10px" }}
+                                                />
+                                                <div className="d-flex flex-column lh-sm">
+                                                    <span className="fw-bold text-dark">{est.name || "Unknown Establishment"}</span>
+                                                    <small className="text-muted">{est.location || "Unknown location"}</small>
+                                                </div>
+                                            </div>
+                                        </button>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
                 <div className="d-flex flex-row justify-content-between w-75">
                     <div className="custom-card border p-3 d-flex align-items-center justify-content-center mb-5" style={{ width: "60%", height: "700px" }}>
