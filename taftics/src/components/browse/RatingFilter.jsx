@@ -1,9 +1,22 @@
 import { useState } from 'react';
 import { Star } from 'lucide-react';
 
-const RatingFilter = () => {
-  const [selectedRating, setSelectedRating] = useState(0);
+const RatingFilter = ({ selectedRating = 0, onChange }) => {
   const [hoverRating, setHoverRating] = useState(0);
+
+  const handleSelect = (star) => {
+    if (onChange) {
+      onChange(star);
+      return;
+    }
+  };
+
+  const handleClear = () => {
+    if (onChange) {
+      onChange(0);
+      return;
+    }
+  };
 
   return (
     <div className="filter-section mb-4">
@@ -17,7 +30,7 @@ const RatingFilter = () => {
             key={star}
             type="button"
             className="btn btn-link p-0 border-0 text-decoration-none transition-all"
-            onClick={() => setSelectedRating(star)}
+            onClick={() => handleSelect(star)}
             onMouseEnter={() => setHoverRating(star)}
             onMouseLeave={() => setHoverRating(0)}
             style={{ outline: 'none', boxShadow: 'none' }}
@@ -46,7 +59,7 @@ const RatingFilter = () => {
       {selectedRating > 0 && (
         <button 
           className="btn btn-link btn-sm p-0 mt-2 text-muted small text-decoration-none"
-          onClick={() => setSelectedRating(0)}
+          onClick={handleClear}
         >
           Clear Filter
         </button>
