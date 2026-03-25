@@ -12,7 +12,8 @@
     "contactNumber": "02-8888-1234",
     "email": "support@nationalbookstore.com",
     "website": "https://www.nationalbookstore.com",
-    "address": "Yuchengco Hall, De La Salle University, Taft Ave, Manila"
+    "address": "Yuchengco Hall, De La Salle University, Taft Ave, Manila",
+    "isOfficial": true
   },
   {
     "_id": {
@@ -27,7 +28,8 @@
     "contactNumber": "0917-555-6789",
     "email": "rsquare@anytimefitness.ph",
     "website": "https://www.anytimefitness.ph",
-    "address": "R Square Mall, Taft Ave, Malate, Manila"
+    "address": "R Square Mall, Taft Ave, Malate, Manila",
+    "isOfficial": true
   },
   {
     "_id": {
@@ -42,7 +44,8 @@
     "contactNumber": "0999-123-4567",
     "email": "atericas@yahoo.com",
     "website": "https://www.facebook.com/AteRicasBacsilog",
-    "address": "Agno Food Court, De La Salle University, Taft Ave, Manila"
+    "address": "Agno Food Court, De La Salle University, Taft Ave, Manila",
+    "isOfficial": true
   },
   {
     "_id": {
@@ -57,7 +60,8 @@
     "contactNumber": "02-7777-8888",
     "email": "inquiries@smdc.com",
     "website": "https://smdc.com/properties/green-residences",
-    "address": "Taft Ave, Malate, Manila, Metro Manila"
+    "address": "Taft Ave, Malate, Manila, Metro Manila",
+    "isOfficial": true
   },
   {
     "_id": {
@@ -72,7 +76,8 @@
     "contactNumber": "0917-111-2222",
     "email": "hello@zuscoffee.ph",
     "website": "https://zuscoffee.ph",
-    "address": "Ground Floor, Green Mall, Taft Ave, Manila"
+    "address": "Ground Floor, Green Mall, Taft Ave, Manila",
+    "isOfficial": true
   },
   {
     "_id": {
@@ -87,7 +92,8 @@
     "contactNumber": "091-234-5678",
     "email": "dlsu@laundry.com",
     "website": "www.dlsu-laundry.com",
-    "address": "2401 Taft Ave, Malate, Manila, 1004 Metro Manila"
+    "address": "2401 Taft Ave, Malate, Manila, 1004 Metro Manila",
+    "isOfficial": true
   },
   {
     "_id": {
@@ -102,7 +108,8 @@
     "contactNumber": "0917-888-9999",
     "email": "studycafe.taft@gmail.com",
     "website": "https://studycafe.ph",
-    "address": "2nd Floor, One Archers Place, Taft Ave, Manila"
+    "address": "2nd Floor, One Archers Place, Taft Ave, Manila",
+    "isOfficial": true
   },
   {
     "_id": {
@@ -117,6 +124,7 @@
     "contactNumber": "02-8555-4321",
     "email": "print.taft@gmail.com",
     "website": "https://taftquickprint.com",
-    "address": "Sherwood Place, Taft Ave, Manila"
+    "address": "Sherwood Place, Taft Ave, Manila",
+    "isOfficial": true
   }
 ]

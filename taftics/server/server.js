@@ -126,7 +126,7 @@ app.post('/api/login', async (req, res) => {
 
     match = await bcrypt.compare(password, user.password);
     // 2. Check if user exists AND password matches
-    if (!user || (!match && user.password !== password)) {
+    if (!user || !match) {
       return res.status(401).json({ success: false, message: "Invalid username/email or password" });
     }
 
