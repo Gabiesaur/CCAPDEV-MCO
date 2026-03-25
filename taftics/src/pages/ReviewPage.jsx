@@ -90,9 +90,20 @@ const ReviewPage = () => {
         const reviewData = await reviewRes.json();
         setReview(reviewData);
         setCounts({
-          up: reviewData.helpfulVotes || 0,
-          down: reviewData.unhelpfulVotes || 0,
+          up: reviewData.helpfulVoters?.length ?? reviewData.helpfulVotes ?? 0,
+          down: reviewData.unhelpfulVoters?.length ?? reviewData.unhelpfulVotes ?? 0,
         });
+
+        // Restore the current user's existing vote if any
+        const storedUser = sessionStorage.getItem("currentUser") || localStorage.getItem("currentUser");
+        const currentUser = storedUser ? JSON.parse(storedUser) : null;
+        if (currentUser?._id) {
+          const uid = currentUser._id.toString();
+          const alreadyHelpful = reviewData.helpfulVoters?.map(id => id.toString()).includes(uid);
+          const alreadyUnhelpful = reviewData.unhelpfulVoters?.map(id => id.toString()).includes(uid);
+          if (alreadyHelpful) setUserVote('up');
+          else if (alreadyUnhelpful) setUserVote('down');
+        }
 
         // 2. Safely extract Establishment ID and fetch Establishment details
         const estId = getEntityId(reviewData.establishmentId);
@@ -140,22 +151,38 @@ const ReviewPage = () => {
     fetchPageData();
   }, [id]);
 
-  const handleVote = (type) => {
-    setCounts((prev) => {
-      const newCounts = { ...prev };
-      if (userVote === type) {
-        newCounts[type] -= 1;
-        setUserVote(null);
-      } else if (userVote && userVote !== type) {
-        newCounts[userVote] -= 1;
-        newCounts[type] += 1;
-        setUserVote(type);
-      } else {
-        newCounts[type] += 1;
-        setUserVote(type);
+  const handleVote = async (type) => {
+    const storedUser = sessionStorage.getItem("currentUser") || localStorage.getItem("currentUser");
+    const currentUser = storedUser ? JSON.parse(storedUser) : null;
+    if (!currentUser?._id) {
+      triggerToast("You must be logged in to vote.");
+      return;
+    }
+
+    const voteType = type === 'up' ? 'helpful' : 'unhelpful';
+    try {
+      const res = await fetch(`http://localhost:3000/api/reviews/${id}/vote`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: currentUser._id, type: voteType }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        triggerToast(data.message || "Failed to submit vote.");
+        return;
       }
-      return newCounts;
-    });
+      const updatedReview = data.review;
+      setCounts({
+        up: updatedReview.helpfulVoters?.length ?? 0,
+        down: updatedReview.unhelpfulVoters?.length ?? 0,
+      });
+      const uid = currentUser._id.toString();
+      const nowHelpful = updatedReview.helpfulVoters?.map(id => id.toString()).includes(uid);
+      const nowUnhelpful = updatedReview.unhelpfulVoters?.map(id => id.toString()).includes(uid);
+      setUserVote(nowHelpful ? 'up' : nowUnhelpful ? 'down' : null);
+    } catch (error) {
+      triggerToast(`Network error: ${error.message}`);
+    }
   };
 
   const handleCommentSubmit = async (e) => {
