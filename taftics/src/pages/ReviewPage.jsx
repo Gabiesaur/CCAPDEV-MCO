@@ -109,7 +109,21 @@ const ReviewPage = () => {
         const commentsRes = await fetch(`http://localhost:3000/api/reviews/${id}/comments`);
         if (commentsRes.ok) {
           const commentsData = await commentsRes.json();
-          setComments(Array.isArray(commentsData) ? commentsData : []);
+          const commentsArray = Array.isArray(commentsData) ? commentsData : [];
+          
+          // Sort: Establishment Owner Priority first, then by Date (Newest)
+          const sortedComments = [...commentsArray].sort((a, b) => {
+            const aIsOwner = getEntityId(a?.userId?.ownedEstablishmentId) === estId;
+            const bIsOwner = getEntityId(b?.userId?.ownedEstablishmentId) === estId;
+            
+            if (aIsOwner && !bIsOwner) return -1;
+            if (!aIsOwner && bIsOwner) return 1;
+            
+            // Secondary sort: Date (Newest first)
+            return new Date(b.date) - new Date(a.date);
+          });
+          
+          setComments(sortedComments);
         } else {
           setComments([]);
         }
@@ -181,8 +195,19 @@ const ReviewPage = () => {
         return;
       }
 
-      // Adds the comment to the top
-      setComments((prev) => [data.comment, ...prev]);
+      // Re-sort to maintain Owner Priority
+      const estId = getEntityId(review?.establishmentId);
+      setComments((prev) => {
+        const updated = [data.comment, ...prev];
+        return [...updated].sort((a, b) => {
+          const aIsOwner = getEntityId(a?.userId?.ownedEstablishmentId) === estId;
+          const bIsOwner = getEntityId(b?.userId?.ownedEstablishmentId) === estId;
+          if (aIsOwner && !bIsOwner) return -1;
+          if (!aIsOwner && bIsOwner) return 1;
+          return new Date(b.date) - new Date(a.date);
+        });
+      });
+      
       setCommentText("");
       triggerToast("Comment posted!");
     } catch (error) {
@@ -343,8 +368,13 @@ const ReviewPage = () => {
                 const commentAuthor = getAuthorFromComment(comment);
                 const commentDate = getRelativeDate(comment?.date);
 
+                // Check if commenter owns the establishment this review belongs to
+                const commentUserOwnedEst = getEntityId(comment?.userId?.ownedEstablishmentId);
+                const reviewEstId = getEntityId(review?.establishmentId);
+                const isOwner = !!(commentUserOwnedEst && reviewEstId && commentUserOwnedEst === reviewEstId);
+
                 return (
-                  <div key={commentId} className="mb-4 p-4 bg-light rounded-4 shadow-sm">
+                  <div key={commentId} className={`mb-4 p-4 rounded-4 shadow-sm ${isOwner ? 'border border-success bg-dlsu-light' : 'bg-light'}`}>
                     <div className="d-flex align-items-center mb-3">
                       <img
                         src={commentAuthor.avatar}
@@ -361,6 +391,14 @@ const ReviewPage = () => {
                           <div className="text-dark fw-bold" style={{ marginBottom: '-4px' }}>
                             {commentAuthor.displayName}
                           </div>
+                        )}
+                        {isOwner && (
+                          <span
+                            className="badge rounded-pill fw-bold me-1 mt-1 d-inline-block bg-dlsu-light text-dlsu-dark border"
+                            style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', padding: '3px 7px' }}
+                          >
+                            Establishment Owner
+                          </span>
                         )}
                         <small className="text-muted d-block">{commentDate}</small>
                       </div>

@@ -24,6 +24,39 @@ export default function OwnerProfilePage({ user, setUser }) {
     setTimeout(() => setShowToast(false), 3000);
   };
 
+  const [replyTexts, setReplyTexts] = useState({});
+
+  const handleReplySubmit = async (reviewId) => {
+    const text = replyTexts[reviewId];
+    if (!text || !text.trim()) return;
+
+    try {
+      const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}/comments`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user._id || user.id, text: text.trim() }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setReviews((prevReviews) =>
+          prevReviews.map((r) => {
+            if (r._id === reviewId) {
+              const updatedComments = [...(r.comments || []), { userId: user._id || user.id, text: text.trim(), date: new Date() }];
+              return { ...r, comments: updatedComments };
+            }
+            return r;
+          })
+        );
+        setReplyTexts((prev) => ({ ...prev, [reviewId]: "" }));
+        triggerToast("Reply posted successfully!");
+      } else {
+        triggerToast("Failed to post reply.");
+      }
+    } catch {
+      triggerToast("Network error while replying.");
+    }
+  };
+
   const [storeForm, setStoreForm] = useState({
     name: "",
     category: "Food",
@@ -392,8 +425,18 @@ export default function OwnerProfilePage({ user, setUser }) {
                     ) : (
                       <div className="ms-md-5 mt-3 pt-3 border-top border-dashed">
                         <div className="d-flex gap-2 align-items-start">
-                           <textarea className="form-control form-control-sm" rows="2" placeholder="Write a public reply as the owner..."></textarea>
-                           <button className="btn btn-sm btn-dlsu-dark rounded-3 px-3 py-2 fw-bold h-100">
+                           <textarea 
+                             className="form-control form-control-sm" 
+                             rows="2" 
+                             placeholder="Write a public reply as the owner..."
+                             value={replyTexts[rev.id] || ""}
+                             onChange={(e) => setReplyTexts({ ...replyTexts, [rev.id]: e.target.value })}
+                           ></textarea>
+                           <button 
+                             className="btn btn-sm btn-dlsu-dark rounded-3 px-3 py-2 fw-bold h-100"
+                             onClick={() => handleReplySubmit(rev.id)}
+                             disabled={!replyTexts[rev.id]?.trim()}
+                           >
                              Reply
                            </button>
                         </div>

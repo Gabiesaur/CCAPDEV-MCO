@@ -384,6 +384,34 @@ app.get('/api/establishments/:id', async (req, res) => {
   }
 });
 
+// GET ESTABLISHMENT OWNER
+app.get('/api/establishments/:id/owner', async (req, res) => {
+  try {
+    const estId = req.params.id;
+
+    // Query using $in to match both ObjectId and string representations.
+    // This handles cases where seeded data stored the field as a plain string.
+    const queryValues = [estId];
+    if (mongoose.Types.ObjectId.isValid(estId)) {
+      queryValues.push(new mongoose.Types.ObjectId(estId));
+    }
+
+    const owner = await User.findOne({
+      ownedEstablishmentId: { $in: queryValues }
+    }).select('_id username name avatar');
+
+    console.log(`[owner lookup] estId=${estId}, found=${!!owner}`);
+
+    if (!owner) {
+      return res.status(404).json({ success: false, message: "No owner found for this establishment" });
+    }
+    res.json({ success: true, owner });
+  } catch (error) {
+    console.error("Error fetching establishment owner:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+});
+
 // 2. GET REVIEWS FOR A SPECIFIC ESTABLISHMENT
 app.get('/api/establishments/:id/reviews', async (req, res) => {
   try {
@@ -705,7 +733,7 @@ app.get('/api/reviews/:id/comments', async (req, res) => {
   try {
     // Find all comments where the reviewId matches the URL parameter
     const comments = await Comment.find({ reviewId: req.params.id })
-      .populate('userId', 'username name avatar')
+      .populate('userId', 'username name avatar ownedEstablishmentId')
       .sort({ date: -1 }); // Sort by newest comments first
 
     res.json(comments);
@@ -775,6 +803,10 @@ app.post('/api/reviews/:id/comments', async (req, res) => {
     });
 
     await newComment.save();
+
+    await Review.findByIdAndUpdate(req.params.id, {
+      $push: { comments: { userId, text: text.trim(), date: new Date() } }
+    });
 
     const populatedComment = await Comment.findById(newComment._id)
       .populate('userId', 'username name avatar');
