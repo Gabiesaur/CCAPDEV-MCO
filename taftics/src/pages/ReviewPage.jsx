@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Star, Send, MapPin, ThumbsUp, ThumbsDown, CheckCircle2, Loader2 } from 'lucide-react';
+import { Star, Send, MapPin, ThumbsUp, ThumbsDown, CheckCircle2, Loader2, Maximize2, X, ChevronLeft, ChevronRight } from 'lucide-react';
 
 const getRelativeDate = (dateString) => {
   if (!dateString) return "";
@@ -74,6 +74,33 @@ const ReviewPage = () => {
     setToastMessage(message);
     setShowToast(true);
     setTimeout(() => setShowToast(false), 3000);
+  };
+
+  // Image Modal State
+  const [imageModalOpen, setImageModalOpen] = useState(false);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  const openImageModal = (index) => {
+    setCurrentImageIndex(index);
+    setImageModalOpen(true);
+  };
+
+  const closeImageModal = () => {
+    setImageModalOpen(false);
+  };
+
+  const nextImage = (e) => {
+    e.stopPropagation();
+    if (review?.images?.length) {
+      setCurrentImageIndex((prev) => (prev + 1) % review.images.length);
+    }
+  };
+
+  const prevImage = (e) => {
+    e.stopPropagation();
+    if (review?.images?.length) {
+      setCurrentImageIndex((prev) => (prev === 0 ? review.images.length - 1 : prev - 1));
+    }
   };
 
   // MAIN FETCH HOOK: Runs whenever the URL ID changes
@@ -306,6 +333,38 @@ const ReviewPage = () => {
             {reviewBody}
           </p>
 
+          {/* Images Section */}
+          {review?.images && review.images.length > 0 && (
+            <div className="d-flex gap-2 mb-4 overflow-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+              {review.images.map((imgUrl, idx) => (
+                <div 
+                  key={idx} 
+                  className="position-relative flex-shrink-0 rounded-4 overflow-hidden"
+                  style={{ width: '120px', height: '120px', cursor: 'pointer' }}
+                  onClick={() => openImageModal(idx)}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.querySelector('.expand-indicator').style.opacity = '1';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.querySelector('.expand-indicator').style.opacity = '0';
+                  }}
+                >
+                  <img 
+                    src={imgUrl} 
+                    alt={`Review image ${idx + 1}`} 
+                    className="w-100 h-100 object-fit-cover"
+                  />
+                  <div 
+                    className="expand-indicator position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center transition-all"
+                    style={{ opacity: 0, transition: 'opacity 0.2s ease-in-out' }}
+                  >
+                    <Maximize2 className="text-white" size={24} />
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
           <div className="d-flex justify-content-between align-items-center">
             {/* Establishment Tag */}
             <div className="d-inline-flex align-items-center bg-white border border-light-subtle rounded-pill p-2 pe-3 shadow-sm">
@@ -432,6 +491,62 @@ const ReviewPage = () => {
           </form>
         </div>
       </main>
+
+      {/* Full Screen Image Modal */}
+      {imageModalOpen && review?.images && review.images.length > 0 && (
+        <div 
+          className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex flex-column align-items-center justify-content-center z-3"
+          style={{ zIndex: 1050 }}
+          onClick={closeImageModal}
+        >
+          {/* Close Button */}
+          <button 
+            className="btn btn-dark position-absolute start-0 m-4 rounded-circle p-2 shadow"
+            onClick={closeImageModal}
+            style={{ zIndex: 1060, top: '80px' }}
+          >
+            <X size={24} />
+          </button>
+
+          {/* Image Container */}
+          <div 
+            className="position-relative w-100 h-100 d-flex align-items-center justify-content-center p-5"
+          >
+            <img 
+              src={review.images[currentImageIndex]} 
+              alt={`Full screen ${currentImageIndex + 1}`} 
+              className="max-w-100 max-h-100 object-fit-contain rounded shadow-lg"
+              style={{ maxHeight: '75vh', maxWidth: '75vw' }}
+              onClick={(e) => e.stopPropagation()}
+            />
+
+            {/* Navigation Buttons (if multiple images) */}
+            {review.images.length > 1 && (
+              <>
+                <button 
+                  className="btn btn-dark position-absolute start-0 ms-4 rounded-circle p-2"
+                  onClick={prevImage}
+                >
+                  <ChevronLeft size={32} />
+                </button>
+                <button 
+                  className="btn btn-dark position-absolute end-0 me-4 rounded-circle p-2"
+                  onClick={nextImage}
+                >
+                  <ChevronRight size={32} />
+                </button>
+              </>
+            )}
+            
+            {/* Image Indicator */}
+            {review.images.length > 1 && (
+              <div className="position-absolute bottom-0 mb-4 text-white p-2 rounded bg-dark bg-opacity-50">
+                {currentImageIndex + 1} / {review.images.length}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

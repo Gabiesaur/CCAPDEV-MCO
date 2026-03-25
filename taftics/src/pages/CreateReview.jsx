@@ -364,9 +364,9 @@ function CreateReview() {
         <div className="d-flex flex-row justify-content-between w-75">
           <div
             className="custom-card border p-3 d-flex align-items-center justify-content-center mb-5"
-            style={{ width: "60%", height: "700px" }}
+            style={{ width: "60%", minHeight: "700px", height: "auto" }}
           >
-            <div style={{ width: "95%", height: "95%" }}>
+            <div style={{ width: "95%" }}>
               <p className="fw-bold small opacity-75">QUALITY SCORE</p>
               <div
                 className="textBox p-3 d-flex flex-row justify-content-between align-items-center"
