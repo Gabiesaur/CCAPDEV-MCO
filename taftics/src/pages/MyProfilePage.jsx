@@ -172,6 +172,7 @@ export default function MyProfilePage({ user, setUser }) {
                             isOwnProfile={true}
                             comment={{
                               _id: comment._id,
+                              reviewId: comment.reviewId?._id,
                               // Pull the original review details populated from the backend
                               postTitle: comment.reviewId?.title || "Deleted Review",
                               postAuthor: comment.reviewId?.userId?.username || "Unknown User",
