@@ -1,6 +1,7 @@
 const path = require('path');
 const mongoose = require('mongoose');
 const cors = require('cors');
+const bcrypt = require('bcrypt');
 const fileUpload = require('express-fileupload');
 require('dotenv').config({ path: path.resolve(__dirname, 'taftics.env') });
 const Establishment = require('./models/Establishment');
@@ -123,8 +124,9 @@ app.post('/api/login', async (req, res) => {
     // Since aggregation returns an array, grab the first (and only) matched user
     const user = users[0];
 
+    match = await bcrypt.compare(password, user.password);
     // 2. Check if user exists AND password matches
-    if (!user || user.password !== password) {
+    if (!user || (!match && user.password !== password)) {
       return res.status(401).json({ success: false, message: "Invalid username/email or password" });
     }
 
@@ -152,6 +154,9 @@ app.post('/api/login', async (req, res) => {
     res.status(500).json({ success: false, message: "Server error during login" });
   }
 });
+
+
+var count_salt = 10;
 
 // --- REGISTER ROUTE ---
 app.post('/api/register', async (req, res) => {
@@ -184,12 +189,13 @@ app.post('/api/register', async (req, res) => {
       avatarUrl = `http://localhost:3000/uploads/${fileName}`;
     }
 
+    const salt_rounds = count_salt;
     // 3. Create and save the new user
     const newUser = new User({
       username,
       name,
       email,
-      password,
+      password: await bcrypt.hash(password, salt_rounds),
       idSeries: dlsuId,
       avatar: avatarUrl,
       isAdmin: false
