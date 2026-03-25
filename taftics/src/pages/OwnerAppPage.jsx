@@ -1,9 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../styles/LoginRegStyles.css";
 import logoImage from "/logo_green.svg?url";
 
-const OwnerAppPage = () => {
+const OwnerAppPage = ({ onApply }) => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     establishmentName: "",
     address: "",
@@ -18,9 +20,33 @@ const OwnerAppPage = () => {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Owner Application:", formData);
+
+    // 1. Basic Validation (Using alerts to preserve original layout)
+    if (!formData.establishmentName || !formData.address || !formData.establishmentType || !formData.email || !formData.contactInfo || !formData.contactName) {
+      alert("Please fill in all required fields.");
+      return;
+    }
+
+    // 2. Package the data into FormData
+    const submitData = new FormData();
+    submitData.append("establishmentName", formData.establishmentName);
+    submitData.append("address", formData.address);
+    submitData.append("establishmentType", formData.establishmentType);
+    submitData.append("email", formData.email);
+    submitData.append("contactInfo", formData.contactInfo);
+    submitData.append("contactName", formData.contactName);
+
+    // 3. Send to App.jsx and wait for the response
+    const result = await onApply(submitData);
+    
+    if (result.success) {
+      alert('Application submitted successfully! Please wait for approval.'); // Show success message
+      navigate("/"); // Redirect to home if successful
+    } else {
+      alert(result.message); // Display the error from the server
+    }
   };
 
   return (
@@ -84,10 +110,15 @@ const OwnerAppPage = () => {
                 <option value="" disabled>
                   Select type
                 </option>
-                <option value="food">Food & Beverage</option>
-                <option value="retail">Retail Store</option>
-                <option value="services">Services</option>
-                <option value="study">Study Hub/Coworking</option>
+                <option value="School Supplies">School Supplies</option>
+                <option value="Laundry">Laundry</option>
+                <option value="Groceries">Groceries</option>
+                <option value="Dorms/Condos">Dorms/Condos</option>
+                <option value="Repairs">Repairs</option>
+                <option value="Printing">Printing</option>
+                <option value="Fitness">Fitness</option>
+                <option value="Food">Food</option>
+                <option value="Coffee">Coffee</option>
               </select>
             </div>
 

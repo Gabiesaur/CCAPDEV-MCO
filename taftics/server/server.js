@@ -220,6 +220,54 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
+app.post('/api/apply', async (req, res) => {
+  try {
+    // With FormData, text fields are in req.body
+    const { establishmentName, address, establishmentType, email, contactInfo, contactName } = req.body;
+
+    // 1. Check if a user with the entered email already exists
+    const existingUser = await User.findOne({
+      email: email
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Email already taken by an existing user." });
+    }
+
+    // 3. Create and save the new user
+    const newEstablishment = new Establishment({
+      name: establishmentName,
+      address,
+      category: establishmentType,
+      email,
+      contactNumber: contactInfo,
+      contactPerson: contactName,
+      isOfficial: false
+    });
+
+    await newEstablishment.save();
+
+    // 4. Send success response and auto-login the user
+    res.status(201).json({
+      success: true,
+      user: {
+        _id: newEstablishment._id,
+        name: newEstablishment.name,
+        address: newEstablishment.address,
+        category: newEstablishment.category,
+        email: newEstablishment.email,
+        contactNumber: newEstablishment.contactNumber,
+        contactPerson: newEstablishment.contactPerson,
+        isOfficial: newEstablishment.isOfficial
+      }
+    });
+
+  } catch (error) {
+    console.error("Application error:", error);
+    res.status(500).json({ success: false, message: "Server error during application." });
+  }
+});
+
 // Create review
 app.post('/api/reviews', async (req, res) => {
   console.log("req.body:", req.body);

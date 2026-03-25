@@ -8,9 +8,11 @@ const EstablishmentSchema = new mongoose.Schema({
     description: String,
     businessHours: String,
     contactNumber: String,
+    contactPerson: String,
     email: String,
     website: String,
-    address: String
+    address: String,
+    isOfficial: { type: Boolean, default: false }
 })
 
 const Establishment = mongoose.model('Establishment', EstablishmentSchema)

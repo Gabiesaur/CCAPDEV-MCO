@@ -118,11 +118,29 @@ function App() {
     }
   };
 
-  const apply = async (applicant) => {
-    if (dbUsers.find((u) => u.email === applicant.email)) {
+  const apply = async (formData) => {
+    /*if (dbUsers.find((u) => u.email === applicant.email)) {
       return { success: false, message: "Email already exists." };
     }
-    return { success: true, message: "Application submitted!" };
+    return { success: true, message: "Application submitted!" };*/
+    try {
+      const response = await fetch('http://localhost:3000/api/apply', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // Auto-login the user after successful registration
+        return { success: true };
+      } else {
+        return { success: false, message: data.message };
+      }
+    } catch (error) {
+      console.error("Failed to register:", error);
+      return { success: false, message: "Network error. Is the server running?" };
+    }
   };
 
   // --- ROUTING ---
@@ -163,7 +181,7 @@ function App() {
 
         <Route path="/login" element={<LoginPage onLogin={login} />} />
         <Route path="/register" element={<RegPage onRegister={register} />} />
-        <Route path="/apply" element={<OwnerAppPage onRegister={apply} />} />
+        <Route path="/apply" element={<OwnerAppPage onApply={apply} />} />
       </Routes>
     </BrowserRouter>
   );

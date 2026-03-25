@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/LoginRegStyles.css";
 import logoImage from "/logo_green.svg?url";
@@ -15,25 +15,11 @@ const RegPage = ({ onRegister }) => {
     confirmPassword: "",
   });
 
-  const fileInputRef = useRef(null);
-
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
-
-  const handleFileClick = (e) => {
-    e.preventDefault();
-    fileInputRef.current.click();
-  };
-
-  const handleFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      setFormData((prev) => ({ ...prev, avatar: e.target.files[0] }));
-      alert(`Selected: ${e.target.files[0].name}`);
-    }
-  };
-
+  
   const handleSubmit = async (e) => {
     e.preventDefault();
 
