@@ -247,21 +247,6 @@ app.post('/api/apply', async (req, res) => {
 
     await newEstablishment.save();
 
-    // 4. Send success response and auto-login the user
-    res.status(201).json({
-      success: true,
-      user: {
-        _id: newEstablishment._id,
-        name: newEstablishment.name,
-        address: newEstablishment.address,
-        category: newEstablishment.category,
-        email: newEstablishment.email,
-        contactNumber: newEstablishment.contactNumber,
-        contactPerson: newEstablishment.contactPerson,
-        isOfficial: newEstablishment.isOfficial
-      }
-    });
-
   } catch (error) {
     console.error("Application error:", error);
     res.status(500).json({ success: false, message: "Server error during application." });
