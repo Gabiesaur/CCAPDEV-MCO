@@ -4,11 +4,20 @@ import { Search, Star, MapPin, ThumbsUp, ThumbsDown } from "lucide-react";
 
 import EstablishmentCardSmall from "../components/landing/EstablishmentCardSmall";
 
-// ❌ REMOVED: import { ESTABLISHMENTS } from "../data/mockData";
-
 const LandingPage = () => {
   const navigate = useNavigate();
-  const categories = ['Any', 'School Supplies', 'Laundry', 'Groceries', 'Dorms/Condos', 'Repairs', 'Printing', 'Fitness', "Food", "Coffee"];
+  const categories = [
+    "Any",
+    "School Supplies",
+    "Laundry",
+    "Groceries",
+    "Dorms/Condos",
+    "Repairs",
+    "Printing",
+    "Fitness",
+    "Food",
+    "Coffee",
+  ];
 
   const getRelativeDate = (dateString) => {
     if (!dateString) return "";
@@ -35,24 +44,28 @@ const LandingPage = () => {
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
-    navigate('/browse', { state: { searchQuery: searchQuery.trim() } });
+    navigate("/browse", { state: { searchQuery: searchQuery.trim() } });
   };
 
   // 2. NEW: Fetch, sort, and slice data from the database
   useEffect(() => {
     const fetchLandingData = async () => {
       try {
-        const res = await fetch('http://localhost:3000/api/establishments');
+        const res = await fetch("http://localhost:3000/api/establishments");
         const data = await res.json();
 
-        const sortedByRating = [...data].sort((a, b) => (b.rating || 0) - (a.rating || 0));
+        const sortedByRating = [...data].sort(
+          (a, b) => (b.rating || 0) - (a.rating || 0),
+        );
         const topRated = sortedByRating.slice(0, 3);
         setTopRatedEstablishments(topRated);
 
         const reviewResults = await Promise.all(
           sortedByRating.map(async (est) => {
             try {
-              const reviewsRes = await fetch(`http://localhost:3000/api/establishments/${est._id}/reviews`);
+              const reviewsRes = await fetch(
+                `http://localhost:3000/api/establishments/${est._id}/reviews`,
+              );
               if (!reviewsRes.ok) return [];
 
               const reviews = await reviewsRes.json();
@@ -62,33 +75,39 @@ const LandingPage = () => {
             } catch {
               return [];
             }
-          })
+          }),
         );
 
         const allReviewPairs = reviewResults.flat();
-        const shuffledReviewPairs = [...allReviewPairs].sort(() => Math.random() - 0.5);
+        const shuffledReviewPairs = [...allReviewPairs].sort(
+          () => Math.random() - 0.5,
+        );
         const selectedPairs = shuffledReviewPairs.slice(0, 3);
 
-        const selectedShowcaseReviews = selectedPairs.map(({ review, establishment }) => ({
-          id: review._id,
-          rating: Number(review.rating || 0),
-          date: getRelativeDate(review.date),
-          title: review.title || "Untitled Review",
-          body: review.comment || review.body || "",
-          helpfulVotes: Number(review.helpfulVotes || 0),
-          unhelpfulVotes: Number(review.unhelpfulVotes || 0),
-          establishment: {
-            id: establishment._id,
-            name: establishment.name,
-            location: establishment.location,
-            image: establishment.image,
-          },
-          user: review.userId?.name || review.userId?.username || "Anonymous",
-          avatar: review.userId?.avatar || "https://ui-avatars.com/api/?name=Anonymous&background=0D8ABC&color=fff",
-          username: review.userId?.username || null,
-          rawReview: review,
-          rawEstablishment: establishment,
-        }));
+        const selectedShowcaseReviews = selectedPairs.map(
+          ({ review, establishment }) => ({
+            id: review._id,
+            rating: Number(review.rating || 0),
+            date: getRelativeDate(review.date),
+            title: review.title || "Untitled Review",
+            body: review.comment || review.body || "",
+            helpfulVotes: Number(review.helpfulVotes || 0),
+            unhelpfulVotes: Number(review.unhelpfulVotes || 0),
+            establishment: {
+              id: establishment._id,
+              name: establishment.name,
+              location: establishment.location,
+              image: establishment.image,
+            },
+            user: review.userId?.name || review.userId?.username || "Anonymous",
+            avatar:
+              review.userId?.avatar ||
+              "https://ui-avatars.com/api/?name=Anonymous&background=0D8ABC&color=fff",
+            username: review.userId?.username || null,
+            rawReview: review,
+            rawEstablishment: establishment,
+          }),
+        );
 
         setShowcaseReviews(selectedShowcaseReviews);
 
@@ -105,15 +124,22 @@ const LandingPage = () => {
   return (
     <div className="min-vh-100 bg-white">
       {/* Hero Section */}
-      <header className="container text-center" style={{ paddingTop: '100px', paddingBottom: '80px' }}>
+      <header
+        className="container text-center"
+        style={{ paddingTop: "100px", paddingBottom: "80px" }}
+      >
         <h1 className="fw-bold display-4 mt-5">
           Every <span className="text-dlsu-dark">Archer</span> needs a strategy.
         </h1>
         <p className="text-muted fs-5">
-          Find the best services and essentials around Taft with peer-verified reviews.
+          Find the best services and essentials around Taft with peer-verified
+          reviews.
         </p>
         <div className="mx-auto mt-5 px-3" style={{ maxWidth: "800px" }}>
-          <form onSubmit={handleSearchSubmit} className="input-group shadow-lg rounded-pill overflow-hidden bg-white p-2 border border-light">
+          <form
+            onSubmit={handleSearchSubmit}
+            className="input-group shadow-lg rounded-pill overflow-hidden bg-white p-2 border border-light"
+          >
             <span className="input-group-text bg-white border-0 ps-4">
               <Search size={22} className="text-dlsu-primary" />
             </span>
@@ -123,9 +149,12 @@ const LandingPage = () => {
               placeholder="Search for laundry, printing, groceries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              style={{ paddingLeft: '10px' }}
+              style={{ paddingLeft: "10px" }}
             />
-            <button type="submit" className="btn btn-dlsu-dark rounded-pill px-5 fw-bold shadow-sm ms-2 d-flex align-items-center">
+            <button
+              type="submit"
+              className="btn btn-dlsu-dark rounded-pill px-5 fw-bold shadow-sm ms-2 d-flex align-items-center"
+            >
               Search
             </button>
           </form>
@@ -133,8 +162,13 @@ const LandingPage = () => {
           {/* Quick Shortcuts / Popular Tags */}
           <div className="d-flex justify-content-center gap-3 mt-3 opacity-75">
             <span className="small text-muted fw-bold">Try:</span>
-            {['Bacsilog', 'Laundry', 'Printing', 'Coffee'].map(tag => (
-              <Link key={tag} to="/browse" className="small text-dlsu-dark text-decoration-none hover-underline fw-semibold">
+            {["Bacsilog", "Laundry", "Printing", "Coffee"].map((tag) => (
+              <Link
+                key={tag}
+                to="/browse"
+                state={{ searchQuery: tag }}
+                className="small text-dlsu-dark text-decoration-none hover-underline fw-semibold"
+              >
                 {tag}
               </Link>
             ))}
@@ -143,7 +177,10 @@ const LandingPage = () => {
       </header>
 
       {/* Category Section */}
-      <section className="container text-center" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+      <section
+        className="container text-center"
+        style={{ paddingTop: "80px", paddingBottom: "80px" }}
+      >
         <h2 className="fw-bold mb-4">
           Browse reviews by <span className="text-dlsu-dark">category</span>
         </h2>
@@ -163,9 +200,13 @@ const LandingPage = () => {
       </section>
 
       {/* Top Rated Section */}
-      <section className="container" style={{ paddingTop: '80px', paddingBottom: '80px' }}>
+      <section
+        className="container"
+        style={{ paddingTop: "80px", paddingBottom: "80px" }}
+      >
         <h2 className="fw-bold text-center mb-5">
-          See the <span className="text-dlsu-dark">top rated</span> establishments
+          See the <span className="text-dlsu-dark">top rated</span>{" "}
+          establishments
         </h2>
 
         {/* 3. NEW: Conditional rendering while data loads */}
@@ -176,7 +217,9 @@ const LandingPage = () => {
         ) : (
           <div className="row g-4">
             {topRatedEstablishments.map((store) => (
-              <div key={store._id} className="col-md-4"> {/* ✅ CHANGED: store._id */}
+              <div key={store._id} className="col-md-4">
+                {" "}
+                {/* ✅ CHANGED: store._id */}
                 <EstablishmentCardSmall
                   id={store._id}
                   name={store.name}
@@ -193,32 +236,48 @@ const LandingPage = () => {
       </section>
 
       {/* Community Review Section */}
-      <section className="container text-center" style={{ paddingTop: '80px', paddingBottom: '160px' }}>
+      <section
+        className="container text-center"
+        style={{ paddingTop: "80px", paddingBottom: "160px" }}
+      >
         <h2 className="fw-bold mb-5">
-          Help others in the <span className="text-dlsu-dark">DLSU</span> community
+          Help others in the <span className="text-dlsu-dark">DLSU</span>{" "}
+          community
         </h2>
 
         <div className="mx-auto text-start" style={{ maxWidth: "1200px" }}>
           {loading ? (
             <p className="text-muted">Loading featured review...</p>
           ) : showcaseReviews.length > 0 ? (
-            <div className="d-flex gap-4 overflow-auto pb-2" style={{ scrollSnapType: "x mandatory" }}>
+            <div
+              className="d-flex gap-4 overflow-auto pb-2"
+              style={{ scrollSnapType: "x mandatory" }}
+            >
               {showcaseReviews.map((review) => (
                 <article
                   key={review.id}
                   className="custom-card p-4 flex-shrink-0 d-flex flex-column"
-                  style={{ width: "380px", minHeight: "360px", scrollSnapAlign: "start" }}
+                  style={{
+                    width: "380px",
+                    minHeight: "360px",
+                    scrollSnapAlign: "start",
+                  }}
                 >
                   <div className="d-flex align-items-center mb-3">
                     <img
-                      src={review.avatar || "https://ui-avatars.com/api/?name=User&background=random"}
+                      src={
+                        review.avatar ||
+                        "https://ui-avatars.com/api/?name=User&background=random"
+                      }
                       alt="avatar"
                       className="rounded-circle me-3 object-cover"
                       style={{ width: "40px", height: "40px" }}
                     />
                     <div>
                       <Link
-                        to={review.username ? `/profile/${review.username}` : "#"}
+                        to={
+                          review.username ? `/profile/${review.username}` : "#"
+                        }
                         className="fw-bold text-dark text-decoration-none"
                         style={{ display: "block", lineHeight: "1.2" }}
                       >
@@ -234,7 +293,11 @@ const LandingPage = () => {
                           key={i}
                           size={16}
                           fill={i < review.rating ? "currentColor" : "none"}
-                          className={i < review.rating ? "text-dlsu-primary" : "text-muted opacity-25"}
+                          className={
+                            i < review.rating
+                              ? "text-dlsu-primary"
+                              : "text-muted opacity-25"
+                          }
                         />
                       ))}
                     </div>
@@ -243,19 +306,27 @@ const LandingPage = () => {
 
                   <Link
                     to={`/review/${review.id}`}
-                    state={{ review: review.rawReview, establishment: review.rawEstablishment }}
+                    state={{
+                      review: review.rawReview,
+                      establishment: review.rawEstablishment,
+                    }}
                     className="text-decoration-none"
                   >
-                    <h5 className="fw-bold text-dlsu-dark mb-2 hover-underline">{review.title}</h5>
+                    <h5 className="fw-bold text-dlsu-dark mb-2 hover-underline">
+                      {review.title}
+                    </h5>
                   </Link>
 
-                  <p className="text-secondary small mb-3" style={{
-                    overflow: "hidden",
-                    textOverflow: "ellipsis",
-                    display: "-webkit-box",
-                    WebkitLineClamp: 3,
-                    WebkitBoxOrient: "vertical",
-                  }}>
+                  <p
+                    className="text-secondary small mb-3"
+                    style={{
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      display: "-webkit-box",
+                      WebkitLineClamp: 3,
+                      WebkitBoxOrient: "vertical",
+                    }}
+                  >
                     {review.body}
                   </p>
 
@@ -284,10 +355,16 @@ const LandingPage = () => {
                         style={{ width: "28px", height: "28px" }}
                       />
                       <div className="lh-1 text-start">
-                        <h6 className="fw-bold mb-0 text-dark" style={{ fontSize: "0.8rem" }}>
+                        <h6
+                          className="fw-bold mb-0 text-dark"
+                          style={{ fontSize: "0.8rem" }}
+                        >
                           {review.establishment.name}
                         </h6>
-                        <small className="text-muted d-flex align-items-center gap-1" style={{ fontSize: "0.7rem" }}>
+                        <small
+                          className="text-muted d-flex align-items-center gap-1"
+                          style={{ fontSize: "0.7rem" }}
+                        >
                           <MapPin size={10} /> {review.establishment.location}
                         </small>
                       </div>
@@ -302,7 +379,10 @@ const LandingPage = () => {
         </div>
 
         <div>
-          <Link className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold text-decoration-none" to="/browse">
+          <Link
+            className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold text-decoration-none"
+            to="/browse"
+          >
             Need a specific service? We'll help find it! ↗
           </Link>
         </div>

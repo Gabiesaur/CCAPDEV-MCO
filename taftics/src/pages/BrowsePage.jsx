@@ -79,6 +79,44 @@ const getHoursState = (businessHours) => {
   return { isOpenNow, is24x7: false };
 };
 
+const categoryKeywordMap = {
+  "School Supplies": [
+    "school",
+    "supplies",
+    "notebook",
+    "pens",
+    "paper",
+    "bookstore",
+  ],
+  Laundry: ["laundry", "wash", "dry", "clean", "clothes"],
+  Groceries: ["groceries", "grocery", "mart", "convenience", "snacks"],
+  "Dorms/Condos": ["dorm", "condo", "housing", "apartment", "stay"],
+  Repairs: ["repair", "fix", "maintenance", "service"],
+  Printing: ["print", "printing", "photocopy", "xerox", "documents"],
+  Fitness: ["fitness", "gym", "workout", "exercise", "training"],
+  Food: ["food", "eat", "meal", "restaurant", "cafe"],
+  Coffee: ["coffee", "espresso", "latte", "cafe", "drinks"],
+};
+
+const buildSearchableText = (establishment) => {
+  const categoryKeywords = categoryKeywordMap[establishment?.category] || [];
+
+  return [
+    establishment?.name,
+    establishment?.category,
+    establishment?.location,
+    establishment?.description,
+    establishment?.address,
+    establishment?.businessHours,
+    establishment?.website,
+    ...(Array.isArray(establishment?.keywords) ? establishment.keywords : []),
+    ...categoryKeywords,
+  ]
+    .filter(Boolean)
+    .join(" ")
+    .toLowerCase();
+};
+
 const BrowsePage = () => {
   const location = useLocation();
 
@@ -146,11 +184,20 @@ const BrowsePage = () => {
     if (activeHour === "24/7" && !hoursState.is24x7) return false;
 
     // Search query filter
-    if (
-      searchQuery &&
-      !est.name.toLowerCase().includes(searchQuery.toLowerCase())
-    )
-      return false;
+    if (searchQuery.trim()) {
+      const searchableText = buildSearchableText(est);
+      const queryTokens = searchQuery
+        .toLowerCase()
+        .trim()
+        .split(/\s+/)
+        .filter(Boolean);
+
+      const matchesSearch = queryTokens.every((token) =>
+        searchableText.includes(token),
+      );
+
+      if (!matchesSearch) return false;
+    }
 
     return true; // Pass if all active filters match
   });
