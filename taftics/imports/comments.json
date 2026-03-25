@@ -54,5 +54,61 @@
     "userId": { "$oid": "65f100000000000000000007" },
     "text": "The gym was so refreshing.",
     "date": "2026-07-17"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000009" },
+    "reviewId": { "$oid": "65f200000000000000000029" },
+    "userId": { "$oid": "65f300000000000000000007" },
+    "text": "Happy to hear you're enjoying the space! We're glad the Spanish Latte is hitting the spot. See you again soon!",
+    "date": "2026-03-25"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000010" },
+    "reviewId": { "$oid": "65f200000000000000000032" },
+    "userId": { "$oid": "65f300000000000000000007" },
+    "text": "Good luck with your thesis! We're here for all your late-night study needs.",
+    "date": "2026-03-25"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000011" },
+    "reviewId": { "$oid": "65f200000000000000000029" },
+    "userId": { "$oid": "65f100000000000000000008" },
+    "text": "Is it okay to bring a group for a quick meeting there?",
+    "date": "2026-03-25"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000012" },
+    "reviewId": { "$oid": "65f200000000000000000029" },
+    "userId": { "$oid": "65f300000000000000000007" },
+    "text": "Absolutely! We have a few larger tables perfect for group discussions. Just try to keep the volume at a reasonable level for others.",
+    "date": "2026-03-25"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000013" },
+    "reviewId": { "$oid": "65f200000000000000000036" },
+    "userId": { "$oid": "65f300000000000000000007" },
+    "text": "Actually, I might need some posters printed too. Do you guys do that?",
+    "date": "2026-03-25"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000014" },
+    "reviewId": { "$oid": "65f200000000000000000036" },
+    "userId": { "$oid": "65f300000000000000000004" },
+    "text": "Yes we do! We can print up to A1 size. Just bring your file in PDF format.",
+    "date": "2026-03-25"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000015" },
+    "reviewId": { "$oid": "65f200000000000000000033" },
+    "userId": { "$oid": "65f100000000000000000006" },
+    "text": "The Spanish Latte is definitely the best choice there.",
+    "date": "2026-03-24"
+  },
+  {
+    "_id": { "$oid": "65f300000000000000000016" },
+    "reviewId": { "$oid": "65f200000000000000000035" },
+    "userId": { "$oid": "65f300000000000000000007" },
+    "text": "Thank you for the kind words! We work hard to maintain those chairs for you guys.",
+    "date": "2026-03-24"
   }
 ]

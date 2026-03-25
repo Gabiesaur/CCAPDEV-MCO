@@ -173,5 +173,45 @@
     "avatar": "https://ui-avatars.com/api/?name=De%20La%20Salle%20Laundry%20Management&background=random&color=fff",
     "ownedEstablishmentId": "65f000000000000000000006",
     "isAdmin": false
+  },
+  {
+    "_id": {
+      "$oid": "65f100000000000000000008"
+    },
+    "username": "stud_org_pioneer",
+    "password": "password123",
+    "name": "Alex Org",
+    "email": "alex@dlsu.edu.ph",
+    "idSeries": "122",
+    "bio": "President of the Student Org | Work hard, play hard",
+    "avatar": "https://ui-avatars.com/api/?name=Alex+Org&background=FF5733&color=fff",
+    "isAdmin": false
+  },
+  {
+    "_id": {
+      "$oid": "65f100000000000000000009"
+    },
+    "username": "thesis_warrior",
+    "password": "password123",
+    "name": "Ben Dy",
+    "email": "ben@dlsu.edu.ph",
+    "idSeries": "121",
+    "bio": "Currently dying with my thesis. Help.",
+    "avatar": "https://ui-avatars.com/api/?name=Ben+Dy&background=33FF57&color=fff",
+    "isAdmin": false
+  },
+  {
+    "_id": {
+      "$oid": "65f300000000000000000007"
+    },
+    "username": "study_cafe_admin",
+    "password": "password123",
+    "name": "Study Cafe Management",
+    "email": "study_cafe@gmail.com",
+    "idSeries": "owner",
+    "bio": "The official management team of The Study Cafe.",
+    "avatar": "https://ui-avatars.com/api/?name=Study%20Cafe%20Management&background=random&color=fff",
+    "ownedEstablishmentId": "65f000000000000000000007",
+    "isAdmin": false
   }
 ]

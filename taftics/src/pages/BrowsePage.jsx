@@ -200,6 +200,28 @@ const BrowsePage = () => {
     }
 
     return true; // Pass if all active filters match
+  }).sort((a, b) => {
+    // Search priority: Establishment name matches first
+    if (!searchQuery.trim()) return 0;
+
+    const query = searchQuery.toLowerCase().trim();
+    const aName = a.name.toLowerCase();
+    const bName = b.name.toLowerCase();
+
+    const aNameMatch = aName.includes(query);
+    const bNameMatch = bName.includes(query);
+
+    if (aNameMatch && !bNameMatch) return -1;
+    if (!aNameMatch && bNameMatch) return 1;
+
+    // Optional: Secondary sort by exact name match length (shorter name = more relevant)
+    if (aNameMatch && bNameMatch) {
+       if (aName === query && bName !== query) return -1;
+       if (aName !== query && bName === query) return 1;
+       return aName.length - bName.length;
+    }
+
+    return 0;
   });
 
   return (

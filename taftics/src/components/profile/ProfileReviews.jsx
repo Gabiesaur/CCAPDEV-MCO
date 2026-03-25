@@ -55,11 +55,12 @@ export default function ProfileReviews({ review }) {
 
       {/* Date & Rating */}
       <div className="d-flex justify-content-between mb-2">
-        <div className="d-flex gap-1 text-dlsu-primary">
+        <div className="d-flex align-items-center gap-1 text-dlsu-primary">
           {[...Array(5)].map((_, i) => (
             <Star
               key={i}
               size={16}
+              style={{ transform: "translateY(-1px)" }}
               fill={i < review.rating ? "currentColor" : "none"}
               className={
                 i < review.rating

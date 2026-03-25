@@ -88,5 +88,35 @@
     "email": "dlsu@laundry.com",
     "website": "www.dlsu-laundry.com",
     "address": "2401 Taft Ave, Malate, Manila, 1004 Metro Manila"
+  },
+  {
+    "_id": {
+      "$oid": "65f000000000000000000007"
+    },
+    "name": "The Study Cafe",
+    "category": "Coffee/Study",
+    "location": "One Archers",
+    "image": "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1000",
+    "description": "The premier student study hub in Taft. Ultra-fast WiFi and ergonomic chairs. Perfect for focus sessions and group meetings.",
+    "businessHours": "24/7",
+    "contactNumber": "0917-888-9999",
+    "email": "studycafe.taft@gmail.com",
+    "website": "https://studycafe.ph",
+    "address": "2nd Floor, One Archers Place, Taft Ave, Manila"
+  },
+  {
+    "_id": {
+      "$oid": "65f000000000000000000008"
+    },
+    "name": "Taft Quick Print",
+    "category": "Services",
+    "location": "Sherwood",
+    "image": "https://images.unsplash.com/photo-1563200022-de9326f6eb8b?auto=format&fit=crop&q=80&w=1000",
+    "description": "Fast and high-quality printing services. Perfect for posters and bulk academic requirements. We handle large scale bindings and thesis printing.",
+    "businessHours": "7:00 AM - 9:00 PM",
+    "contactNumber": "02-8555-4321",
+    "email": "print.taft@gmail.com",
+    "website": "https://taftquickprint.com",
+    "address": "Sherwood Place, Taft Ave, Manila"
   }
 ]

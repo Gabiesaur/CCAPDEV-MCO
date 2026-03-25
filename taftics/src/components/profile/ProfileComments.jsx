@@ -42,7 +42,7 @@ export default function ProfileComments({ comment, isOwnProfile }) {
         </span>
         <span>•</span>
         <span className="d-flex align-items-center gap-1 text-dlsu-primary">
-          <Star size={18} fill="currentColor" /> {comment.postRating}
+          <Star size={18} fill="currentColor" style={{ transform: "translateY(-1px)" }} /> {comment.postRating}
         </span>
       </div>
 

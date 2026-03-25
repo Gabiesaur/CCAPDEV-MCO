@@ -530,5 +530,185 @@
     "images": [],
     "helpfulVoters": [],
     "unhelpfulVoters": []
+  },
+  {
+    "_id": {
+      "$oid": "65f200000000000000000029"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000007"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000006"
+    },
+    "rating": 5,
+    "title": "Best Study Spot in Taft!",
+    "body": "The Study Cafe is a lifesaver. The WiFi is actually fast and the chairs won't break your back after 5 hours of coding. Highly recommend the Spanish Latte while you're here.",
+    "date": "2026-03-24",
+    "isEdited": false,
+    "images": [
+      "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&q=80&w=1000",
+      "https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?auto=format&fit=crop&q=80&w=1000",
+      "https://images.unsplash.com/photo-1511920170033-f8396924c348?auto=format&fit=crop&q=80&w=1000"
+    ],
+    "helpfulVoters": [
+      { "$oid": "65f100000000000000000001" },
+      { "$oid": "65f100000000000000000002" }
+    ],
+    "unhelpfulVoters": []
+  },
+  {
+    "_id": {
+      "$oid": "65f200000000000000000030"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000008"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000007"
+    },
+    "rating": 4,
+    "title": "Super convenient printing",
+    "body": "Prompt service and really clear prints. They handle PDF formatting issues really well. A bit of a queue during noon but moves fast.",
+    "date": "2026-03-22",
+    "isEdited": false,
+    "images": [],
+    "helpfulVoters": [
+      { "$oid": "65f100000000000000000003" }
+    ],
+    "unhelpfulVoters": []
+  },
+  {
+    "_id": {
+      "$oid": "65f200000000000000000031"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000002"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000005"
+    },
+    "rating": 5,
+    "title": "Cleanest AF branch",
+    "body": "I love training here. The equipment is always wiped down and the airconditioning is perfect. Not as crowded as I expected for a Taft branch.",
+    "date": "2026-03-25",
+    "isEdited": false,
+    "images": [
+      "https://images.unsplash.com/photo-1540497077202-7c8a3999166f?auto=format&fit=crop&q=80&w=1000",
+      "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&q=80&w=1000"
+    ],
+    "helpfulVoters": [
+      { "$oid": "65f100000000000000000004" }
+    ],
+    "unhelpfulVoters": []
+  },
+  {
+    "_id": {
+      "$oid": "65f200000000000000000032"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000007"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000009"
+    },
+    "rating": 5,
+    "title": "Saved my thesis",
+    "body": "Been staying here until 3AM to finish my document. The environment is so productive and quiet compared to other cafes in the area.",
+    "date": "2026-03-25",
+    "isEdited": false,
+    "images": [],
+    "helpfulVoters": [],
+    "unhelpfulVoters": []
+  },
+  {
+    "_id": {
+      "$oid": "65f200000000000000000033"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000005"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000008"
+    },
+    "rating": 4,
+    "title": "Good coffee for org meetings",
+    "body": "ZUS is always a safe bet for our executive committee meetings. The Spanish Latte is affordable and consistent. It's usually quiet enough to discuss org plans.",
+    "date": "2026-03-22",
+    "isEdited": false,
+    "images": [
+      "https://images.unsplash.com/photo-1541167760496-162955ed8a9f?auto=format&fit=crop&q=80&w=1000"
+    ],
+    "helpfulVoters": [],
+    "unhelpfulVoters": []
+  },
+  {
+    "_id": {
+      "$oid": "65f200000000000000000034"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000001"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000009"
+    },
+    "rating": 5,
+    "title": "Stocked with blue pens!",
+    "body": "Quickly stopped by to get pens for my midterms. They're always stocked up on the basics. Lifesaver!",
+    "date": "2026-03-24",
+    "isEdited": false,
+    "images": [],
+    "helpfulVoters": [
+      { "$oid": "65f100000000000000000002" }
+    ],
+    "unhelpfulVoters": []
+  },
+  {
+    "_id": {
+      "$oid": "65f200000000000000000035"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000007"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000004"
+    },
+    "rating": 4,
+    "title": "Solid study spot",
+    "body": "I appreciate the ergonomic chairs here. My lower back doesn't ache after a 4-hour session. WiFi is also stable even when the place is full.",
+    "date": "2026-03-21",
+    "isEdited": false,
+    "images": [
+      "https://images.unsplash.com/photo-1497366754035-7c7026831d82?auto=format&fit=crop&q=80&w=1000"
+    ],
+    "helpfulVoters": [
+      { "$oid": "65f100000000000000000001" },
+      { "$oid": "65f100000000000000000008" }
+    ],
+    "unhelpfulVoters": []
+  },
+  {
+    "_id": {
+      "$oid": "65f200000000000000000036"
+    },
+    "establishmentId": {
+      "$oid": "65f000000000000000000008"
+    },
+    "userId": {
+      "$oid": "65f100000000000000000006"
+    },
+    "rating": 5,
+    "title": "Clear thesis prints",
+    "body": "Got my final thesis hardbound and printed here. The quality is exceptional and the alignment is perfect. They really know their stuff when it comes to formatting requirements.",
+    "date": "2026-03-25",
+    "isEdited": false,
+    "images": [
+      "https://images.unsplash.com/photo-1589118949245-7d38baf380d6?auto=format&fit=crop&q=80&w=1000",
+      "https://images.unsplash.com/photo-1544650039-22886bc113d0?auto=format&fit=crop&q=80&w=1000"
+    ],
+    "helpfulVoters": [
+      { "$oid": "65f100000000000000000009" }
+    ],
+    "unhelpfulVoters": []
   }
 ]

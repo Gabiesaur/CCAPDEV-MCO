@@ -27,7 +27,7 @@ export default function ProfileSavedEstablishmentCard({ establishment }) {
               {establishment.category || "General"}
            </div>
            <small className="d-flex align-items-center gap-1">
-              <Star size={14} fill="#41AB5D" style={{ color: "#41AB5D" }} />
+              <Star size={14} fill="#41AB5D" style={{ color: "#41AB5D", transform: "translateY(-1px)" }} />
               <span className="fw-bold text-dark">{averageRating}</span>
               <span>({establishment.reviews?.length || 0} reviews)</span>
            </small>
