@@ -157,7 +157,7 @@ app.post('/api/login', async (req, res) => {
 app.post('/api/register', async (req, res) => {
   try {
     // With FormData, text fields are in req.body
-    const { username, email, password, dlsuId } = req.body;
+    const { username, name, email, password, dlsuId } = req.body;
 
     // 1. Check if username or email already exists
     const existingUser = await User.findOne({
@@ -187,6 +187,7 @@ app.post('/api/register', async (req, res) => {
     // 3. Create and save the new user
     const newUser = new User({
       username,
+      name,
       email,
       password,
       idSeries: dlsuId,

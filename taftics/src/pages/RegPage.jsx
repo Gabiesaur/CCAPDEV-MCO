@@ -8,11 +8,11 @@ const RegPage = ({ onRegister }) => {
 
   const [formData, setFormData] = useState({
     username: "",
+    name: "",
     email: "",
     password: "",
     dlsuId: "",
     confirmPassword: "",
-    avatar: null,
   });
 
   const fileInputRef = useRef(null);
@@ -38,7 +38,7 @@ const RegPage = ({ onRegister }) => {
     e.preventDefault();
 
     // 1. Basic Validation (Using alerts to preserve original layout)
-    if (!formData.username || !formData.email || !formData.password || !formData.dlsuId) {
+    if (!formData.name || !formData.email || !formData.password || !formData.dlsuId || !formData.confirmPassword) {
       alert("Please fill in all required fields.");
       return;
     }
@@ -50,13 +50,10 @@ const RegPage = ({ onRegister }) => {
     // 2. Package the data into FormData
     const submitData = new FormData();
     submitData.append("username", formData.username);
+    submitData.append("name", formData.name);
     submitData.append("email", formData.email);
     submitData.append("password", formData.password);
     submitData.append("dlsuId", formData.dlsuId);
-    
-    if (formData.avatar) {
-      submitData.append("avatar", formData.avatar);
-    }
 
     // 3. Send to App.jsx and wait for the response
     const result = await onRegister(submitData);
@@ -104,6 +101,19 @@ const RegPage = ({ onRegister }) => {
               </div>
 
               <div className="input-form-group">
+                <label htmlFor="email">Email</label>
+                <input
+                  type="email"
+                  name="email"
+                  id="email"
+                  className="styled-input"
+                  value={formData.email}
+                  onChange={handleChange}
+                  placeholder="Active DLSU (@dlsu.edu.ph) email"
+                />
+              </div>
+
+              <div className="input-form-group">
                 <label htmlFor="password">Password</label>
                 <input
                   type="password"
@@ -115,32 +125,19 @@ const RegPage = ({ onRegister }) => {
                   placeholder="Must be at least 8 characters long"
                 />
               </div>
-
-              <div className="input-form-group">
-                <label htmlFor="confirmPassword">Confirm password</label>
-                <input
-                  type="password"
-                  name="confirmPassword"
-                  id="confirmPassword"
-                  className="styled-input"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                  placeholder="Re-enter your password"
-                />
-              </div>
             </div>
 
             <div className="form-column">
               <div className="input-form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="username">Name</label>
                 <input
-                  type="email"
-                  name="email"
-                  id="email"
+                  type="text"
+                  name="name"
+                  id="name"
                   className="styled-input"
-                  value={formData.email}
+                  value={formData.name}
                   onChange={handleChange}
-                  placeholder="Active DLSU (@dlsu.edu.ph) email"
+                  placeholder="Can be real name or alias"
                 />
               </div>
 
@@ -159,19 +156,15 @@ const RegPage = ({ onRegister }) => {
               </div>
 
               <div className="input-form-group">
-                <label>Avatar (optional)</label>
-                <button
-                  className="primary-btn full-width"
-                  onClick={handleFileClick}
-                >
-                  Upload an avatar
-                </button>
+                <label htmlFor="confirmPassword">Confirm password</label>
                 <input
-                  type="file"
-                  ref={fileInputRef}
-                  style={{ display: "none" }}
-                  onChange={handleFileChange}
-                  accept="image/*"
+                  type="password"
+                  name="confirmPassword"
+                  id="confirmPassword"
+                  className="styled-input"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  placeholder="Re-enter your password"
                 />
               </div>
             </div>
