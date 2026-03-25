@@ -1,26 +1,41 @@
-import { useState } from "react";
-import { useLocation, Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { Search, LogOut, User, ChevronDown } from "lucide-react";
-// Ensure this path matches your file structure
+
 import logo from "/logo_white.svg?url";
 
 function NavBar({ user, onLogoutClick }) {
   const location = useLocation();
-  const showSearchBar =
-    location.pathname !== "/" && location.pathname !== "/browse";
+  const navigate = useNavigate();
+  const showSearchBar = location.pathname !== "/";
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // 1. STATE: Manually track if the menu is open
+  // STATE: Manually track if the menu is open
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 
-  // 2. TOGGLE: Flip the state
+  // TOGGLE: Flip the state
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
 
-  // 3. CLOSE: Force close (used when clicking links)
+  // CLOSE: Force close (used when clicking links)
   const closeDropdown = () => {
     setIsDropdownOpen(false);
   };
+
+  const handleSearchSubmit = (event) => {
+    event.preventDefault();
+    navigate("/browse", { state: { searchQuery: searchQuery.trim() } });
+  };
+
+  useEffect(() => {
+    if (
+      location.pathname === "/browse" &&
+      typeof location.state?.searchQuery === "string"
+    ) {
+      setSearchQuery(location.state.searchQuery);
+    }
+  }, [location.pathname, location.state]);
 
   return (
     <>
@@ -30,11 +45,11 @@ function NavBar({ user, onLogoutClick }) {
       >
         <div
           className="container-fluid position-relative d-flex align-items-center"
-          style={{ paddingLeft: "80px", paddingRight: "80px" }}
+          style={{ paddingLeft: "40px", paddingRight: "40px" }}
         >
           {/* LEFT: Brand Logo */}
           <Link
-            className="navbar-brand text-white fw-bold fs-2 d-flex align-items-center gap-2"
+            className="navbar-brand text-white fw-bold fs-1 d-flex align-items-center gap-2"
             to="/"
           >
             <img
@@ -48,20 +63,22 @@ function NavBar({ user, onLogoutClick }) {
           {/* CENTER: Search Bar */}
           {showSearchBar && (
             <div
-              className="position-absolute end-50 translate-middle-x d-none d-md-flex"
-              style={{ width: "325px" }}
+              className="position-absolute d-none d-md-flex"
+              style={{ width: "720px", left: "26.5%" }}
             >
-              <div className="input-group">
-                <span className="input-group-text bg-light border-0 rounded-start-pill ps-3 py-2">
+              <form className="input-group" onSubmit={handleSearchSubmit}>
+                <span className="input-group-text bg-light border-0 rounded-start-3 ps-3 py-2">
                   <Search size={20} className="text-muted" />
                 </span>
                 <input
                   type="text"
-                  className="form-control bg-light border-0 rounded-end-pill py-2 fs-6"
+                  className="form-control bg-light border-0 rounded-end-3 py-2 fs-6"
                   placeholder="Search Taftics..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
                   style={{ height: "40px" }}
                 />
-              </div>
+              </form>
             </div>
           )}
 

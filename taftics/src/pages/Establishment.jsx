@@ -29,12 +29,38 @@ function Establishment() {
     const [isBookmarked, setIsBookmarked] = useState(false);
 
     useEffect(() => {
-        if (currentUser && currentUser.savedEstablishments) {
-            const savedIds = currentUser.savedEstablishments.map(e => e._id || e);
-            if (savedIds.includes(id)) {
-                setIsBookmarked(true);
+        const checkBookmarkState = async () => {
+            if (!currentUser || !id) {
+                setIsBookmarked(false);
+                return;
             }
-        }
+
+            const savedIdsFromUser = Array.isArray(currentUser.savedEstablishments)
+                ? currentUser.savedEstablishments.map(e => String(e._id || e))
+                : [];
+
+            if (savedIdsFromUser.length > 0) {
+                setIsBookmarked(savedIdsFromUser.includes(String(id)));
+                return;
+            }
+
+            try {
+                const res = await fetch(`http://localhost:3000/api/users/${currentUser._id}/bookmarks`);
+                if (!res.ok) {
+                    throw new Error("Failed to fetch user bookmarks");
+                }
+                const savedEstablishments = await res.json();
+                const savedIds = Array.isArray(savedEstablishments)
+                    ? savedEstablishments.map(est => String(est._id || est.id || est))
+                    : [];
+
+                setIsBookmarked(savedIds.includes(String(id)));
+            } catch (error) {
+                console.error("Error loading bookmark state:", error);
+            }
+        };
+
+        checkBookmarkState();
     }, [currentUser, id]);
 
     const handleBookmark = async () => {

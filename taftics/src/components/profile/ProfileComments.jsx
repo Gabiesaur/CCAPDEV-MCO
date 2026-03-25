@@ -20,7 +20,17 @@ export default function ProfileComments({ comment, isOwnProfile }) {
         <MessageSquare size={14} />
         <span>
           Commented on{" "}
-          <strong className="text-dark">{comment.postTitle}</strong> by{" "}
+          {comment.reviewId ? (
+            <Link
+              to={`/review/${comment.reviewId}`}
+              className="fw-bold text-dark text-decoration-none hover-underline"
+            >
+              {comment.postTitle}
+            </Link>
+          ) : (
+            <strong className="text-dark">{comment.postTitle}</strong>
+          )}{" "}
+          by{" "}
           {/* 2. Make the Post Author Clickable */}
           <Link
             to={postAuthorPath}
