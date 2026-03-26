@@ -1,0 +1,203 @@
+const Establishment = require('../models/Establishment');
+const Review = require('../models/Review');
+const User = require('../models/User');
+const mongoose = require('mongoose');
+
+exports.getAllEstablishments = async (req, res) => {
+  try {
+    const establishments = await Establishment.aggregate([
+      {
+        $lookup: {
+          from: 'reviews',
+          localField: '_id',
+          foreignField: 'establishmentId',
+          as: 'reviews'
+        }
+      },
+      {
+        $addFields: {
+          reviewCount: { $size: "$reviews" },
+          rating: {
+            $cond: {
+              if: { $gt: [{ $size: "$reviews" }, 0] },
+              then: { $round: [{ $avg: "$reviews.rating" }, 1] },
+              else: 0
+            }
+          }
+        }
+      },
+      {
+        $project: {
+          reviews: 0
+        }
+      }
+    ]);
+    res.json(establishments);
+  } catch (error) {
+    console.error("Error fetching establishments:", error);
+    res.status(500).json({ message: "Failed to fetch establishments" });
+  }
+};
+
+exports.getEstablishmentById = async (req, res) => {
+  try {
+    // Find establishment by its unique MongoDB _id
+    const establishment = await Establishment.findById(req.params.id);
+
+    if (!establishment) {
+      return res.status(404).json({ message: "Establishment not found" });
+    }
+
+    res.json(establishment);
+  } catch (error) {
+    console.error("Error fetching establishment:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+exports.getEstablishmentOwner = async (req, res) => {
+  try {
+    const estId = req.params.id;
+
+    // Query using $in to match both ObjectId and string representations.
+    // This handles cases where seeded data stored the field as a plain string.
+    const queryValues = [estId];
+    if (mongoose.Types.ObjectId.isValid(estId)) {
+      queryValues.push(new mongoose.Types.ObjectId(estId));
+    }
+
+    const owner = await User.findOne({
+      ownedEstablishmentId: { $in: queryValues }
+    }).select('_id username name avatar');
+
+    console.log(`[owner lookup] estId=${estId}, found=${!!owner}`);
+
+    if (!owner) {
+      return res.status(404).json({ success: false, message: "No owner found for this establishment" });
+    }
+    res.json({ success: true, owner });
+  } catch (error) {
+    console.error("Error fetching establishment owner:", error);
+    res.status(500).json({ success: false, message: "Server error" });
+  }
+};
+
+exports.applyEstablishment = async (req, res) => {
+  console.log("POST /api/apply hit");
+  try {
+    // With FormData, text fields are in req.body
+    console.log("req.body:", req.body);
+    const { establishmentName, address, establishmentType, email, contactInfo, contactName } = req.body;
+
+    // 1. Check if a user with the entered email already exists
+    const existingUser = await User.findOne({
+      email: email
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Email already taken by an existing user." });
+    }
+
+    // 3. Create and save the new establishment with defaults
+    const newEstablishment = new Establishment({
+      name: establishmentName,
+      address,
+      category: establishmentType,
+      email,
+      contactNumber: contactInfo,
+      contactPerson: contactName,
+      image: "", // Triggers branded fallback in frontend
+      businessHours: "7:00 AM - 7:00 PM",
+      location: "Taft Ave (Near DLSU)",
+      description: "A newly applied establishment on Taftics.",
+      isOfficial: false
+    });
+
+    await newEstablishment.save();
+    res.status(201).json({ success: true, message: "Application submitted successfully!" });
+
+  } catch (error) {
+    console.error("Application error:", error);
+    res.status(500).json({ success: false, message: "Server error during application." });
+  }
+};
+
+exports.getEstablishmentReviews = async (req, res) => {
+  try {
+    // Find all reviews where establishmentId matches the URL parameter
+    const reviews = await Review.find({ establishmentId: req.params.id })
+      .populate('userId', 'username name avatar')
+      .sort({ date: -1 }); // Sort by newest first
+
+    res.json(reviews);
+  } catch (error) {
+    console.error("Error fetching reviews:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+exports.updateEstablishment = async (req, res) => {
+  try {
+    const { name, category, startTime, endTime, location } = req.body;
+
+    const formatTime = (timeStr) => {
+      if (!timeStr) return '';
+      if (timeStr.includes('AM') || timeStr.includes('PM')) return timeStr; // Already formatted
+      const [hourStr, minStr] = timeStr.split(':');
+      let hour = parseInt(hourStr, 10);
+      const ampm = hour >= 12 ? 'PM' : 'AM';
+      hour = hour % 12;
+      hour = hour ? hour : 12;
+      return `${hour}:${minStr} ${ampm}`;
+    };
+
+    const formattedHours = `${formatTime(startTime)} - ${formatTime(endTime)}`;
+
+    const establishment = await Establishment.findByIdAndUpdate(
+      req.params.id,
+      { name, category, businessHours: formattedHours, location },
+      { new: true }
+    );
+
+    if (!establishment) {
+      return res.status(404).json({ success: false, message: "Establishment not found" });
+    }
+
+    res.json({ success: true, establishment });
+  } catch (error) {
+    console.error("Error updating establishment:", error);
+    res.status(500).json({ success: false, message: "Failed to update establishment details" });
+  }
+}
+
+exports.uploadEstablishmentImg = async (req, res) => {
+  try {
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({ success: false, message: "No image uploaded" });
+    }
+
+    const imageFile = req.files.image;
+    const fileName = `est_${Date.now()}_${imageFile.name}`;
+    const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+
+    await imageFile.mv(uploadPath);
+
+    const imageUrl = `http://localhost:3000/uploads/${fileName}`;
+
+    const updatedEst = await Establishment.findByIdAndUpdate(
+      req.params.id,
+      { image: imageUrl },
+      { new: true }
+    );
+
+    if (!updatedEst) {
+      return res.status(404).json({ success: false, message: "Establishment not found" });
+    }
+
+    res.json({ success: true, establishment: updatedEst });
+
+  } catch (error) {
+    console.error("Establishment image upload error:", error);
+    res.status(500).json({ success: false, message: "Server error during upload" });
+  }
+}
