@@ -2,6 +2,7 @@ const path = require('path');
 const User = require('../models/User');
 const Review = require('../models/Review');
 const Comment = require('../models/Comment');
+const Establishment = require('../models/Establishment');
 
 exports.getAllUsers = async (req, res) => {
   try {
