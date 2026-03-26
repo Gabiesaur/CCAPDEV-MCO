@@ -1,10 +1,22 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { CheckCircle2 } from "lucide-react";
 import "../styles/LoginRegStyles.css";
 import logoImage from "/logo_green.svg?url";
 
 const OwnerAppPage = ({ onApply }) => {
   const navigate = useNavigate();
+  
+  // Toast State
+  const [showToast, setShowToast] = useState(false);
+  const [toastMessage, setToastMessage] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const triggerToast = (message) => {
+    setToastMessage(message);
+    setShowToast(true);
+    setTimeout(() => setShowToast(false), 3000);
+  };
 
   const [formData, setFormData] = useState({
     establishmentName: "",
@@ -23,9 +35,9 @@ const OwnerAppPage = ({ onApply }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // 1. Basic Validation (Using alerts to preserve original layout)
+    // 1. Basic Validation
     if (!formData.establishmentName || !formData.address || !formData.establishmentType || !formData.email || !formData.contactInfo || !formData.contactName) {
-      alert("Please fill in all required fields.");
+      triggerToast("Please fill in all required fields.");
       return;
     }
 
@@ -39,18 +51,30 @@ const OwnerAppPage = ({ onApply }) => {
     submitData.append("contactName", formData.contactName);
 
     // 3. Send to App.jsx and wait for the response
+    setIsSubmitting(true);
     const result = await onApply(submitData);
     
     if (result.success) {
-      alert('Application submitted successfully! Please wait for approval.'); // Show success message
-      navigate("/"); // Redirect to home if successful
+      triggerToast("Application submitted successfully! Redirecting...");
+      setTimeout(() => {
+        navigate("/"); 
+      }, 1500); 
     } else {
-      alert(result.message); // Display the error from the server
+      alert(result.message || "Failed to submit application.");
+      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="centered-container">
+    <div className="centered-container position-relative">
+      {/* Success Toast */}
+      {showToast && (
+        <div className="toast-success-custom fw-bold" style={{ zIndex: 9999 }}>
+          <CheckCircle2 size={24} />
+          <span>{toastMessage}</span>
+        </div>
+      )}
+
       <div className="auth-card">
         <Link to="/" className="home-corner-btn">
           Home
@@ -163,8 +187,13 @@ const OwnerAppPage = ({ onApply }) => {
           </div>
 
           <div className="action-section">
-            <button type="submit" className="primary-btn wide">
-              Submit
+            <button 
+              type="submit" 
+              className="primary-btn wide" 
+              disabled={isSubmitting}
+              style={{ opacity: isSubmitting ? 0.6 : 1, cursor: isSubmitting ? 'not-allowed' : 'pointer' }}
+            >
+              {isSubmitting ? "Submitting..." : "Submit"}
             </button>
 
             <p className="footer-text">

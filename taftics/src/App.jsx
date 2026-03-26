@@ -23,6 +23,7 @@ import RegPage from "./pages/RegPage";
 import OwnerAppPage from "./pages/OwnerAppPage";
 import EstablishmentPage from "./pages/Establishment";
 import OwnerProfilePage from "./pages/OwnerProfilePage";
+import AdminDashboard from "./pages/AdminDashboard";
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -132,10 +133,9 @@ function App() {
       const data = await response.json();
 
       if (data.success) {
-        // Auto-login the user after successful registration
-        return { success: true };
+        return { success: true, message: data.message };
       } else {
-        return { success: false, message: data.message };
+        return { success: false, message: data.message || "Server error" };
       }
     } catch (error) {
       console.error("Failed to register:", error);
@@ -176,6 +176,16 @@ function App() {
           <Route
             path="/profile/:username"
             element={<PublicProfilePage db={dbUsers} currentUser={user} />}
+          />
+          <Route
+            path="/admin-dashboard"
+            element={
+              user && user.isAdmin ? (
+                <AdminDashboard user={user} />
+              ) : (
+                <Navigate to="/" />
+              )
+            }
           />
         </Route>
 

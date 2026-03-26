@@ -227,8 +227,10 @@ app.post('/api/register', async (req, res) => {
 });
 
 app.post('/api/apply', async (req, res) => {
+  console.log("POST /api/apply hit");
   try {
     // With FormData, text fields are in req.body
+    console.log("req.body:", req.body);
     const { establishmentName, address, establishmentType, email, contactInfo, contactName } = req.body;
 
     // 1. Check if a user with the entered email already exists
@@ -252,6 +254,7 @@ app.post('/api/apply', async (req, res) => {
     });
 
     await newEstablishment.save();
+    res.status(201).json({ success: true, message: "Application submitted successfully!" });
 
   } catch (error) {
     console.error("Application error:", error);
@@ -854,6 +857,124 @@ app.post('/api/reviews/:id/comments', async (req, res) => {
     res.status(201).json({ success: true, comment: populatedComment });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error." });
+  }
+});
+
+// ==========================================
+//               ADMIN ROUTES
+// ==========================================
+
+// 1. GET ADMIN STATS
+app.get('/api/admin/stats', async (req, res) => {
+  try {
+    const totalUsers = await User.countDocuments();
+    const totalReviews = await Review.countDocuments();
+    const totalEstablishments = await Establishment.countDocuments();
+    const pendingEstablishments = await Establishment.countDocuments({ isOfficial: false });
+
+    // Aggregate reviews by date (YYYY-MM-DD)
+    const reviewsOverTime = await Review.aggregate([
+      {
+        $group: {
+          _id: { $dateToString: { format: "%Y-%m-%d", date: "$date" } },
+          count: { $sum: 1 }
+        }
+      },
+      { $sort: { _id: 1 } } // Sort by date ascending
+    ]);
+
+    res.json({
+      totalUsers,
+      totalReviews,
+      totalEstablishments,
+      pendingEstablishments,
+      reviewsOverTime
+    });
+  } catch (error) {
+    console.error("Error fetching admin stats:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch stats" });
+  }
+});
+
+// 2. GET PENDING ESTABLISHMENTS
+app.get('/api/admin/pending-establishments', async (req, res) => {
+  try {
+    const pending = await Establishment.find({ isOfficial: false });
+    res.json(pending);
+  } catch (error) {
+    console.error("Error fetching pending establishments:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch pending establishments" });
+  }
+});
+
+// 3. APPROVE ESTABLISHMENT AND CREATE OWNER ACCOUNT
+app.post('/api/admin/establishments/:id/approve', async (req, res) => {
+  try {
+    const { username, name, email, password } = req.body;
+    const establishmentId = req.params.id;
+
+    // A. Check if user already exists
+    const existingUser = await User.findOne({ $or: [{ username }, { email }] });
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Username or Email already taken by another user." });
+    }
+
+    // B. Find the establishment
+    const establishment = await Establishment.findById(establishmentId);
+    if (!establishment) {
+      return res.status(404).json({ success: false, message: "Establishment not found" });
+    }
+
+    // C. Create the Owner User
+    const hashedPassword = await bcrypt.hash(password, count_salt);
+    const newOwner = new User({
+      username,
+      name,
+      email,
+      password: hashedPassword,
+      idSeries: "owner",
+      avatar: `https://ui-avatars.com/api/?name=${username}`,
+      ownedEstablishmentId: establishmentId,
+      isAdmin: false
+    });
+
+    await newOwner.save();
+
+    // D. Update Establishment status
+    establishment.isOfficial = true;
+    await establishment.save();
+
+    res.json({ success: true, message: "Establishment approved and owner account created." });
+  } catch (error) {
+    console.error("Error approving establishment:", error);
+    res.status(500).json({ success: false, message: "Failed to approve establishment." });
+  }
+});
+
+// 4. REJECT/DELETE ESTABLISHMENT
+app.delete('/api/admin/establishments/:id', async (req, res) => {
+  try {
+    await Establishment.findByIdAndDelete(req.params.id);
+    res.json({ success: true, message: "Establishment deleted." });
+  } catch (error) {
+    console.error("Error deleting establishment:", error);
+    res.status(500).json({ success: false, message: "Failed to delete establishment." });
+  }
+});
+
+// 5. TOGGLE USER ADMIN STATUS
+app.put('/api/admin/users/:id/role', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ success: false, message: "User not found" });
+
+    user.isAdmin = !user.isAdmin;
+    await user.save();
+
+    res.json({ success: true, isAdmin: user.isAdmin });
+  } catch (error) {
+    console.error("Error toggling user role:", error);
+    res.status(500).json({ success: false, message: "Failed to update user role." });
   }
 });
 

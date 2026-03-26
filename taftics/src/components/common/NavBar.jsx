@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
-import { Search, LogOut, User, ChevronDown } from "lucide-react";
+import { Search, LogOut, User, ChevronDown, Shield } from "lucide-react";
 
 import logo from "/logo_white.svg?url";
 
@@ -160,6 +160,17 @@ function NavBar({ user, onLogoutClick }) {
                         <User size={16} /> View Profile
                       </Link>
                     </li>
+                    {user.isAdmin && (
+                      <li>
+                        <Link
+                          className="dropdown-item d-flex align-items-center gap-2 rounded-2 py-2"
+                          to="/admin-dashboard"
+                          onClick={closeDropdown}
+                        >
+                          <Shield size={16} /> Admin Dashboard
+                        </Link>
+                      </li>
+                    )}
                     <li>
                       <hr className="dropdown-divider opacity-50 my-1" />
                     </li>
