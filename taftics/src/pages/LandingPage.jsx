@@ -349,10 +349,13 @@ const LandingPage = () => {
                       style={{ maxWidth: "100%" }}
                     >
                       <img
-                        src={review.establishment.image}
+                        src={review.establishment.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.establishment.name)}&background=00441b&color=fff&size=512&bold=true`}
                         alt="shop"
                         className="rounded-circle me-2 object-cover"
                         style={{ width: "28px", height: "28px" }}
+                        onError={(e) => {
+                          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(review.establishment.name)}&background=00441b&color=fff&size=512&bold=true`;
+                        }}
                       />
                       <div className="lh-1 text-start">
                         <h6

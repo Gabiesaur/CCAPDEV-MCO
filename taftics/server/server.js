@@ -242,7 +242,7 @@ app.post('/api/apply', async (req, res) => {
       return res.status(400).json({ success: false, message: "Email already taken by an existing user." });
     }
 
-    // 3. Create and save the new user
+    // 3. Create and save the new establishment with defaults
     const newEstablishment = new Establishment({
       name: establishmentName,
       address,
@@ -250,6 +250,10 @@ app.post('/api/apply', async (req, res) => {
       email,
       contactNumber: contactInfo,
       contactPerson: contactName,
+      image: "", // Triggers branded fallback in frontend
+      businessHours: "7:00 AM - 7:00 PM",
+      location: "Taft Ave (Near DLSU)",
+      description: "A newly applied establishment on Taftics.",
       isOfficial: false
     });
 
@@ -472,10 +476,11 @@ app.get('/api/establishments/:id/reviews', async (req, res) => {
 // --- UPDATE SPECIFIC ESTABLISHMENT ---
 app.put('/api/establishments/:id', async (req, res) => {
   try {
-    const { name, category, startTime, endTime } = req.body;
+    const { name, category, startTime, endTime, location } = req.body;
 
     const formatTime = (timeStr) => {
       if (!timeStr) return '';
+      if (timeStr.includes('AM') || timeStr.includes('PM')) return timeStr; // Already formatted
       const [hourStr, minStr] = timeStr.split(':');
       let hour = parseInt(hourStr, 10);
       const ampm = hour >= 12 ? 'PM' : 'AM';
@@ -488,7 +493,7 @@ app.put('/api/establishments/:id', async (req, res) => {
 
     const establishment = await Establishment.findByIdAndUpdate(
       req.params.id,
-      { name, category, businessHours: formattedHours },
+      { name, category, businessHours: formattedHours, location },
       { new: true }
     );
 
@@ -500,6 +505,39 @@ app.put('/api/establishments/:id', async (req, res) => {
   } catch (error) {
     console.error("Error updating establishment:", error);
     res.status(500).json({ success: false, message: "Failed to update establishment details" });
+  }
+});
+
+// --- ESTABLISHMENT IMAGE UPLOAD ---
+app.put('/api/establishments/:id/image', async (req, res) => {
+  try {
+    if (!req.files || !req.files.image) {
+      return res.status(400).json({ success: false, message: "No image uploaded" });
+    }
+
+    const imageFile = req.files.image;
+    const fileName = `est_${Date.now()}_${imageFile.name}`;
+    const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+
+    await imageFile.mv(uploadPath);
+
+    const imageUrl = `http://localhost:3000/uploads/${fileName}`;
+
+    const updatedEst = await Establishment.findByIdAndUpdate(
+      req.params.id,
+      { image: imageUrl },
+      { new: true }
+    );
+
+    if (!updatedEst) {
+      return res.status(404).json({ success: false, message: "Establishment not found" });
+    }
+
+    res.json({ success: true, establishment: updatedEst });
+
+  } catch (error) {
+    console.error("Establishment image upload error:", error);
+    res.status(500).json({ success: false, message: "Server error during upload" });
   }
 });
 

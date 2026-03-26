@@ -4,10 +4,13 @@ import { Star, Settings, Store, BarChart3, Edit, Trash2, ExternalLink, CheckCirc
 import { useEffect } from "react";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import ImageUploadModal from "../components/profile/ImageUploadModal";
+import EstablishmentImageUploadModal from "../components/profile/EstablishmentImageUploadModal";
+import { Camera } from "lucide-react";
 
 export default function OwnerProfilePage({ user, setUser }) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEstImageModalOpen, setIsEstImageModalOpen] = useState(false);
   const [isEditingStore, setIsEditingStore] = useState(false);
   const [loading, setLoading] = useState(true);
   
@@ -61,7 +64,8 @@ export default function OwnerProfilePage({ user, setUser }) {
     name: "",
     category: "Food",
     startTime: "07:00",
-    endTime: "19:00"
+    endTime: "19:00",
+    location: ""
   });
 
   useEffect(() => {
@@ -112,7 +116,8 @@ export default function OwnerProfilePage({ user, setUser }) {
         name: estData.name || "",
         category: estData.category || "Food",
         startTime: sTime,
-        endTime: eTime
+        endTime: eTime,
+        location: estData.location || ""
       });
       setLoading(false);
     }).catch(err => {
@@ -185,15 +190,24 @@ export default function OwnerProfilePage({ user, setUser }) {
       <ImageUploadModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        userId={user._id || user.id} // Ensure we have the ID for the backend string matching
+        userId={user._id || user.id}
         onUploadSuccess={(updatedUser) => {
-          // Update global state and persist
           if (setUser) {
             setUser(updatedUser);
             localStorage.setItem("currentUser", JSON.stringify(updatedUser));
           }
           setIsModalOpen(false);
-          triggerToast("Establishment profile picture updated!");
+          triggerToast("Profile picture updated!");
+        }}
+      />
+
+      <EstablishmentImageUploadModal
+        isOpen={isEstImageModalOpen}
+        onClose={() => setIsEstImageModalOpen(false)}
+        establishmentId={establishment?._id || establishment?.id}
+        onUploadSuccess={(updatedEst) => {
+          setEstablishment(updatedEst);
+          triggerToast("Establishment cover image updated!");
         }}
       />
 
@@ -342,6 +356,47 @@ export default function OwnerProfilePage({ user, setUser }) {
                       ) : (
                         <div className="form-control bg-light text-muted border-0 py-2">{establishment.businessHours}</div>
                       )}
+                    </div>
+
+                    {/* Location Field */}
+                    <div className="col-12">
+                      <label className="form-label small fw-bold text-muted">Location</label>
+                      {isEditingStore ? (
+                        <input 
+                          type="text" 
+                          className="form-control" 
+                          placeholder="your location relative to DLSU"
+                          value={storeForm.location} 
+                          onChange={(e) => setStoreForm({...storeForm, location: e.target.value})} 
+                        />
+                      ) : (
+                        <div className="form-control bg-light text-muted border-0 py-2">{establishment.location || "Not Specified"}</div>
+                      )}
+                    </div>
+
+                    {/* Establishment Image Section */}
+                    <div className="col-12 mt-3">
+                      <label className="form-label small fw-bold text-muted">Establishment Cover Image</label>
+                      <div 
+                        className="rounded-4 overflow-hidden position-relative bg-light" 
+                        style={{ height: '200px', cursor: 'default' }}
+                      >
+                        <img 
+                          src={establishment.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(establishment.name)}&background=00441b&color=fff&size=512&bold=true`}
+                          alt="Store cover"
+                          className="w-100 h-100 object-cover"
+                          onError={(e) => {
+                            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(establishment.name)}&background=00441b&color=fff&size=512&bold=true`;
+                          }}
+                        />
+                        <button 
+                          type="button"
+                          className="btn btn-dark btn-sm position-absolute bottom-0 end-0 m-3 shadow-sm rounded-pill d-flex align-items-center gap-2 px-3 py-2"
+                          onClick={() => setIsEstImageModalOpen(true)}
+                        >
+                          <Camera size={16} /> Update Cover
+                        </button>
+                      </div>
                     </div>
                   </div>
 

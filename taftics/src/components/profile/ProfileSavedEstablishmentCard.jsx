@@ -10,10 +10,13 @@ export default function ProfileSavedEstablishmentCard({ establishment }) {
     <div className="custom-card mb-3 p-3 overflow-hidden d-flex flex-row align-items-center gap-3">
       {/* Establishment Cover Image */}
       <img
-        src={establishment.image || "https://images.unsplash.com/photo-1554118811-1e0d58224f24"}
+        src={establishment.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(establishment.name)}&background=00441b&color=fff&size=512&bold=true`}
         alt={establishment.name}
         className="rounded-3 shadow-sm"
         style={{ width: "120px", height: "120px", objectFit: "cover", flexShrink: 0 }}
+        onError={(e) => {
+          e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(establishment.name)}&background=00441b&color=fff&size=512&bold=true`;
+        }}
       />
       
       {/* Details Vector */}

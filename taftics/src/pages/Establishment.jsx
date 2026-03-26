@@ -168,7 +168,7 @@ function Establishment() {
             <div className="container-fluid" style={{ paddingTop: '30px', paddingBottom: '100px' }}>
                 <div className="d-flex flex-column align-items-center w-75 mx-auto">
                     {/* Gallery Section */}
-                    <EstablishmentGallery image={establishment.image} />
+                    <EstablishmentGallery image={establishment.image} name={establishment.name} />
 
                     {/* Main Content Row */}
                     <div className="d-flex flex-row justify-content-between align-items-start w-100 mt-4 gap-4">
@@ -296,21 +296,39 @@ function Establishment() {
                                 <div
                                     className="w-100 my-2"
                                     style={{
-                                        height: "150px", 
+                                        height: "200px", 
                                         overflow: "hidden",
-                                        borderRadius: "5px",
+                                        borderRadius: "8px",
+                                        border: "1px solid #ddd"
                                     }}
                                 >
-                                    <img
-                                        src={addressIcon}
-                                        alt="address"
-                                        style={{
-                                            width: "100%",
-                                            height: "100%",
-                                            objectFit: "cover",
-                                        }}
-                                    />
+                                    <iframe
+                                        title="Establishment Location"
+                                        width="100%"
+                                        height="100%"
+                                        style={{ border: 0 }}
+                                        src={`https://maps.google.com/maps?q=${encodeURIComponent(establishment.name + " " + (establishment.address || ""))}&output=embed`}
+                                        allowFullScreen
+                                    ></iframe>
                                 </div>
+                                <a 
+                                    href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(establishment.name + " " + (establishment.address || ""))}`}
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="btn btn-sm btn-outline-secondary w-100 mb-3 rounded-pill fw-bold"
+                                    style={{ fontSize: '11px' }}
+                                >
+                                    Open in Google Maps
+                                </a>
+
+                                {establishment.location && (
+                                    <div className="mb-3">
+                                        <p className="mb-0 small fw-bold text-muted text-uppercase" style={{ fontSize: '10px' }}>Relative to DLSU:</p>
+                                        <p className="mb-0 fw-bold" style={{ color: "#00441B", fontSize: "14px" }}>
+                                            {establishment.location}
+                                        </p>
+                                    </div>
+                                )}
 
                                 <p
                                     className="mb-0 fw-bold text-wrap" 

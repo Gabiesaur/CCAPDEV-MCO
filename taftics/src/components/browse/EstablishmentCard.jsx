@@ -86,10 +86,13 @@ const EstablishmentCard = ({
       <div className="mx-auto mb-4" style={{ height: "280px" }}>
         <Link to={`/establishment/${id}`} state={{ establishment }}>
           <img
-            src={image}
+            src={image || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00441b&color=fff&size=512&bold=true`}
             className="w-100 h-100"
             style={{ objectFit: "cover", borderRadius: "12px" }}
             alt={name}
+            onError={(e) => {
+              e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00441b&color=fff&size=512&bold=true`;
+            }}
           />
         </Link>
       </div>

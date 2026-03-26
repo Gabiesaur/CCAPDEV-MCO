@@ -14,10 +14,13 @@ const EstablishmentCardSmall = ({
     <div className="custom-card p-4 h-100">
       <Link to={`/establishment/${id}`} className="text-decoration-none text-dark">
         <img
-          src={image}
+          src={image || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00441b&color=fff&size=512&bold=true`}
           className="card-img-top rounded-3 w-100 mb-2"
           style={{ height: '280px', objectFit: 'cover', borderRadius: '20px' }}
           alt={name}
+          onError={(e) => {
+            e.target.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00441b&color=fff&size=512&bold=true`;
+          }}
         />
       </Link>
       <div className="card-body px-0 pb-0">
