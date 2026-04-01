@@ -42,7 +42,7 @@ function CreateReview() {
     const loadEstablishments = async () => {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/establishments",
+          `${import.meta.env.VITE_API_URL}/api/establishments`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch establishments");
@@ -85,7 +85,7 @@ function CreateReview() {
 
       try {
         const response = await fetch(
-          `http://localhost:3000/api/establishments/${selectedEstablishment._id}/reviews`,
+          `${import.meta.env.VITE_API_URL}/api/establishments/${selectedEstablishment._id}/reviews`,
         );
         if (!response.ok) {
           throw new Error("Failed to fetch establishment reviews");
@@ -242,7 +242,7 @@ function CreateReview() {
     });
 
     try {
-      const response = await fetch("http://localhost:3000/api/reviews", {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews`, {
         method: "POST",
         body: formData,
       });

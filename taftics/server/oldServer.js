@@ -186,7 +186,7 @@ app.post('/api/register', async (req, res) => {
       await avatarFile.mv(uploadPath);
 
       // Set the URL that React will use to display the image
-      avatarUrl = `http://localhost:3000/uploads/${fileName}`;
+      avatarUrl = `${process.env.BASE_URL}/uploads/${fileName}`;
     }
 
     const salt_rounds = count_salt;
@@ -282,7 +282,7 @@ app.post('/api/reviews', async (req, res) => {
         const fileName = `${Date.now()}_${file.name}`;
         const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
         await file.mv(uploadPath);
-        imageUrls.push(`http://localhost:3000/uploads/${fileName}`);
+        imageUrls.push(`${process.env.BASE_URL}/uploads/${fileName}`);
       }
     }
 
@@ -331,7 +331,7 @@ app.put('/api/reviews/:id', async (req, res) => {
         const fileName = `${Date.now()}_${file.name}`;
         const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
         await file.mv(uploadPath);
-        imageUrls.push(`http://localhost:3000/uploads/${fileName}`);
+        imageUrls.push(`${process.env.BASE_URL}/uploads/${fileName}`);
       }
     }
     existingReview.images = imageUrls;
@@ -521,7 +521,7 @@ app.put('/api/establishments/:id/image', async (req, res) => {
 
     await imageFile.mv(uploadPath);
 
-    const imageUrl = `http://localhost:3000/uploads/${fileName}`;
+    const imageUrl = `${process.env.BASE_URL}/uploads/${fileName}`;
 
     const updatedEst = await Establishment.findByIdAndUpdate(
       req.params.id,
@@ -758,7 +758,7 @@ app.put('/api/users/:id/avatar', async (req, res) => {
     await avatarFile.mv(uploadPath);
 
     // 3. Generate the new URL
-    const avatarUrl = `http://localhost:3000/uploads/${fileName}`;
+    const avatarUrl = `${process.env.BASE_URL}/uploads/${fileName}`;
 
     // 4. Find the user and update their avatar in the database
     // { new: true } tells Mongoose to return the UPDATED user document

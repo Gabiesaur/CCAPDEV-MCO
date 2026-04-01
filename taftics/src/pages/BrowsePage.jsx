@@ -156,7 +156,7 @@ const BrowsePage = () => {
 
   // 3. NEW: Fetch establishments from the database on component mount
   useEffect(() => {
-    fetch("http://localhost:3000/api/establishments")
+    fetch(`${import.meta.env.VITE_API_URL}/api/establishments`)
       .then((res) => res.json())
       .then((data) => {
         setEstablishments(data);

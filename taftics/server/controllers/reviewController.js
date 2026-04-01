@@ -17,7 +17,7 @@ exports.createReview = async (req, res) => {
         const fileName = `${Date.now()}_${file.name}`;
         const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
         await file.mv(uploadPath);
-        imageUrls.push(`http://localhost:3000/uploads/${fileName}`);
+        imageUrls.push(`${process.env.BASE_URL}/uploads/${fileName}`);
       }
     }
 
@@ -63,9 +63,9 @@ exports.updateReview = async (req, res) => {
       const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
       for (const file of files) {
         const fileName = `${Date.now()}_${file.name}`;
-        const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+        const uploadPath = path.join(__dirname, '../../public/uploads', fileName);
         await file.mv(uploadPath);
-        imageUrls.push(`http://localhost:3000/uploads/${fileName}`);
+        imageUrls.push(`${process.env.BASE_URL}/uploads/${fileName}`);
       }
     }
     existingReview.images = imageUrls;

@@ -96,7 +96,7 @@ export default function EstablishmentImageUploadModal({ isOpen, onClose, onUploa
     formData.append("image", file);
 
     try {
-      const response = await fetch(`http://localhost:3000/api/establishments/${establishmentId}/image`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${establishmentId}/image`, {
         method: "PUT",
         body: formData,
       });

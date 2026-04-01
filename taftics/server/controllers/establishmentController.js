@@ -182,7 +182,7 @@ exports.uploadEstablishmentImg = async (req, res) => {
 
     await imageFile.mv(uploadPath);
 
-    const imageUrl = `http://localhost:3000/uploads/${fileName}`;
+    const imageUrl = `${process.env.BASE_URL}/uploads/${fileName}`;
 
     const updatedEst = await Establishment.findByIdAndUpdate(
       req.params.id,

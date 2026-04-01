@@ -49,7 +49,7 @@ const AdminDashboard = ({ user }) => {
   // --- ACTIONS: DATA FETCHING ---
   const fetchStats = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/admin/stats");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats`);
       const data = await res.json();
       setStats(data);
     } catch (err) {
@@ -60,7 +60,7 @@ const AdminDashboard = ({ user }) => {
   const fetchPending = async () => {
     // --- ACTIONS: DATA FETCHING ---
     try {
-      const res = await fetch("http://localhost:3000/api/admin/pending-establishments");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/pending-establishments`);
       const data = await res.json();
       setPendingList(data);
     } catch (err) {
@@ -72,7 +72,7 @@ const AdminDashboard = ({ user }) => {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch("http://localhost:3000/api/users");
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users`);
       const data = await res.json();
       setUserList(data);
     } catch (err) {
@@ -95,7 +95,7 @@ const AdminDashboard = ({ user }) => {
     e.preventDefault();
     setFormError("");
     try {
-      const res = await fetch(`http://localhost:3000/api/admin/establishments/${selectedEst._id}/approve`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/establishments/${selectedEst._id}/approve`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(ownerForm)
@@ -116,7 +116,7 @@ const AdminDashboard = ({ user }) => {
   const handleReject = async (id) => {
     if (window.confirm("Are you sure you want to reject this establishment? This will permanently delete the application.")) {
       try {
-        const res = await fetch(`http://localhost:3000/api/admin/establishments/${id}`, {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/establishments/${id}`, {
           method: "DELETE"
         });
         const data = await res.json();
@@ -134,7 +134,7 @@ const AdminDashboard = ({ user }) => {
   // --- ACTIONS: MODERATION & USER ROLES ---
   const toggleAdmin = async (id) => {
     try {
-      const res = await fetch(`http://localhost:3000/api/admin/users/${id}/role`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${id}/role`, {
         method: "PUT"
       });
       const data = await res.json();

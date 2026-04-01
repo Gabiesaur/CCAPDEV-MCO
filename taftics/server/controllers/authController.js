@@ -109,7 +109,7 @@ exports.register = async (req, res) => {
       await avatarFile.mv(uploadPath);
 
       // Set the URL that React will use to display the image
-      avatarUrl = `http://localhost:3000/uploads/${fileName}`;
+      avatarUrl = `${process.env.BASE_URL}/uploads/${fileName}`;
     }
 
     const salt_rounds = count_salt;

@@ -11,6 +11,7 @@ import {
 import MainLayout from "./components/layout/MainLayout";
 
 // --- PAGES ---
+console.log(import.meta.env.VITE_API_URL)
 import MyProfilePage from "./pages/MyProfilePage";
 import PublicProfilePage from "./pages/PublicProfilePage";
 import LandingPage from "./pages/LandingPage";
@@ -53,7 +54,7 @@ function App() {
 
   // Fetch all users on mount
   useEffect(() => {
-    fetch('http://localhost:3000/api/users')
+    fetch(`${import.meta.env.VITE_API_URL}/api/users`)
       .then(res => res.json())
       .then(data => setDbUsers(data))
       .catch(err => console.error("Error fetching users:", err));
@@ -63,7 +64,7 @@ function App() {
   
   const login = async (username, password, rememberMe) => {
     try {
-      const response = await fetch('http://localhost:3000/api/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password })
@@ -98,7 +99,7 @@ function App() {
 
   const register = async (formData) => {
     try {
-      const response = await fetch('http://localhost:3000/api/register', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/register`, {
         method: 'POST',
         body: formData
       });
@@ -125,7 +126,7 @@ function App() {
     }
     return { success: true, message: "Application submitted!" };*/
     try {
-      const response = await fetch('http://localhost:3000/api/apply', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/apply`, {
         method: 'POST',
         body: formData
       });

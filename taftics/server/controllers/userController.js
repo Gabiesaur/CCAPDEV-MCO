@@ -195,7 +195,7 @@ exports.updateUserAvatar = async (req, res) => {
         await avatarFile.mv(uploadPath);
     
         // 3. Generate the new URL
-        const avatarUrl = `http://localhost:3000/uploads/${fileName}`;
+        const avatarUrl = `${process.env.BASE_URL}/uploads/${fileName}`;
     
         // 4. Find the user and update their avatar in the database
         // { new: true } tells Mongoose to return the UPDATED user document

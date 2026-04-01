@@ -59,8 +59,8 @@ export default function PublicProfilePage({ db, currentUser }) {
   
       // Fetch Review Arrays
       Promise.all([
-        fetch(`http://localhost:3000/api/users/${publicUser._id}/reviews`).then(res => res.json()),
-        fetch(`http://localhost:3000/api/users/${publicUser._id}/comments`).then(res => res.json())
+        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/reviews`).then(res => res.json()),
+        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/comments`).then(res => res.json())
       ])
         .then(([revData, commentData]) => {
           setPublicReviews(Array.isArray(revData) ? revData : []);

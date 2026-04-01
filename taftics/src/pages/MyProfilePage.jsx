@@ -64,11 +64,11 @@ export default function MyProfilePage({ user, setUser }) {
 
     // Fetch Review Arrays
     Promise.all([
-      fetch(`http://localhost:3000/api/users/${user._id}/bookmarks`).then(res => res.json()),
-      fetch(`http://localhost:3000/api/users/${user._id}/helpful-reviews`).then(res => res.json()),
-      fetch(`http://localhost:3000/api/users/${user._id}/unhelpful-reviews`).then(res => res.json()),
-      fetch(`http://localhost:3000/api/users/${user._id}/reviews`).then(res => res.json()),
-      fetch(`http://localhost:3000/api/users/${user._id}/comments`).then(res => res.json())
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/bookmarks`).then(res => res.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/helpful-reviews`).then(res => res.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/unhelpful-reviews`).then(res => res.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/reviews`).then(res => res.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/comments`).then(res => res.json())
     ])
       .then(([savedData, helpfulData, unhelpfulData, revData, commentData]) => {
         setSavedEstablishments(Array.isArray(savedData) ? savedData : []);

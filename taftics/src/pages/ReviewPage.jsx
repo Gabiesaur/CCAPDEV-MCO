@@ -111,7 +111,7 @@ const ReviewPage = () => {
       setIsLoading(true);
       try {
         // 1. Fetch the Review
-        const reviewRes = await fetch(`http://localhost:3000/api/reviews/${id}`);
+        const reviewRes = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}`);
         if (!reviewRes.ok) throw new Error("Review not found");
         
         const reviewData = await reviewRes.json();
@@ -135,7 +135,7 @@ const ReviewPage = () => {
         // 2. Safely extract Establishment ID and fetch Establishment details
         const estId = getEntityId(reviewData.establishmentId);
         if (estId) {
-          const estRes = await fetch(`http://localhost:3000/api/establishments/${estId}`);
+          const estRes = await fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${estId}`);
           if (estRes.ok) {
             const estData = await estRes.json();
             setEstablishment(estData);
@@ -144,7 +144,7 @@ const ReviewPage = () => {
 
         // 3. Fetch the Comments for this review
         setLoadingComments(true);
-        const commentsRes = await fetch(`http://localhost:3000/api/reviews/${id}/comments`);
+        const commentsRes = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/comments`);
         if (commentsRes.ok) {
           const commentsData = await commentsRes.json();
           const commentsArray = Array.isArray(commentsData) ? commentsData : [];
@@ -188,7 +188,7 @@ const ReviewPage = () => {
 
     const voteType = type === 'up' ? 'helpful' : 'unhelpful';
     try {
-      const res = await fetch(`http://localhost:3000/api/reviews/${id}/vote`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/vote`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUser._id, type: voteType }),
@@ -229,7 +229,7 @@ const ReviewPage = () => {
 
     setIsSubmittingComment(true);
     try {
-      const res = await fetch(`http://localhost:3000/api/reviews/${id}/comments`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: currentUser._id, text: commentText.trim() }),

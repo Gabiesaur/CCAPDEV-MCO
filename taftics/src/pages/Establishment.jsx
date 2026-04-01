@@ -45,7 +45,7 @@ function Establishment() {
             }
 
             try {
-                const res = await fetch(`http://localhost:3000/api/users/${currentUser._id}/bookmarks`);
+                const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${currentUser._id}/bookmarks`);
                 if (!res.ok) {
                     throw new Error("Failed to fetch user bookmarks");
                 }
@@ -66,7 +66,7 @@ function Establishment() {
     const handleBookmark = async () => {
         if (!currentUser) return alert("Please log in to bookmark.");
         try {
-            const res = await fetch(`http://localhost:3000/api/users/${currentUser._id}/bookmark`, {
+            const res = await fetch(`${import.meta.env.VITE_API_URL}/api/users/${currentUser._id}/bookmark`, {
                 method: "PUT",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ establishmentId: id })
@@ -93,7 +93,7 @@ function Establishment() {
                     !establishmentFromState || String(establishmentFromState._id) !== String(id);
 
                 const establishmentPromise = shouldFetchEstablishment
-                    ? fetch(`http://localhost:3000/api/establishments/${id}`).then((res) => {
+                    ? fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${id}`).then((res) => {
                         if (!res.ok) {
                             throw new Error("Establishment not found");
                         }
@@ -101,7 +101,7 @@ function Establishment() {
                     })
                     : Promise.resolve(establishmentFromState);
 
-                const reviewsPromise = fetch(`http://localhost:3000/api/establishments/${id}/reviews`).then((res) => {
+                const reviewsPromise = fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${id}/reviews`).then((res) => {
                     if (!res.ok) {
                         return [];
                     }

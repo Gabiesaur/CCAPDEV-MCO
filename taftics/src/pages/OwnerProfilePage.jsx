@@ -34,7 +34,7 @@ export default function OwnerProfilePage({ user, setUser }) {
     if (!text || !text.trim()) return;
 
     try {
-      const res = await fetch(`http://localhost:3000/api/reviews/${reviewId}/comments`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${reviewId}/comments`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ userId: user._id || user.id, text: text.trim() }),
@@ -77,8 +77,8 @@ export default function OwnerProfilePage({ user, setUser }) {
     const targetId = user.ownedEstablishmentId?.$oid || user.ownedEstablishmentId;
 
     Promise.all([
-      fetch(`http://localhost:3000/api/establishments/${targetId}`).then(r => r.json()),
-      fetch(`http://localhost:3000/api/establishments/${targetId}/reviews`).then(r => r.json())
+      fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${targetId}`).then(r => r.json()),
+      fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${targetId}/reviews`).then(r => r.json())
     ]).then(([estData, revData]) => {
       setEstablishment(estData);
       setReviews(Array.isArray(revData) ? revData : []);
@@ -129,7 +129,7 @@ export default function OwnerProfilePage({ user, setUser }) {
   const handleSaveStore = async () => {
     try {
       const targetId = user.ownedEstablishmentId?.$oid || user.ownedEstablishmentId;
-      const res = await fetch(`http://localhost:3000/api/establishments/${targetId}`, {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${targetId}`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(storeForm)

@@ -51,7 +51,7 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchLandingData = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/establishments");
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/establishments`);
         const data = await res.json();
 
         const sortedByRating = [...data].sort(
@@ -64,7 +64,7 @@ const LandingPage = () => {
           sortedByRating.map(async (est) => {
             try {
               const reviewsRes = await fetch(
-                `http://localhost:3000/api/establishments/${est._id}/reviews`,
+                `${import.meta.env.VITE_API_URL}/api/establishments/${est._id}/reviews`,
               );
               if (!reviewsRes.ok) return [];
 
