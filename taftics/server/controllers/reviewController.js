@@ -1,6 +1,15 @@
-const path = require('path');
-const Review = require('../models/Review');
-const Comment = require('../models/Comment');
+const path = require("path");
+const fs = require("fs");
+const Review = require("../models/Review");
+const Comment = require("../models/Comment");
+
+const uploadsDir = path.join(__dirname, "..", "public", "uploads");
+
+const ensureUploadsDir = () => {
+  if (!fs.existsSync(uploadsDir)) {
+    fs.mkdirSync(uploadsDir, { recursive: true });
+  }
+};
 
 exports.createReview = async (req, res) => {
   console.log("req.body:", req.body);
@@ -11,11 +20,14 @@ exports.createReview = async (req, res) => {
     // 1. Process Images using express-fileupload
     let imageUrls = [];
     if (req.files && req.files.images) {
-      const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+      ensureUploadsDir();
+      const files = Array.isArray(req.files.images)
+        ? req.files.images
+        : [req.files.images];
 
       for (const file of files) {
         const fileName = `${Date.now()}_${file.name}`;
-        const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
+        const uploadPath = path.join(uploadsDir, fileName);
         await file.mv(uploadPath);
         imageUrls.push(`${process.env.BASE_URL}/uploads/${fileName}`);
       }
@@ -29,7 +41,7 @@ exports.createReview = async (req, res) => {
       title,
       body,
       images: imageUrls,
-      date: new Date()
+      date: new Date(),
     });
 
     await newReview.save();
@@ -49,21 +61,28 @@ exports.updateReview = async (req, res) => {
     // 1. Find existing review
     const existingReview = await Review.findById(req.params.id);
     if (!existingReview) {
-      return res.status(404).json({ success: false, message: "Review not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Review not found" });
     }
     const newRating = Number(rating);
 
     // 3. Process Images
     let imageUrls = [];
     if (existingImages) {
-      imageUrls = Array.isArray(existingImages) ? existingImages : [existingImages];
+      imageUrls = Array.isArray(existingImages)
+        ? existingImages
+        : [existingImages];
     }
 
     if (req.files && req.files.images) {
-      const files = Array.isArray(req.files.images) ? req.files.images : [req.files.images];
+      ensureUploadsDir();
+      const files = Array.isArray(req.files.images)
+        ? req.files.images
+        : [req.files.images];
       for (const file of files) {
         const fileName = `${Date.now()}_${file.name}`;
-        const uploadPath = path.join(__dirname, '../../public/uploads', fileName);
+        const uploadPath = path.join(uploadsDir, fileName);
         await file.mv(uploadPath);
         imageUrls.push(`${process.env.BASE_URL}/uploads/${fileName}`);
       }
@@ -79,12 +98,14 @@ exports.updateReview = async (req, res) => {
     await existingReview.save();
 
     // Populate user to return fully formed review for frontend state
-    await existingReview.populate('userId', 'username name avatar');
+    await existingReview.populate("userId", "username name avatar");
 
     res.json({ success: true, review: existingReview });
   } catch (error) {
     console.error("Error updating review:", error);
-    res.status(500).json({ success: false, message: "Failed to update review" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to update review" });
   }
 };
 
@@ -92,27 +113,40 @@ exports.toggleReviewVote = async (req, res) => {
   try {
     const { userId, type } = req.body;
 
-    if (!userId) return res.status(401).json({ success: false, message: "Unauthorized. Please login to vote." });
+    if (!userId)
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "Unauthorized. Please login to vote.",
+        });
 
     const reviewId = req.params.id;
     const review = await Review.findById(reviewId);
-    if (!review) return res.status(404).json({ success: false, message: "Review not found" });
+    if (!review)
+      return res
+        .status(404)
+        .json({ success: false, message: "Review not found" });
 
     // initialize arrays if undefined
     if (!review.helpfulVoters) review.helpfulVoters = [];
     if (!review.unhelpfulVoters) review.unhelpfulVoters = [];
 
-    const hasVotedHelpful = review.helpfulVoters.map(id => id.toString()).includes(userId.toString());
-    const hasVotedUnhelpful = review.unhelpfulVoters.map(id => id.toString()).includes(userId.toString());
+    const hasVotedHelpful = review.helpfulVoters
+      .map((id) => id.toString())
+      .includes(userId.toString());
+    const hasVotedUnhelpful = review.unhelpfulVoters
+      .map((id) => id.toString())
+      .includes(userId.toString());
 
-    if (type === 'helpful') {
+    if (type === "helpful") {
       if (hasVotedHelpful) {
         review.helpfulVoters.pull(userId);
       } else {
         review.helpfulVoters.push(userId);
         if (hasVotedUnhelpful) review.unhelpfulVoters.pull(userId);
       }
-    } else if (type === 'unhelpful') {
+    } else if (type === "unhelpful") {
       if (hasVotedUnhelpful) {
         review.unhelpfulVoters.pull(userId);
       } else {
@@ -122,7 +156,7 @@ exports.toggleReviewVote = async (req, res) => {
     }
 
     await review.save();
-    await review.populate('userId', 'username name avatar');
+    await review.populate("userId", "username name avatar");
     res.json({ success: true, review });
   } catch (error) {
     console.error("Error submitting vote:", error);
@@ -134,7 +168,9 @@ exports.deleteReview = async (req, res) => {
   try {
     const existingReview = await Review.findById(req.params.id);
     if (!existingReview) {
-      return res.status(404).json({ success: false, message: "Review not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Review not found" });
     }
 
     await Review.findByIdAndDelete(req.params.id);
@@ -142,33 +178,35 @@ exports.deleteReview = async (req, res) => {
     res.json({ success: true, message: "Review deleted successfully" });
   } catch (error) {
     console.error("Error deleting review:", error);
-    res.status(500).json({ success: false, message: "Failed to delete review" });
+    res
+      .status(500)
+      .json({ success: false, message: "Failed to delete review" });
   }
 };
 
 exports.getReviewById = async (req, res) => {
   try {
-      const review = await Review.findById(req.params.id)
-        .populate('userId', 'username name avatar')
-        .populate('establishmentId', 'name location')
-        .populate('comments.userId', 'username name avatar');
-  
-      if (!review) {
-        return res.status(404).json({ message: "Review not found" });
-      }
-  
-      res.json(review);
-    } catch (error) {
-      console.error("Error fetching review:", error);
-      res.status(500).json({ message: "Server error" });
+    const review = await Review.findById(req.params.id)
+      .populate("userId", "username name avatar")
+      .populate("establishmentId", "name location")
+      .populate("comments.userId", "username name avatar");
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" });
     }
-}
+
+    res.json(review);
+  } catch (error) {
+    console.error("Error fetching review:", error);
+    res.status(500).json({ message: "Server error" });
+  }
+};
 
 exports.getCommentsFromReview = async (req, res) => {
   try {
     // Find all comments where the reviewId matches the URL parameter
     const comments = await Comment.find({ reviewId: req.params.id })
-      .populate('userId', 'username name avatar ownedEstablishmentId')
+      .populate("userId", "username name avatar ownedEstablishmentId")
       .sort({ date: -1 }); // Sort by newest comments first
 
     res.json(comments);
@@ -176,15 +214,15 @@ exports.getCommentsFromReview = async (req, res) => {
     console.error("Error fetching comments for review:", error);
     res.status(500).json({ message: "Server error while fetching comments" });
   }
-}
+};
 
 exports.getOneCommentFromReview = async (req, res) => {
   try {
     // Find a single comment ensuring both the comment ID and review ID match
     const comment = await Comment.findOne({
       _id: req.params.commentId,
-      reviewId: req.params.reviewId
-    }).populate('userId', 'username name avatar');
+      reviewId: req.params.reviewId,
+    }).populate("userId", "username name avatar");
 
     if (!comment) {
       return res.status(404).json({ message: "Comment not found" });
@@ -193,38 +231,47 @@ exports.getOneCommentFromReview = async (req, res) => {
     res.json(comment);
   } catch (error) {
     console.error("Error fetching specific comment:", error);
-    res.status(500).json({ message: "Server error while fetching specific comment" });
+    res
+      .status(500)
+      .json({ message: "Server error while fetching specific comment" });
   }
-}
+};
 
 exports.createReviewComment = async (req, res) => {
   try {
-      const { userId, text } = req.body;
-  
-      // Check if logged in
-      if (!userId) {
-        return res.status(401).json({ success: false, message: "You must be logged in to post a comment." });
-      }
-  
-      // Create and save the new comment
-      const newComment = new Comment({
-        reviewId: req.params.id,
-        userId,
-        text: text.trim(),
-        date: new Date(),
-      });
-  
-      await newComment.save();
-  
-      await Review.findByIdAndUpdate(req.params.id, {
-        $push: { comments: { userId, text: text.trim(), date: new Date() } }
-      });
-  
-      const populatedComment = await Comment.findById(newComment._id)
-        .populate('userId', 'username name avatar');
-  
-      res.status(201).json({ success: true, comment: populatedComment });
-    } catch (error) {
-      res.status(500).json({ success: false, message: "Server error." });
+    const { userId, text } = req.body;
+
+    // Check if logged in
+    if (!userId) {
+      return res
+        .status(401)
+        .json({
+          success: false,
+          message: "You must be logged in to post a comment.",
+        });
     }
-}
+
+    // Create and save the new comment
+    const newComment = new Comment({
+      reviewId: req.params.id,
+      userId,
+      text: text.trim(),
+      date: new Date(),
+    });
+
+    await newComment.save();
+
+    await Review.findByIdAndUpdate(req.params.id, {
+      $push: { comments: { userId, text: text.trim(), date: new Date() } },
+    });
+
+    const populatedComment = await Comment.findById(newComment._id).populate(
+      "userId",
+      "username name avatar",
+    );
+
+    res.status(201).json({ success: true, comment: populatedComment });
+  } catch (error) {
+    res.status(500).json({ success: false, message: "Server error." });
+  }
+};
