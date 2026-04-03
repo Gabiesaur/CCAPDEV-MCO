@@ -23,3 +23,4 @@ server/public/uploads
 *.njsproj
 *.sln
 *.sw?
+*.env
