@@ -1,15 +1,5 @@
-const path = require("path");
-const fs = require("fs");
 const Review = require("../models/Review");
 const Comment = require("../models/Comment");
-
-const uploadsDir = path.join(__dirname, "..", "public", "uploads");
-
-const ensureUploadsDir = () => {
-  if (!fs.existsSync(uploadsDir)) {
-    fs.mkdirSync(uploadsDir, { recursive: true });
-  }
-};
 
 exports.createReview = async (req, res) => {
   console.log("req.body:", req.body);
@@ -17,20 +7,10 @@ exports.createReview = async (req, res) => {
   try {
     const { userId, establishmentId, rating, title, body } = req.body;
 
-    // 1. Process Images using express-fileupload
+    // 1. Process images uploaded by multer + Cloudinary middleware
     let imageUrls = [];
-    if (req.files && req.files.images) {
-      ensureUploadsDir();
-      const files = Array.isArray(req.files.images)
-        ? req.files.images
-        : [req.files.images];
-
-      for (const file of files) {
-        const fileName = `${Date.now()}_${file.name}`;
-        const uploadPath = path.join(uploadsDir, fileName);
-        await file.mv(uploadPath);
-        imageUrls.push(`${process.env.BASE_URL}/uploads/${fileName}`);
-      }
+    if (req.files && req.files.length > 0) {
+      imageUrls = req.files.map((file) => file.path);
     }
 
     // 2. Save to Database
@@ -75,17 +55,8 @@ exports.updateReview = async (req, res) => {
         : [existingImages];
     }
 
-    if (req.files && req.files.images) {
-      ensureUploadsDir();
-      const files = Array.isArray(req.files.images)
-        ? req.files.images
-        : [req.files.images];
-      for (const file of files) {
-        const fileName = `${Date.now()}_${file.name}`;
-        const uploadPath = path.join(uploadsDir, fileName);
-        await file.mv(uploadPath);
-        imageUrls.push(`${process.env.BASE_URL}/uploads/${fileName}`);
-      }
+    if (req.files && req.files.length > 0) {
+      imageUrls.push(...req.files.map((file) => file.path));
     }
     existingReview.images = imageUrls;
 
@@ -114,12 +85,10 @@ exports.toggleReviewVote = async (req, res) => {
     const { userId, type } = req.body;
 
     if (!userId)
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "Unauthorized. Please login to vote.",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "Unauthorized. Please login to vote.",
+      });
 
     const reviewId = req.params.id;
     const review = await Review.findById(reviewId);
@@ -243,12 +212,10 @@ exports.createReviewComment = async (req, res) => {
 
     // Check if logged in
     if (!userId) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "You must be logged in to post a comment.",
-        });
+      return res.status(401).json({
+        success: false,
+        message: "You must be logged in to post a comment.",
+      });
     }
 
     // Create and save the new comment

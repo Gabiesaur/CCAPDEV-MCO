@@ -1,18 +1,18 @@
-const Establishment = require('../models/Establishment');
-const Review = require('../models/Review');
-const User = require('../models/User');
-const mongoose = require('mongoose');
+const Establishment = require("../models/Establishment");
+const Review = require("../models/Review");
+const User = require("../models/User");
+const mongoose = require("mongoose");
 
 exports.getAllEstablishments = async (req, res) => {
   try {
     const establishments = await Establishment.aggregate([
       {
         $lookup: {
-          from: 'reviews',
-          localField: '_id',
-          foreignField: 'establishmentId',
-          as: 'reviews'
-        }
+          from: "reviews",
+          localField: "_id",
+          foreignField: "establishmentId",
+          as: "reviews",
+        },
       },
       {
         $addFields: {
@@ -21,16 +21,16 @@ exports.getAllEstablishments = async (req, res) => {
             $cond: {
               if: { $gt: [{ $size: "$reviews" }, 0] },
               then: { $round: [{ $avg: "$reviews.rating" }, 1] },
-              else: 0
-            }
-          }
-        }
+              else: 0,
+            },
+          },
+        },
       },
       {
         $project: {
-          reviews: 0
-        }
-      }
+          reviews: 0,
+        },
+      },
     ]);
     res.json(establishments);
   } catch (error) {
@@ -67,13 +67,18 @@ exports.getEstablishmentOwner = async (req, res) => {
     }
 
     const owner = await User.findOne({
-      ownedEstablishmentId: { $in: queryValues }
-    }).select('_id username name avatar');
+      ownedEstablishmentId: { $in: queryValues },
+    }).select("_id username name avatar");
 
     console.log(`[owner lookup] estId=${estId}, found=${!!owner}`);
 
     if (!owner) {
-      return res.status(404).json({ success: false, message: "No owner found for this establishment" });
+      return res
+        .status(404)
+        .json({
+          success: false,
+          message: "No owner found for this establishment",
+        });
     }
     res.json({ success: true, owner });
   } catch (error) {
@@ -87,15 +92,27 @@ exports.applyEstablishment = async (req, res) => {
   try {
     // With FormData, text fields are in req.body
     console.log("req.body:", req.body);
-    const { establishmentName, address, establishmentType, email, contactInfo, contactName } = req.body;
+    const {
+      establishmentName,
+      address,
+      establishmentType,
+      email,
+      contactInfo,
+      contactName,
+    } = req.body;
 
     // 1. Check if a user with the entered email already exists
     const existingUser = await User.findOne({
-      email: email
+      email: email,
     });
 
     if (existingUser) {
-      return res.status(400).json({ success: false, message: "Email already taken by an existing user." });
+      return res
+        .status(400)
+        .json({
+          success: false,
+          message: "Email already taken by an existing user.",
+        });
     }
 
     // 3. Create and save the new establishment with defaults
@@ -110,15 +127,18 @@ exports.applyEstablishment = async (req, res) => {
       businessHours: "7:00 AM - 7:00 PM",
       location: "Taft Ave (Near DLSU)",
       description: "A newly applied establishment on Taftics.",
-      isOfficial: false
+      isOfficial: false,
     });
 
     await newEstablishment.save();
-    res.status(201).json({ success: true, message: "Application submitted successfully!" });
-
+    res
+      .status(201)
+      .json({ success: true, message: "Application submitted successfully!" });
   } catch (error) {
     console.error("Application error:", error);
-    res.status(500).json({ success: false, message: "Server error during application." });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error during application." });
   }
 };
 
@@ -126,7 +146,7 @@ exports.getEstablishmentReviews = async (req, res) => {
   try {
     // Find all reviews where establishmentId matches the URL parameter
     const reviews = await Review.find({ establishmentId: req.params.id })
-      .populate('userId', 'username name avatar')
+      .populate("userId", "username name avatar")
       .sort({ date: -1 }); // Sort by newest first
 
     res.json(reviews);
@@ -134,18 +154,18 @@ exports.getEstablishmentReviews = async (req, res) => {
     console.error("Error fetching reviews:", error);
     res.status(500).json({ message: "Server error" });
   }
-}
+};
 
 exports.updateEstablishment = async (req, res) => {
   try {
     const { name, category, startTime, endTime, location } = req.body;
 
     const formatTime = (timeStr) => {
-      if (!timeStr) return '';
-      if (timeStr.includes('AM') || timeStr.includes('PM')) return timeStr; // Already formatted
-      const [hourStr, minStr] = timeStr.split(':');
+      if (!timeStr) return "";
+      if (timeStr.includes("AM") || timeStr.includes("PM")) return timeStr; // Already formatted
+      const [hourStr, minStr] = timeStr.split(":");
       let hour = parseInt(hourStr, 10);
-      const ampm = hour >= 12 ? 'PM' : 'AM';
+      const ampm = hour >= 12 ? "PM" : "AM";
       hour = hour % 12;
       hour = hour ? hour : 12;
       return `${hour}:${minStr} ${ampm}`;
@@ -156,48 +176,54 @@ exports.updateEstablishment = async (req, res) => {
     const establishment = await Establishment.findByIdAndUpdate(
       req.params.id,
       { name, category, businessHours: formattedHours, location },
-      { new: true }
+      { new: true },
     );
 
     if (!establishment) {
-      return res.status(404).json({ success: false, message: "Establishment not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Establishment not found" });
     }
 
     res.json({ success: true, establishment });
   } catch (error) {
     console.error("Error updating establishment:", error);
-    res.status(500).json({ success: false, message: "Failed to update establishment details" });
+    res
+      .status(500)
+      .json({
+        success: false,
+        message: "Failed to update establishment details",
+      });
   }
-}
+};
 
 exports.uploadEstablishmentImg = async (req, res) => {
   try {
-    if (!req.files || !req.files.image) {
-      return res.status(400).json({ success: false, message: "No image uploaded" });
+    if (!req.file) {
+      return res
+        .status(400)
+        .json({ success: false, message: "No image uploaded" });
     }
 
-    const imageFile = req.files.image;
-    const fileName = `est_${Date.now()}_${imageFile.name}`;
-    const uploadPath = path.join(__dirname, 'public', 'uploads', fileName);
-
-    await imageFile.mv(uploadPath);
-
-    const imageUrl = `${process.env.BASE_URL}/uploads/${fileName}`;
+    const imageUrl = req.file.path;
 
     const updatedEst = await Establishment.findByIdAndUpdate(
       req.params.id,
       { image: imageUrl },
-      { new: true }
+      { new: true },
     );
 
     if (!updatedEst) {
-      return res.status(404).json({ success: false, message: "Establishment not found" });
+      return res
+        .status(404)
+        .json({ success: false, message: "Establishment not found" });
     }
 
     res.json({ success: true, establishment: updatedEst });
-
   } catch (error) {
     console.error("Establishment image upload error:", error);
-    res.status(500).json({ success: false, message: "Server error during upload" });
+    res
+      .status(500)
+      .json({ success: false, message: "Server error during upload" });
   }
-}
+};
