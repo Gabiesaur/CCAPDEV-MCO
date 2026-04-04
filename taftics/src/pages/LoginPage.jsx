@@ -69,7 +69,7 @@ const LoginPage = ({ onLogin }) => {
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               className="styled-input"
-              placeholder="e.g. leelanczerscx"
+              placeholder="user_name / name@dlsu.edu.ph"
             />
           </div>
 
