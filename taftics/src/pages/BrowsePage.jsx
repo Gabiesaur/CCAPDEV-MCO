@@ -4,8 +4,6 @@ import { useLocation } from "react-router-dom";
 import RatingFilter from "../components/browse/RatingFilter";
 import EstablishmentCard from "../components/browse/EstablishmentCard";
 
-// ❌ REMOVED: import { ESTABLISHMENTS } from "../data/mockData";
-
 const categories = [
   "Any",
   "School Supplies",
@@ -169,60 +167,62 @@ const BrowsePage = () => {
   }, []);
 
   // Filter establishments based on active filters, search query, AND the live database state
-  const filteredEstablishments = establishments.filter((est) => {
-    // Category filter
-    if (activeCategory !== "Any" && est.category !== activeCategory)
-      return false;
+  const filteredEstablishments = establishments
+    .filter((est) => {
+      // Category filter
+      if (activeCategory !== "Any" && est.category !== activeCategory)
+        return false;
 
-    // Minimum rating filter
-    if (minimumRating > 0 && Number(est.rating || 0) < minimumRating)
-      return false;
+      // Minimum rating filter
+      if (minimumRating > 0 && Number(est.rating || 0) < minimumRating)
+        return false;
 
-    // Hours filter
-    const hoursState = getHoursState(est.businessHours);
-    if (activeHour === "Open Now" && !hoursState.isOpenNow) return false;
-    if (activeHour === "24/7" && !hoursState.is24x7) return false;
+      // Hours filter
+      const hoursState = getHoursState(est.businessHours);
+      if (activeHour === "Open Now" && !hoursState.isOpenNow) return false;
+      if (activeHour === "24/7" && !hoursState.is24x7) return false;
 
-    // Search query filter
-    if (searchQuery.trim()) {
-      const searchableText = buildSearchableText(est);
-      const queryTokens = searchQuery
-        .toLowerCase()
-        .trim()
-        .split(/\s+/)
-        .filter(Boolean);
+      // Search query filter
+      if (searchQuery.trim()) {
+        const searchableText = buildSearchableText(est);
+        const queryTokens = searchQuery
+          .toLowerCase()
+          .trim()
+          .split(/\s+/)
+          .filter(Boolean);
 
-      const matchesSearch = queryTokens.every((token) =>
-        searchableText.includes(token),
-      );
+        const matchesSearch = queryTokens.every((token) =>
+          searchableText.includes(token),
+        );
 
-      if (!matchesSearch) return false;
-    }
+        if (!matchesSearch) return false;
+      }
 
-    return true; // Pass if all active filters match
-  }).sort((a, b) => {
-    // Search priority: Establishment name matches first
-    if (!searchQuery.trim()) return 0;
+      return true; // Pass if all active filters match
+    })
+    .sort((a, b) => {
+      // Search priority: Establishment name matches first
+      if (!searchQuery.trim()) return 0;
 
-    const query = searchQuery.toLowerCase().trim();
-    const aName = a.name.toLowerCase();
-    const bName = b.name.toLowerCase();
+      const query = searchQuery.toLowerCase().trim();
+      const aName = a.name.toLowerCase();
+      const bName = b.name.toLowerCase();
 
-    const aNameMatch = aName.includes(query);
-    const bNameMatch = bName.includes(query);
+      const aNameMatch = aName.includes(query);
+      const bNameMatch = bName.includes(query);
 
-    if (aNameMatch && !bNameMatch) return -1;
-    if (!aNameMatch && bNameMatch) return 1;
+      if (aNameMatch && !bNameMatch) return -1;
+      if (!aNameMatch && bNameMatch) return 1;
 
-    // Optional: Secondary sort by exact name match length (shorter name = more relevant)
-    if (aNameMatch && bNameMatch) {
-       if (aName === query && bName !== query) return -1;
-       if (aName !== query && bName === query) return 1;
-       return aName.length - bName.length;
-    }
+      // Optional: Secondary sort by exact name match length (shorter name = more relevant)
+      if (aNameMatch && bNameMatch) {
+        if (aName === query && bName !== query) return -1;
+        if (aName !== query && bName === query) return 1;
+        return aName.length - bName.length;
+      }
 
-    return 0;
-  });
+      return 0;
+    });
 
   return (
     <div className="bg-white min-vh-100">

@@ -51,7 +51,9 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchLandingData = async () => {
       try {
-        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/establishments`);
+        const res = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/establishments`,
+        );
         const data = await res.json();
 
         const sortedByRating = [...data].sort(
@@ -181,7 +183,7 @@ const LandingPage = () => {
         className="container text-center"
         style={{ paddingTop: "80px", paddingBottom: "80px" }}
       >
-        <h2 className="fw-bold mb-4">
+        <h2 className="fw-bold mb-5">
           Browse reviews by <span className="text-dlsu-dark">category</span>
         </h2>
         <div className="row g-3 justify-content-center row-cols-2 row-cols-md-3 row-cols-lg-5">
@@ -349,7 +351,10 @@ const LandingPage = () => {
                       style={{ maxWidth: "100%" }}
                     >
                       <img
-                        src={review.establishment.image || `https://ui-avatars.com/api/?name=${encodeURIComponent(review.establishment.name)}&background=00441b&color=fff&size=512&bold=true`}
+                        src={
+                          review.establishment.image ||
+                          `https://ui-avatars.com/api/?name=${encodeURIComponent(review.establishment.name)}&background=00441b&color=fff&size=512&bold=true`
+                        }
                         alt="shop"
                         className="rounded-circle me-2 object-cover"
                         style={{ width: "28px", height: "28px" }}
@@ -383,7 +388,7 @@ const LandingPage = () => {
 
         <div>
           <Link
-            className="btn btn-outline-dark rounded-pill px-4 mt-4 fw-bold text-decoration-none"
+            className="btn btn-outline-dark rounded-pill px-4 mt-5 fw-bold text-decoration-none"
             to="/browse"
           >
             Need a specific service? We'll help find it! ↗

@@ -86,7 +86,10 @@ const EstablishmentCard = ({
       <div className="mx-auto mb-4" style={{ height: "280px" }}>
         <Link to={`/establishment/${id}`} state={{ establishment }}>
           <img
-            src={image || `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00441b&color=fff&size=512&bold=true`}
+            src={
+              image ||
+              `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=00441b&color=fff&size=512&bold=true`
+            }
             className="w-100 h-100"
             style={{ objectFit: "cover", borderRadius: "12px" }}
             alt={name}
@@ -113,7 +116,7 @@ const EstablishmentCard = ({
             </p>
             <div className="d-inline-flex align-items-center gap-2">
               <span
-                className="badge rounded-pill"
+                className="badge text-uppercase rounded-pill"
                 style={{
                   backgroundColor: openStatus.known
                     ? openStatus.isOpen

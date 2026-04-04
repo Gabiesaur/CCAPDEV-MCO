@@ -11,6 +11,7 @@ function CreateReview() {
   const [hover, setHover] = React.useState(0);
   const [titleText, setTitleText] = React.useState("");
   const [reviewText, setReviewText] = React.useState("");
+  const [isSubmitting, setIsSubmitting] = React.useState(false);
 
   // Toast State
   const [showToast, setShowToast] = React.useState(false);
@@ -214,6 +215,10 @@ function CreateReview() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
+    if (isSubmitting) {
+      return;
+    }
+
     // 1. Basic Validation
     if (rating === 0) {
       alert("Please provide a rating.");
@@ -227,6 +232,8 @@ function CreateReview() {
       alert("Please choose an establishment before submitting this review.");
       return;
     }
+
+    setIsSubmitting(true);
 
     // 2. Prepare FormData (required for file uploads)
     const formData = new FormData();
@@ -242,10 +249,13 @@ function CreateReview() {
     });
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews`, {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/reviews`,
+        {
+          method: "POST",
+          body: formData,
+        },
+      );
 
       if (!response.ok) {
         const errResult = await response.json().catch(() => ({}));
@@ -254,11 +264,13 @@ function CreateReview() {
 
       const result = await response.json();
 
+      setIsSubmitting(false);
       triggerToast("Review submitted successfully! Redirecting...");
       setTimeout(() => {
         navigate(`/establishment/${selectedEstablishment._id}`);
       }, 2000);
     } catch (err) {
+      setIsSubmitting(false);
       console.error("Submission error:", err);
       alert(
         err.message || "Something went wrong while submitting your review.",
@@ -590,8 +602,9 @@ function CreateReview() {
               <button
                 onClick={handleSubmit}
                 className="btn btn-dlsu-dark w-100 py-3 rounded-pill fw-bold mt-2 shadow-sm"
+                disabled={isSubmitting}
               >
-                Submit Review
+                {isSubmitting ? "Submitting Review..." : "Submit Review"}
               </button>
             </div>
           </div>
