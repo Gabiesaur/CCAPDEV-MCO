@@ -66,11 +66,21 @@ export default function MyProfilePage({ user, setUser }) {
 
     // Fetch Review Arrays
     Promise.all([
-      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/bookmarks`).then(res => res.json()),
-      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/helpful-reviews`).then(res => res.json()),
-      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/unhelpful-reviews`).then(res => res.json()),
-      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/reviews`).then(res => res.json()),
-      fetch(`${import.meta.env.VITE_API_URL}/api/users/${user._id}/comments`).then(res => res.json())
+      fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/${user._id}/bookmarks`,
+      ).then((res) => res.json()),
+      fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/${user._id}/helpful-reviews`,
+      ).then((res) => res.json()),
+      fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/${user._id}/unhelpful-reviews`,
+      ).then((res) => res.json()),
+      fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/${user._id}/reviews`,
+      ).then((res) => res.json()),
+      fetch(
+        `${import.meta.env.VITE_API_URL}/api/users/${user._id}/comments`,
+      ).then((res) => res.json()),
     ])
       .then(([savedData, helpfulData, unhelpfulData, revData, commentData]) => {
         setSavedEstablishments(Array.isArray(savedData) ? savedData : []);
@@ -149,26 +159,38 @@ export default function MyProfilePage({ user, setUser }) {
           <div className="col-lg-8">
             <div className="d-flex flex-wrap gap-2 mb-4">
               <TabButton id="reviews" icon={Star} label="My Reviews" />
-              <TabButton id="comments" icon={MessageSquare} label="My Comments" />
+              <TabButton
+                id="comments"
+                icon={MessageSquare}
+                label="My Comments"
+              />
               <TabButton id="saved" icon={BookMarked} label="Saved" />
               <TabButton id="helpful" icon={ThumbsUp} label="Helpful Reviews" />
-              <TabButton id="unhelpful" icon={ThumbsDown} label="Unhelpful Reviews" />
+              <TabButton
+                id="unhelpful"
+                icon={ThumbsDown}
+                label="Unhelpful Reviews"
+              />
             </div>
 
             {/* Dynamic Content Rendering */}
             <div>
               {isLoading ? (
-                  <div className="text-muted py-3">Loading active data...</div>
+                <div className="text-muted py-3">Loading active data...</div>
               ) : (
                 <>
                   {activeTab === "reviews" && (
                     <div className="py-3">
-                      <h6 className="text-muted mb-4 border-bottom pb-2">Your Authored Reviews</h6>
+                      <h6 className="text-muted mb-4 border-bottom pb-2">
+                        Your Authored Reviews
+                      </h6>
                       {myReviews.length === 0 ? (
-                        <p className="text-muted">You haven't written any reviews yet.</p>
+                        <p className="text-muted">
+                          You haven't written any reviews yet.
+                        </p>
                       ) : (
                         myReviews.map((rev) => (
-                           <ProfileReviews key={rev._id} review={rev} />
+                          <ProfileReviews key={rev._id} review={rev} />
                         ))
                       )}
                     </div>
@@ -176,25 +198,32 @@ export default function MyProfilePage({ user, setUser }) {
 
                   {activeTab === "comments" && (
                     <div className="py-3">
-                      <h6 className="text-muted mb-4 border-bottom pb-2">Your Comments</h6>
-                      
+                      <h6 className="text-muted mb-4 border-bottom pb-2">
+                        Your Comments
+                      </h6>
+
                       {myComments.length === 0 ? (
-                        <p className="text-muted">You haven't posted any comments yet.</p>
+                        <p className="text-muted">
+                          You haven't posted any comments yet.
+                        </p>
                       ) : (
                         myComments.map((comment) => (
-                          <ProfileComments 
-                            key={comment._id} 
+                          <ProfileComments
+                            key={comment._id}
                             isOwnProfile={true}
                             comment={{
                               _id: comment._id,
                               reviewId: comment.reviewId?._id,
                               // Pull the original review details populated from the backend
-                              postTitle: comment.reviewId?.title || "Deleted Review",
-                              postAuthor: comment.reviewId?.userId?.username || "Unknown User",
+                              postTitle:
+                                comment.reviewId?.title || "Deleted Review",
+                              postAuthor:
+                                comment.reviewId?.userId?.username ||
+                                "Unknown User",
                               postRating: comment.reviewId?.rating || 0,
                               date: new Date(comment.date).toLocaleDateString(),
-                              body: comment.text || comment.body // Fallback depending on your schema
-                            }} 
+                              body: comment.text || comment.body, // Fallback depending on your schema
+                            }}
                           />
                         ))
                       )}
@@ -203,12 +232,19 @@ export default function MyProfilePage({ user, setUser }) {
 
                   {activeTab === "saved" && (
                     <div className="py-3">
-                      <h6 className="text-muted mb-4 text-capitalize border-bottom pb-2">Your Saved Establishments</h6>
+                      <h6 className="text-muted mb-4 text-capitalize border-bottom pb-2">
+                        Your Saved Establishments
+                      </h6>
                       {savedEstablishments.length === 0 ? (
-                        <p className="text-muted">You haven't saved any establishments yet.</p>
+                        <p className="text-muted">
+                          You haven't saved any establishments yet.
+                        </p>
                       ) : (
                         savedEstablishments.map((est) => (
-                           <ProfileSavedEstablishmentCard key={est._id} establishment={est} />
+                          <ProfileSavedEstablishmentCard
+                            key={est._id}
+                            establishment={est}
+                          />
                         ))
                       )}
                     </div>
@@ -216,12 +252,16 @@ export default function MyProfilePage({ user, setUser }) {
 
                   {activeTab === "helpful" && (
                     <div className="py-3">
-                      <h6 className="text-muted mb-4 border-bottom pb-2">Reviews You Marked as Helpful</h6>
+                      <h6 className="text-muted mb-4 border-bottom pb-2">
+                        Reviews You Marked as Helpful
+                      </h6>
                       {helpfulReviews.length === 0 ? (
-                        <p className="text-muted">You haven't marked any reviews as helpful.</p>
+                        <p className="text-muted">
+                          You haven't marked any reviews as helpful.
+                        </p>
                       ) : (
                         helpfulReviews.map((rev) => (
-                           <ProfileReviews key={rev._id} review={rev} />
+                          <ProfileReviews key={rev._id} review={rev} />
                         ))
                       )}
                     </div>
@@ -229,12 +269,16 @@ export default function MyProfilePage({ user, setUser }) {
 
                   {activeTab === "unhelpful" && (
                     <div className="py-3">
-                      <h6 className="text-muted mb-4 border-bottom pb-2">Reviews You Marked as Unhelpful</h6>
+                      <h6 className="text-muted mb-4 border-bottom pb-2">
+                        Reviews You Marked as Unhelpful
+                      </h6>
                       {unhelpfulReviews.length === 0 ? (
-                        <p className="text-muted">You haven't marked any reviews as unhelpful.</p>
+                        <p className="text-muted">
+                          You haven't marked any reviews as unhelpful.
+                        </p>
                       ) : (
                         unhelpfulReviews.map((rev) => (
-                           <ProfileReviews key={rev._id} review={rev} />
+                          <ProfileReviews key={rev._id} review={rev} />
                         ))
                       )}
                     </div>

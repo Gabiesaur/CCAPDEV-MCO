@@ -161,13 +161,17 @@ export default function ProfileEditModal({
               </div>
 
               <div>
-                <label className="form-label fw-semibold">Confirm New Password</label>
+                <label className="form-label fw-semibold">
+                  Confirm New Password
+                </label>
                 <input
                   type="password"
                   className="form-control"
                   placeholder="Re-enter new password"
                   value={formData.confirmPassword}
-                  onChange={(e) => handleChange("confirmPassword", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("confirmPassword", e.target.value)
+                  }
                   disabled={loading}
                 />
               </div>
