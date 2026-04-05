@@ -5,11 +5,13 @@ import { useEffect } from "react";
 import ProfileHeader from "../components/profile/ProfileHeader";
 import ImageUploadModal from "../components/profile/ImageUploadModal";
 import EstablishmentImageUploadModal from "../components/profile/EstablishmentImageUploadModal";
+import ProfileEditModal from "../components/profile/ProfileEditModal";
 import { Camera } from "lucide-react";
 
 export default function OwnerProfilePage({ user, setUser }) {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isEstImageModalOpen, setIsEstImageModalOpen] = useState(false);
   const [isEditingStore, setIsEditingStore] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -185,6 +187,7 @@ export default function OwnerProfilePage({ user, setUser }) {
         avatar={user.avatar}
         isOwnProfile={true}
         onCameraClick={() => setIsModalOpen(true)}
+        onEditProfileClick={() => setIsEditProfileModalOpen(true)}
       />
 
       <ImageUploadModal
@@ -198,6 +201,20 @@ export default function OwnerProfilePage({ user, setUser }) {
           }
           setIsModalOpen(false);
           triggerToast("Profile picture updated!");
+        }}
+      />
+
+      <ProfileEditModal
+        isOpen={isEditProfileModalOpen}
+        onClose={() => setIsEditProfileModalOpen(false)}
+        user={user}
+        onUpdateSuccess={(updatedUser) => {
+          if (setUser) {
+            setUser(updatedUser);
+            localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+            sessionStorage.setItem("currentUser", JSON.stringify(updatedUser));
+          }
+          triggerToast("Profile details updated!");
         }}
       />
 

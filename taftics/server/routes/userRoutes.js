@@ -16,6 +16,8 @@ router.put(
   userController.updateUserAvatar,
 );
 router.put("/:id/bio", userController.updateUserBio);
+router.put("/:id/profile", userController.updateUserProfile);
 router.get("/:id/comments", userController.getOwnedComments);
+
 
 module.exports = router;

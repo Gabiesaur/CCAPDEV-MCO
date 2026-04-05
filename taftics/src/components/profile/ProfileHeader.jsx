@@ -1,4 +1,4 @@
-import { Camera } from "lucide-react";
+import { Camera, Edit2 } from "lucide-react";
 
 export default function ProfileHeader({
   avatar,
@@ -6,6 +6,7 @@ export default function ProfileHeader({
   username,
   isOwnProfile,
   onCameraClick, // 1. Add this prop
+  onEditProfileClick,
 }) {
   return (
     <div style={{ width: "100%" }}>
@@ -39,12 +40,24 @@ export default function ProfileHeader({
 
           {/* User Info */}
           <div className="mb-2 text-white" style={{ paddingTop: "10px" }}>
-            <h1
-              className="text-dlsu-dark fw-bold mb-0"
-              style={{ textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}
-            >
-              {name}
-            </h1>
+            <div className="d-flex align-items-center gap-2">
+              <h1
+                className="text-dlsu-dark fw-bold mb-0"
+                style={{ textShadow: "0 2px 4px rgba(0,0,0,0.3)" }}
+              >
+                {name}
+              </h1>
+              {isOwnProfile && (
+                <button
+                  type="button"
+                  onClick={onEditProfileClick}
+                  className="btn btn-light border rounded-circle p-2 shadow-sm"
+                  aria-label="Edit profile details"
+                >
+                  <Edit2 size={16} className="text-secondary" />
+                </button>
+              )}
+            </div>
             <p className="text-dlsu-dark fs-5 mb-0 opacity-75">@{username}</p>
           </div>
         </div>

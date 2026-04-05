@@ -2,6 +2,7 @@ const User = require("../models/User");
 const Review = require("../models/Review");
 const Comment = require("../models/Comment");
 const Establishment = require("../models/Establishment");
+const bcrypt = require("bcrypt");
 
 exports.getAllUsers = async (req, res) => {
   try {
@@ -261,6 +262,84 @@ exports.updateUserBio = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Server error updating bio" });
+  }
+};
+
+exports.updateUserProfile = async (req, res) => {
+  try {
+    const { username, name, password } = req.body;
+
+    const updatePayload = {};
+
+    if (typeof username === "string") {
+      const trimmedUsername = username.trim();
+      if (!trimmedUsername) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Username cannot be empty." });
+      }
+
+      const existingUsername = await User.findOne({
+        username: trimmedUsername,
+        _id: { $ne: req.params.id },
+      }).select("_id");
+
+      if (existingUsername) {
+        return res.status(400).json({
+          success: false,
+          message: "Username is already taken.",
+        });
+      }
+
+      updatePayload.username = trimmedUsername;
+    }
+
+    if (typeof name === "string") {
+      const trimmedName = name.trim();
+      if (!trimmedName) {
+        return res
+          .status(400)
+          .json({ success: false, message: "Name cannot be empty." });
+      }
+      updatePayload.name = trimmedName;
+    }
+
+    if (typeof password === "string" && password.length > 0) {
+      if (password.length < 6) {
+        return res.status(400).json({
+          success: false,
+          message: "Password must be at least 6 characters long.",
+        });
+      }
+
+      updatePayload.password = await bcrypt.hash(password, 10);
+    }
+
+    if (Object.keys(updatePayload).length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "No valid fields provided for update.",
+      });
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(
+      req.params.id,
+      updatePayload,
+      { returnDocument: "after" },
+    ).select("-password");
+
+    if (!updatedUser) {
+      return res
+        .status(404)
+        .json({ success: false, message: "User not found" });
+    }
+
+    res.json({ success: true, user: updatedUser });
+  } catch (error) {
+    console.error("Profile update error:", error);
+    res
+      .status(500)
+      .json({ success: false, message: "Server error updating profile" });
   }
 };
 

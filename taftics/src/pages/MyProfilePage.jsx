@@ -15,12 +15,14 @@ import ProfileStatistics from "../components/profile/ProfileStatistics";
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 import ImageUploadModal from "../components/profile/ImageUploadModal";
+import ProfileEditModal from "../components/profile/ProfileEditModal";
 import ProfileSavedEstablishmentCard from "../components/profile/ProfileSavedEstablishmentCard";
 
 export default function MyProfilePage({ user, setUser }) {
   // UI State
   const [activeTab, setActiveTab] = useState("reviews");
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
 
   // Mock Comment Data
   const mockComment = {
@@ -106,6 +108,7 @@ export default function MyProfilePage({ user, setUser }) {
         avatar={user.avatar}
         isOwnProfile={true}
         onCameraClick={() => setIsModalOpen(true)}
+        onEditProfileClick={() => setIsEditProfileModalOpen(true)}
       />
 
       <ImageUploadModal
@@ -117,6 +120,18 @@ export default function MyProfilePage({ user, setUser }) {
           localStorage.setItem("currentUser", JSON.stringify(updatedUser));
           setIsModalOpen(false);
           triggerToast("Profile picture updated successfully!", "success");
+        }}
+      />
+
+      <ProfileEditModal
+        isOpen={isEditProfileModalOpen}
+        onClose={() => setIsEditProfileModalOpen(false)}
+        user={user}
+        onUpdateSuccess={(updatedUser) => {
+          setUser(updatedUser);
+          localStorage.setItem("currentUser", JSON.stringify(updatedUser));
+          sessionStorage.setItem("currentUser", JSON.stringify(updatedUser));
+          triggerToast("Profile details updated successfully!", "success");
         }}
       />
 
