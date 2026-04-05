@@ -130,20 +130,20 @@ const LandingPage = () => {
         className="container text-center"
         style={{ paddingTop: "100px", paddingBottom: "80px" }}
       >
-        <h1 className="fw-bold display-4 mt-5">
+        <h1 className="fw-bold display-3 mt-5">
           Every <span className="text-dlsu-dark">Archer</span> needs a strategy.
         </h1>
         <p className="text-muted fs-5">
           Find the best services and essentials around Taft with peer-verified
           reviews.
         </p>
-        <div className="mx-auto mt-5 px-3" style={{ maxWidth: "800px" }}>
+        <div className="mx-auto mt-5 px-3" style={{ maxWidth: "1000px" }}>
           <form
             onSubmit={handleSearchSubmit}
-            className="input-group shadow-lg rounded-pill overflow-hidden bg-white p-2 border border-light"
+            className="input-group shadow-sm rounded-pill overflow-hidden bg-white p-1 border border-light"
           >
             <span className="input-group-text bg-white border-0 ps-4">
-              <Search size={22} className="text-dlsu-primary" />
+              <Search size={24} className="text-dlsu-dark" />
             </span>
             <input
               type="text"
@@ -155,7 +155,7 @@ const LandingPage = () => {
             />
             <button
               type="submit"
-              className="btn btn-dlsu-dark rounded-pill px-5 fw-bold shadow-sm ms-2 d-flex align-items-center"
+              className="btn btn-dlsu-dark rounded-pill px-5 fw-semibold shadow-sm ms-2 d-flex align-items-center"
             >
               Search
             </button>
@@ -221,7 +221,6 @@ const LandingPage = () => {
             {topRatedEstablishments.map((store) => (
               <div key={store._id} className="col-md-4">
                 {" "}
-                {/* ✅ CHANGED: store._id */}
                 <EstablishmentCardSmall
                   id={store._id}
                   name={store.name}
@@ -275,7 +274,7 @@ const LandingPage = () => {
                       className="rounded-circle me-3 object-cover"
                       style={{ width: "40px", height: "40px" }}
                     />
-                    <div>
+                    <div className="d-flex flex-column justify-content-center">
                       <Link
                         to={
                           review.username ? `/profile/${review.username}` : "#"
@@ -285,10 +284,11 @@ const LandingPage = () => {
                       >
                         {review.user}
                       </Link>
+                      <small className="text-muted">{review.date}</small>
                     </div>
                   </div>
 
-                  <div className="d-flex justify-content-between mb-2">
+                  <div className="d-flex justify-content-between mb-3">
                     <div className="d-flex gap-1 text-dlsu-primary">
                       {[...Array(5)].map((_, i) => (
                         <Star
@@ -303,7 +303,6 @@ const LandingPage = () => {
                         />
                       ))}
                     </div>
-                    <small className="text-muted">{review.date}</small>
                   </div>
 
                   <Link

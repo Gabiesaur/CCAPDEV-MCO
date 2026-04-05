@@ -2,12 +2,13 @@
    1. FONTS
    ========================================= */
 /* Import Overpass from Google Fonts */
-@import url('https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Overpass:wght@400;600;700;800&display=swap");
 
 body {
-    font-family: 'Overpass', sans-serif;
-    background-color: #f8f9fa;
-    color: #212529;
+  font-family: "Overpass", sans-serif;
+  background-color: #f8f9fa;
+  color: #212529;
+  letter-spacing: -0.02em;
 }
 
 /* =========================================
@@ -15,51 +16,51 @@ body {
    ========================================= */
 
 /* DARK GREEN (#00441B) - Use for: Navbar, Footers, Headings */
-.bg-dlsu-dark { 
-    background-color: #00441B !important; 
-    color: white;
+.bg-dlsu-dark {
+  background-color: #00441b !important;
+  color: white;
 }
-.text-dlsu-dark { 
-    color: #00441B !important; 
+.text-dlsu-dark {
+  color: #00441b !important;
 }
 .btn-dlsu-dark {
-    background-color: #00441B;
-    color: white;
-    border: 1px solid #00441B;
+  background-color: #00441b;
+  color: white;
+  border: 1px solid #00441b;
 }
 .btn-dlsu-dark:hover {
-    background-color: #003314;
-    color: white;
+  background-color: #003314;
+  color: white;
 }
 
 /* PRIMARY GREEN (#41AB5D) - Use for: Main Buttons, Active Stars, Links */
-.bg-dlsu-primary { 
-    background-color: #41AB5D !important; 
-    color: white;
+.bg-dlsu-primary {
+  background-color: #41ab5d !important;
+  color: white;
 }
-.text-dlsu-primary { 
-    color: #41AB5D !important; 
+.text-dlsu-primary {
+  color: #41ab5d !important;
 }
 
 /* LIGHT GREEN (#C7E9C0) - Use for: Secondary Buttons, Badges, Background Accents */
-.bg-dlsu-light { 
-    background-color: #C7E9C0 !important; 
-    color: #00441B; /* Dark text for contrast */
+.bg-dlsu-light {
+  background-color: #c7e9c0 !important;
+  color: #00441b; /* Dark text for contrast */
 }
-.text-dlsu-light { 
-    color: #C7E9C0 !important; 
+.text-dlsu-light {
+  color: #c7e9c0 !important;
 }
 
 /* Custom Button: Light Green Background with Dark Text */
 .btn-dlsu-light {
-    background-color: #C7E9C0;
-    color: #00441B;
-    font-weight: 700;
-    border: none;
+  background-color: #c7e9c0;
+  color: #00441b;
+  font-weight: 700;
+  border: none;
 }
 .btn-dlsu-light:hover {
-    background-color: #aed9a5; /* Slightly darker on hover */
-    color: #00441B;
+  background-color: #aed9a5; /* Slightly darker on hover */
+  color: #00441b;
 }
 
 /* =========================================
@@ -68,17 +69,17 @@ body {
 
 /* Custom Card: Adds the rounded corners and shadow from the design */
 .custom-card {
-    background-color: rgb(255, 255, 255);
-    border: 1px solid #e9ecef;
-    border-radius: 12px; /* Smooth rounded corners */
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Subtle shadow */
-    transition: transform 0.2s ease-in-out;
+  background-color: rgb(255, 255, 255);
+  border: 1px solid #e9ecef;
+  border-radius: 12px; /* Smooth rounded corners */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); /* Subtle shadow */
+  transition: transform 0.2s ease-in-out;
 }
 
 /* Optional: Hover effect for cards that are clickable */
 .custom-card.hover-effect:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 /* =========================================
@@ -86,22 +87,22 @@ body {
    ========================================= */
 
 /* Makes images fill their container without stretching */
-.object-cover { 
-    object-fit: cover; 
+.object-cover {
+  object-fit: cover;
 }
 
 /* Pointer cursor for non-button interactive elements */
-.pointer-cursor { 
-    cursor: pointer; 
+.pointer-cursor {
+  cursor: pointer;
 }
 
 /* Hides scrollbar but allows scrolling (Good for horizontal lists) */
 .no-scrollbar::-webkit-scrollbar {
-    display: none;
+  display: none;
 }
 .no-scrollbar {
-    -ms-overflow-style: none;  /* IE and Edge */
-    scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 /* =========================================
@@ -123,87 +124,95 @@ body {
 
 /* IMAGE POPUP */
 .glass-backdrop {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    /* Darker green-tinted transparent base */
-    background: rgba(0, 20, 10, 0.6); 
-    backdrop-filter: blur(12px) saturate(180%);
-    -webkit-backdrop-filter: blur(12px) saturate(180%);
-    z-index: 1050;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  /* Darker green-tinted transparent base */
+  background: rgba(0, 20, 10, 0.6);
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+  z-index: 1050;
 }
 
 /* Success Toast Animation */
 @keyframes slideInUp {
-    from { transform: translateY(100%); opacity: 0; }
-    to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .toast-success-custom {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    background: #00441B; /* DLSU Dark Green */
-    color: #C7E9C0;    /* DLSU Light Green */
-    padding: 16px 24px;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
-    z-index: 2000;
-    animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    border: 1px solid rgba(199, 233, 192, 0.2);
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: #00441b; /* DLSU Dark Green */
+  color: #c7e9c0; /* DLSU Light Green */
+  padding: 16px 24px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+  z-index: 2000;
+  animation: slideInUp 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(199, 233, 192, 0.2);
 }
 
 .custom-bg {
   background-image:
-    linear-gradient(to bottom,
-      rgba(0,0,0,0) 60%,
-      rgba(0,0,0,0.6) 80%,
-      rgba(0,0,0,1) 100%),
-    url('/src/assets/campus-manila.jpg');
+    linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0) 60%,
+      rgba(0, 0, 0, 0.6) 80%,
+      rgba(0, 0, 0, 1) 100%
+    ),
+    url("/src/assets/campus-manila.jpg");
   background-size: cover;
   background-position: center;
   border-radius: 12px 12px 0 0;
 }
 
 .textBox {
-    background-color: #d1d2d6;
-    border-radius: 15px;
+  background-color: #d1d2d6;
+  border-radius: 15px;
 }
 
 .category-box {
-    background-color: #41AB5D;
-    border-radius: 5px;
+  background-color: #41ab5d;
+  border-radius: 5px;
 }
 
 .bar {
-    background-color: #41AB5D;
-    height: 10px;
-    border-radius: 5px;
+  background-color: #41ab5d;
+  height: 10px;
+  border-radius: 5px;
 }
 
 .button {
-    background-color: #00441B;
-    border-color: #212529;
+  background-color: #00441b;
+  border-color: #212529;
 }
 
 .button:hover {
-    background-color: #41AB5D;
-    border-color: #212529;
+  background-color: #41ab5d;
+  border-color: #212529;
 }
 
 .establishment-image {
-    background-image: url('/src/assets/campus-manila.jpg');
-    background-size: cover;
-    background-position: center;
-    filter: brightness(0.9);
+  background-image: url("/src/assets/campus-manila.jpg");
+  background-size: cover;
+  background-position: center;
+  filter: brightness(0.9);
 }
 
 .rating-box {
-    background-color: #C7E9C0;
-    border-radius: 5px;
+  background-color: #c7e9c0;
+  border-radius: 5px;
 }
