@@ -41,9 +41,18 @@ const OwnerAppPage = ({ onApply }) => {
       return;
     }
 
+    const submitData = {
+      establishmentName: formData.establishmentName,
+      address: formData.address,
+      establishmentType: formData.establishmentType,
+      email: formData.email,
+      contactInfo: formData.contactInfo,
+      contactName: formData.contactName
+    };
+
     // 2. Send to App.jsx and wait for the response
     setIsSubmitting(true);
-    const result = await onApply(formData);
+    const result = await onApply(submitData);
     
     if (result.success) {
       triggerToast("Application submitted successfully! Redirecting...");

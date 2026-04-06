@@ -172,6 +172,8 @@ const BrowsePage = () => {
   const filteredEstablishments = establishments
     .filter((est) => {
       // Category filter
+      if (!est.isOfficial) return false;
+
       if (activeCategory !== "Any" && est.category !== activeCategory)
         return false;
 

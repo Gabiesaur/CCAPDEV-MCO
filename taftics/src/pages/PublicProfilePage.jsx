@@ -34,24 +34,8 @@ export default function PublicProfilePage({ db, currentUser }) {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  // 0. Redirect if viewing own profile
-  if (currentUser && currentUser.username === username) {
-    return <Navigate to="/profile/me" replace />;
-  }
-
   // 1. Find the User
   const publicUser = db.find((u) => u.username === username);
-
-  if (!publicUser) {
-    return (
-      <div className="p-5 text-center">
-        <h1>User @{username} not found.</h1>
-        <Link to="/" className="btn btn-dlsu-dark mt-3">
-          Go Home
-        </Link>
-      </div>
-    );
-  }
 
   useEffect(() => {
       if (!publicUser || !publicUser._id) return;
@@ -72,7 +56,31 @@ export default function PublicProfilePage({ db, currentUser }) {
           setIsLoading(false);
         });
     }, [publicUser]);
-  
+
+  if (currentUser && currentUser.username === username) {
+    return <Navigate to="/profile/me" replace />;
+  }
+
+  if (!db || db.length === 0) {
+    return (
+      <div className="min-vh-100 d-flex justify-content-center align-items-center bg-light">
+        <div className="spinner-border text-success" role="status">
+          <span className="visually-hidden">Loading profile...</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (!publicUser) {
+    return (
+      <div className="p-5 text-center">
+        <h1>User @{username} not found.</h1>
+        <Link to="/" className="btn btn-dlsu-dark mt-3">
+          Go Home
+        </Link>
+      </div>
+    );
+  }
 
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
