@@ -117,12 +117,13 @@ const RegPage = ({ onRegister }) => {
 
     setIsSubmitting(true);
 
-    const submitData = new FormData();
-    submitData.append("username", formData.username.trim());
-    submitData.append("name", formData.name.trim());
-    submitData.append("email", formData.email.trim());
-    submitData.append("password", formData.password);
-    submitData.append("dlsuId", formData.dlsuId.trim());
+    const submitData = {
+      username: formData.username.trim(),
+      name: formData.name.trim(),
+      email: formData.email.trim(),
+      password: formData.password,
+      dlsuId: formData.dlsuId.trim()
+    };
 
     try {
       const result = await onRegister(submitData);
