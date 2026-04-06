@@ -7,18 +7,6 @@ import ProfileStatistics from "../components/profile/ProfileStatistics";
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 
-const TabButton = ({ id, icon: Icon, label }) => (
-  <button
-    className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${activeTab === id
-      ? "bg-dlsu-light text-dlsu-dark border-0"
-      : "btn-light border text-muted"
-      }`}
-    onClick={() => setActiveTab(id)}
-  >
-    <Icon size={16} /> {label}
-  </button>
-);
-
 export default function PublicProfilePage({ db, currentUser }) {
   const { username } = useParams();
   const navigate = useNavigate(); // Added navigate hook
@@ -31,26 +19,6 @@ export default function PublicProfilePage({ db, currentUser }) {
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState("");
   const [toastIcon, setToastIcon] = useState(null);
-
-  useEffect(() => {
-      if (!publicUser || !publicUser._id) return;
-      setIsLoading(true);
-  
-      // Fetch Review Arrays
-      Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/reviews`).then(res => res.json()),
-        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/comments`).then(res => res.json())
-      ])
-        .then(([revData, commentData]) => {
-          setPublicReviews(Array.isArray(revData) ? revData : []);
-          setPublicComments(Array.isArray(commentData) ? commentData : []);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error("Failed fetching profile tabs data:", err);
-          setIsLoading(false);
-        });
-    }, [publicUser]);
 
   // Dynamic Toast Trigger
   const triggerToast = (message, iconType) => {
@@ -74,16 +42,6 @@ export default function PublicProfilePage({ db, currentUser }) {
   // 1. Find the User
   const publicUser = db.find((u) => u.username === username);
 
-  if (!db || db.length === 0) {
-    return (
-      <div className="min-vh-100 d-flex justify-content-center align-items-center bg-light">
-        <div className="spinner-border text-success" role="status">
-          <span className="visually-hidden">Loading profile...</span>
-        </div>
-      </div>
-    );
-  }
-
   if (!publicUser) {
     return (
       <div className="p-5 text-center">
@@ -94,6 +52,39 @@ export default function PublicProfilePage({ db, currentUser }) {
       </div>
     );
   }
+
+  useEffect(() => {
+      if (!publicUser || !publicUser._id) return;
+      setIsLoading(true);
+  
+      // Fetch Review Arrays
+      Promise.all([
+        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/reviews`).then(res => res.json()),
+        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/comments`).then(res => res.json())
+      ])
+        .then(([revData, commentData]) => {
+          setPublicReviews(Array.isArray(revData) ? revData : []);
+          setPublicComments(Array.isArray(commentData) ? commentData : []);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed fetching profile tabs data:", err);
+          setIsLoading(false);
+        });
+    }, [publicUser]);
+  
+
+  const TabButton = ({ id, icon: Icon, label }) => (
+    <button
+      className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${activeTab === id
+        ? "bg-dlsu-light text-dlsu-dark border-0"
+        : "btn-light border text-muted"
+        }`}
+      onClick={() => setActiveTab(id)}
+    >
+      <Icon size={16} /> {label}
+    </button>
+  );
 
   return (
     <div className="min-vh-100 pb-5 bg-light">
