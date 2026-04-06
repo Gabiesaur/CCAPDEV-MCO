@@ -1,6 +1,7 @@
 const Establishment = require('../models/Establishment');
 const User = require('../models/User');
 const Review = require('../models/Review');
+const bcrypt = require('bcrypt');
 
 exports.getAdminStats = async (req, res) => {
   try {
@@ -61,7 +62,7 @@ exports.approveEstablishment = async (req, res) => {
     }
 
     // C. Create the Owner User
-    const hashedPassword = await bcrypt.hash(password, count_salt);
+    const hashedPassword = await bcrypt.hash(password, 10);
     const newOwner = new User({
       username,
       name,
