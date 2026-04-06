@@ -120,26 +120,23 @@ function App() {
     }
   };
 
-  const apply = async (formData) => {
-    /*if (dbUsers.find((u) => u.email === applicant.email)) {
-      return { success: false, message: "Email already exists." };
-    }
-    return { success: true, message: "Application submitted!" };*/
+  const apply = async (data) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/apply`, {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
       });
 
-      const data = await response.json();
+      const responseData = await response.json();
 
-      if (data.success) {
-        return { success: true, message: data.message };
+      if (responseData.success) {
+        return { success: true, message: responseData.message };
       } else {
-        return { success: false, message: data.message || "Server error" };
+        return { success: false, message: responseData.message || "Server error" };
       }
     } catch (error) {
-      console.error("Failed to register:", error);
+      console.error("Failed to apply:", error);
       return { success: false, message: "Network error. Is the server running?" };
     }
   };
