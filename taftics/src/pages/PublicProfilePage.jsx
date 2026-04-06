@@ -7,6 +7,18 @@ import ProfileStatistics from "../components/profile/ProfileStatistics";
 import ProfileReviews from "../components/profile/ProfileReviews";
 import ProfileComments from "../components/profile/ProfileComments";
 
+const TabButton = ({ id, icon: Icon, label }) => (
+  <button
+    className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${activeTab === id
+      ? "bg-dlsu-light text-dlsu-dark border-0"
+      : "btn-light border text-muted"
+      }`}
+    onClick={() => setActiveTab(id)}
+  >
+    <Icon size={16} /> {label}
+  </button>
+);
+
 export default function PublicProfilePage({ db, currentUser }) {
   const { username } = useParams();
   const navigate = useNavigate(); // Added navigate hook
@@ -82,18 +94,6 @@ export default function PublicProfilePage({ db, currentUser }) {
       </div>
     );
   }
-
-  const TabButton = ({ id, icon: Icon, label }) => (
-    <button
-      className={`btn btn-sm d-flex align-items-center gap-2 fw-bold px-4 py-2 ${activeTab === id
-        ? "bg-dlsu-light text-dlsu-dark border-0"
-        : "btn-light border text-muted"
-        }`}
-      onClick={() => setActiveTab(id)}
-    >
-      <Icon size={16} /> {label}
-    </button>
-  );
 
   return (
     <div className="min-vh-100 pb-5 bg-light">
