@@ -130,7 +130,11 @@ exports.handleDeletionRequest = async (req, res) => {
     if (action === "approve") {
       // 1. Delete associated reviews
       await Review.deleteMany({ establishmentId: estId });
-      // 2. Delete the establishment
+      
+      // 2. Delete the owner user (account tied to the establishment)
+      await User.deleteOne({ ownedEstablishmentId: estId });
+      
+      // 3. Delete the establishment
       await Establishment.findByIdAndDelete(estId);
 
       res.json({ success: true, message: "Establishment deleted successfully." });
