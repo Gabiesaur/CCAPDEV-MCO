@@ -42,6 +42,16 @@ export default function PublicProfilePage({ db, currentUser }) {
   // 1. Find the User
   const publicUser = db.find((u) => u.username === username);
 
+  if (!db || db.length === 0) {
+    return (
+      <div className="min-vh-100 d-flex justify-content-center align-items-center bg-light">
+        <div className="spinner-border text-success" role="status">
+          <span className="visually-hidden">Loading profile...</span>
+        </div>
+      </div>
+    );
+  }
+
   if (!publicUser) {
     return (
       <div className="p-5 text-center">
