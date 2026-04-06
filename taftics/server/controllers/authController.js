@@ -107,12 +107,7 @@ exports.register = async (req, res) => {
         .json({ success: false, message: "Username or Email already taken." });
     }
 
-    // 2. Handle the Avatar File Upload
-    let avatarUrl = "https://ui-avatars.com/api/?name=" + username; // Default avatar
-
-    if (req.file) {
-      avatarUrl = req.file.path;
-    }
+    let avatarUrl = "https://ui-avatars.com/api/?name=" + username;
 
     const salt_rounds = count_salt;
     // 3. Create and save the new user
@@ -149,5 +144,45 @@ exports.register = async (req, res) => {
     res
       .status(500)
       .json({ success: false, message: "Server error during registration." });
+  }
+};
+
+exports.apply = async (req, res) => {
+  console.log("POST /api/apply hit");
+  try {
+    // With FormData, text fields are in req.body
+    console.log("req.body:", req.body);
+    const { establishmentName, address, establishmentType, email, contactInfo, contactName } = req.body;
+
+    // 1. Check if a user with the entered email already exists
+    const existingUser = await User.findOne({
+      email: email
+    });
+
+    if (existingUser) {
+      return res.status(400).json({ success: false, message: "Email already taken by an existing user." });
+    }
+
+    // 3. Create and save the new establishment with defaults
+    const newEstablishment = new Establishment({
+      name: establishmentName,
+      address,
+      category: establishmentType,
+      email,
+      contactNumber: contactInfo,
+      contactPerson: contactName,
+      image: "", // Triggers branded fallback in frontend
+      businessHours: "7:00 AM - 7:00 PM",
+      location: "Taft Ave (Near DLSU)",
+      description: "A newly applied establishment on Taftics.",
+      isOfficial: false
+    });
+
+    await newEstablishment.save();
+    res.status(201).json({ success: true, message: "Application submitted successfully!" });
+
+  } catch (error) {
+    console.error("Application error:", error);
+    res.status(500).json({ success: false, message: "Server error during application." });
   }
 };
