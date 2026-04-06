@@ -1,35 +1,51 @@
 const Review = require("../models/Review");
 const Comment = require("../models/Comment");
-const { cloudinary } = require("../config/cloudinary");
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
 
-const storage = new CloudinaryStorage({
-  cloudinary,
-  params: (req, file) => {
-    // Determine storage parameters based on file field name
-    if (file.fieldname === "videos") {
-      return {
-        folder: "taftics/videos",
-        allowed_formats: ["mp4", "mov", "avi", "mkv", "webm"],
-        resource_type: "video",
-      };
-    } else {
-      return {
-        folder: "taftics",
-        allowed_formats: ["jpg", "jpeg", "png", "webp"],
-        transformation: [{ width: 800, crop: "limit" }],
-      };
-    }
-  },
-});
+// Import cloudinary from config
+let cloudinary, storage, upload;
 
-const upload = multer({ 
-  storage,
-  limits: {
-    fileSize: 50 * 1024 * 1024, // 50MB limit per file
-  }
-});
+try {
+  const cloudinaryConfig = require("../config/cloudinary");
+  cloudinary = cloudinaryConfig.cloudinary;
+
+  storage = new CloudinaryStorage({
+    cloudinary,
+    params: (req, file) => {
+      // Determine storage parameters based on file field name
+      if (file.fieldname === "videos") {
+        return {
+          folder: "taftics/videos",
+          allowed_formats: ["mp4", "mov", "avi", "mkv", "webm"],
+          resource_type: "video",
+        };
+      } else {
+        return {
+          folder: "taftics",
+          allowed_formats: ["jpg", "jpeg", "png", "webp"],
+          transformation: [{ width: 800, crop: "limit" }],
+        };
+      }
+    },
+  });
+
+  upload = multer({ 
+    storage,
+    limits: {
+      fileSize: 50 * 1024 * 1024, // 50MB limit per file
+    }
+  });
+} catch (error) {
+  console.error("❌ Cloudinary initialization error:", error);
+  // Fallback to memory storage if Cloudinary fails
+  upload = multer({ 
+    storage: multer.memoryStorage(),
+    limits: {
+      fileSize: 50 * 1024 * 1024,
+    }
+  });
+}
 
 const uploadFields = upload.fields([
   { name: "images", maxCount: 6 },
