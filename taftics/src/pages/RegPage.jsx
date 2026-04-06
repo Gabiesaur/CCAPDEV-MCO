@@ -5,7 +5,7 @@ import logoImage from "/logo_green.svg?url";
 
 const USERNAME_REGEX = /^[A-Za-z0-9._-]{3,30}$/;
 const DLSU_EMAIL_REGEX = /^[A-Za-z0-9._%+-]+@dlsu\.edu\.ph$/i;
-const DLSU_ID_REGEX = /^1\d{2}$/;
+const DLSU_ID_REGEX = /^[01]\d{2}$/;
 const PASSWORD_REGEX = /^(?=.*[A-Za-z])(?=.*\d).{8,}$/;
 
 const validateForm = (data) => {
@@ -43,7 +43,7 @@ const validateForm = (data) => {
   if (!dlsuId) {
     errors.dlsuId = "DLSU ID series is required.";
   } else if (!DLSU_ID_REGEX.test(dlsuId)) {
-    errors.dlsuId = "Enter exactly 3 digits starting with 1 (e.g., 123).";
+    errors.dlsuId = "Enter exactly 3 digits starting with 0 or 1 (e.g., 125).";
   }
 
   if (!data.confirmPassword) {
