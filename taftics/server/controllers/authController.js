@@ -1,5 +1,6 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
+const Establishment = require("../models/Establishment");
 
 exports.login = async (req, res) => {
   const loginIdentifier = req.body.username || req.body.email;
