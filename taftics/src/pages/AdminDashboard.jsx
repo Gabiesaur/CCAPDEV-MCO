@@ -207,7 +207,7 @@ const AdminDashboard = ({ user }) => {
           <p className="text-muted mb-0">Platform Overview & Moderation</p>
         </div>
         <div className="bg-white rounded-pill p-1 shadow-sm border d-flex">
-          {["overview", "verification", "users", "requests"].map((tab) => (
+          {["overview", "verification", "requests", "users"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
