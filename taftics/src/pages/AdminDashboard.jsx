@@ -29,6 +29,9 @@ const AdminDashboard = ({ user }) => {
   const [showApproveModal, setShowApproveModal] = useState(false);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [selectedEst, setSelectedEst] = useState(null);
+  const [showDeletionModal, setShowDeletionModal] = useState(false);
+  const [deletionList, setDeletionList] = useState([]);
+  const [selectedDeletionEst, setSelectedDeletionEst] = useState(null);
 
   // --- FORM STATE: OWNER CREATION ---
   const [ownerForm, setOwnerForm] = useState({
@@ -44,6 +47,7 @@ const AdminDashboard = ({ user }) => {
     fetchStats();
     fetchPending();
     fetchUsers();
+    fetchDeletionRequests();
   }, []);
 
   // --- ACTIONS: DATA FETCHING ---
@@ -67,6 +71,16 @@ const AdminDashboard = ({ user }) => {
       console.error("Error fetching pending:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchDeletionRequests = async () => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/deletion-requests`);
+      const data = await res.json();
+      setDeletionList(data);
+    } catch (err) {
+      console.error("Error fetching deletion requests:", err);
     }
   };
 
@@ -131,6 +145,43 @@ const AdminDashboard = ({ user }) => {
     }
   };
 
+  const handleApproveDeletion = async (id) => {
+    if (window.confirm("This will permanently delete the establishment. Are you sure?")) {
+      try {
+        const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/establishments/${id}/handle-deletion`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: "approve" })
+        });
+        const data = await res.json();
+        if (data.success) {
+          setShowDeletionModal(false);
+          fetchDeletionRequests();
+          fetchStats();
+        }
+      } catch (err) {
+        console.error("Error approving deletion:", err);
+      }
+    }
+  };
+
+  const handleRejectDeletion = async (id) => {
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/establishments/${id}/handle-deletion`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "reject" })
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowDeletionModal(false);
+        fetchDeletionRequests();
+      }
+    } catch (err) {
+      console.error("Error rejecting deletion:", err);
+    }
+  };
+
   // --- ACTIONS: MODERATION & USER ROLES ---
   const toggleAdmin = async (id) => {
     try {
@@ -156,7 +207,7 @@ const AdminDashboard = ({ user }) => {
           <p className="text-muted mb-0">Platform Overview & Moderation</p>
         </div>
         <div className="bg-white rounded-pill p-1 shadow-sm border d-flex">
-          {["overview", "verification", "users"].map((tab) => (
+          {["overview", "verification", "users", "requests"].map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -325,6 +376,66 @@ const AdminDashboard = ({ user }) => {
             </div>
           </div>
         )}
+
+        {activeTab === "requests" && (
+          <div className="p-0">
+            <div className="p-4 border-bottom">
+              <h5 className="fw-bold mb-0">Deletion Requests</h5>
+              <p className="text-muted small mb-0">Establishments requesting to be removed from the platform</p>
+            </div>
+            <div className="table-responsive">
+              <table className="table table-hover align-middle mb-0">
+                <thead className="bg-light text-muted small">
+                  <tr>
+                    <th className="px-4 py-3">Establishment</th>
+                    <th className="py-3">Category</th>
+                    <th className="py-3">Contact</th>
+                    <th className="py-3 text-end px-4">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {deletionList.length === 0 ? (
+                    <tr>
+                      <td colSpan="4" className="text-center py-5 text-muted">No deletion requests found.</td>
+                    </tr>
+                  ) : (
+                    deletionList.map((est) => (
+                      <tr key={est._id}>
+                        <td className="px-4 py-3">
+                          <div className="d-flex align-items-center gap-3">
+                            <div className="bg-light rounded-3 p-2" style={{ width: "40px", height: "40px" }}>
+                              <Store size={24} className="text-danger" />
+                            </div>
+                            <div>
+                              <div className="fw-bold">{est.name}</div>
+                              <div className="text-muted small">{est.location}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td><span className="badge bg-light text-dark fw-normal rounded-pill px-3">{est.category}</span></td>
+                        <td>
+                          <div className="small fw-semibold">{est.contactPerson}</div>
+                          <div className="text-muted smaller">{est.email}</div>
+                        </td>
+                        <td className="text-end px-4">
+                          <button
+                            className="btn btn-outline-danger btn-sm rounded-pill px-3 fw-bold"
+                            onClick={() => {
+                              setSelectedDeletionEst(est);
+                              setShowDeletionModal(true);
+                            }}
+                          >
+                            View Details
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* --- MODAL: ESTABLISHMENT APPROVAL --- */}
@@ -444,6 +555,69 @@ const AdminDashboard = ({ user }) => {
                   onClick={() => handleReject(selectedEst._id)}
                 >
                   Reject
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- MODAL: DELETION REQUEST DETAILS --- */}
+      {showDeletionModal && selectedDeletionEst && (
+        <div className="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center" style={{ zIndex: 1100 }}>
+          <div className="position-absolute w-100 h-100 bg-dark opacity-50" onClick={() => setShowDeletionModal(false)}></div>
+          <div className="bg-white rounded-4 shadow-lg position-relative p-0 overflow-hidden" style={{ width: "600px", zIndex: 1101 }}>
+            <div className="p-4 text-white d-flex justify-content-between align-items-center" style={{ backgroundColor: "#b02a2a" }}>
+              <div>
+                <h5 className="fw-bold mb-0">Deletion Request</h5>
+                <p className="small mb-0 opacity-75">Reviewing: {selectedDeletionEst.name}</p>
+              </div>
+              <button className="btn-close btn-close-white" onClick={() => setShowDeletionModal(false)}></button>
+            </div>
+
+            <div className="p-4">
+              <div className="alert alert-danger py-2 small mb-4">
+                ⚠️ Approving this request will <strong>permanently delete</strong> this establishment and cannot be undone.
+              </div>
+              <div className="row g-4">
+                <div className="col-12">
+                  <label className="text-muted smaller fw-bold text-uppercase mb-1 d-block">Establishment Name</label>
+                  <p className="fw-bold mb-0">{selectedDeletionEst.name}</p>
+                </div>
+                <div className="col-md-6">
+                  <label className="text-muted smaller fw-bold text-uppercase mb-1 d-block">Category</label>
+                  <span className="badge bg-light text-dark rounded-pill px-3">{selectedDeletionEst.category}</span>
+                </div>
+                <div className="col-md-6">
+                  <label className="text-muted smaller fw-bold text-uppercase mb-1 d-block">Email Address</label>
+                  <p className="mb-0">{selectedDeletionEst.email}</p>
+                </div>
+                <div className="col-12">
+                  <label className="text-muted smaller fw-bold text-uppercase mb-1 d-block">Business Address</label>
+                  <p className="mb-0">{selectedDeletionEst.address || selectedDeletionEst.location}</p>
+                </div>
+                <div className="col-md-6">
+                  <label className="text-muted smaller fw-bold text-uppercase mb-1 d-block">Contact Person</label>
+                  <p className="mb-0">{selectedDeletionEst.contactPerson}</p>
+                </div>
+                <div className="col-md-6">
+                  <label className="text-muted smaller fw-bold text-uppercase mb-1 d-block">Contact Number</label>
+                  <p className="mb-0">{selectedDeletionEst.contactNumber}</p>
+                </div>
+              </div>
+
+              <div className="d-flex gap-2 mt-5">
+                <button
+                  className="btn btn-danger rounded-pill w-100 fw-bold py-2 shadow-sm"
+                  onClick={() => handleApproveDeletion(selectedDeletionEst._id)}
+                >
+                  Approve Deletion
+                </button>
+                <button
+                  className="btn btn-outline-secondary rounded-pill w-100 fw-bold py-2"
+                  onClick={() => handleRejectDeletion(selectedDeletionEst._id)}
+                >
+                  Reject Request
                 </button>
               </div>
             </div>

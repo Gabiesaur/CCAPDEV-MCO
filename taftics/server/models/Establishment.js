@@ -12,7 +12,8 @@ const EstablishmentSchema = new mongoose.Schema({
     email: String,
     website: String,
     address: String,
-    isOfficial: { type: Boolean, default: false }
+    isOfficial: { type: Boolean, default: false },
+    deletionRequested: { type: Boolean, default: false }
 })
 
 const Establishment = mongoose.model('Establishment', EstablishmentSchema)

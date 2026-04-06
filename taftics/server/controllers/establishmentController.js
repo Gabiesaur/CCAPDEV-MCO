@@ -172,3 +172,22 @@ exports.uploadEstablishmentImg = async (req, res) => {
       .json({ success: false, message: "Server error during upload" });
   }
 };
+
+exports.requestDeletion = async (req, res) => {
+  try {
+    const establishment = await Establishment.findByIdAndUpdate(
+      req.params.id,
+      { deletionRequested: true },
+      { new: true }
+    );
+
+    if (!establishment) {
+      return res.status(404).json({ success: false, message: "Establishment not found" });
+    }
+
+    res.json({ success: true, message: "Deletion request submitted successfully." });
+  } catch (error) {
+    console.error("Error requesting deletion:", error);
+    res.status(500).json({ success: false, message: "Server error during deletion request" });
+  }
+};

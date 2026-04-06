@@ -185,6 +185,27 @@ export default function OwnerProfilePage({ user, setUser }) {
     }
   };
 
+  const handleRequestDeletion = async () => {
+    if (!window.confirm("Are you sure you want to request deletion of this establishment? This action will be reviewed by an administrator.")) {
+      return;
+    }
+
+    try {
+      const targetId = user.ownedEstablishmentId?.$oid || user.ownedEstablishmentId;
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${targetId}/request-deletion`, {
+        method: "POST"
+      });
+      const data = await res.json();
+      if (data.success) {
+        triggerToast("Deletion request submitted to administrators.");
+      } else {
+        triggerToast("Failed: " + data.message);
+      }
+    } catch {
+      triggerToast("Failed to connect to server");
+    }
+  };
+
   const formattedReviews = reviews
     .map((rev) => {
       const ownerReply = (rev.comments || []).find(
@@ -577,6 +598,7 @@ export default function OwnerProfilePage({ user, setUser }) {
                         <button
                           type="button"
                           className="btn btn-outline-danger fw-bold px-4 rounded-pill flex-grow-1"
+                          onClick={handleRequestDeletion}
                         >
                           <Trash2 size={16} className="me-2" /> Request Deletion
                         </button>

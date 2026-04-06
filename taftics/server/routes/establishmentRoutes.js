@@ -13,5 +13,6 @@ router.put(
   upload.single("image"),
   establishmentController.uploadEstablishmentImg,
 );
+router.post("/:id/request-deletion", establishmentController.requestDeletion);
 
 module.exports = router;

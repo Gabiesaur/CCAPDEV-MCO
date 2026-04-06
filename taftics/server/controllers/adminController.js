@@ -110,3 +110,37 @@ exports.toggleAdminRole = async (req, res) => {
     res.status(500).json({ success: false, message: "Failed to update user role." });
   }
 };
+
+exports.getDeletionRequests = async (req, res) => {
+  try {
+    const deletionRequests = await Establishment.find({ deletionRequested: true });
+    res.json(deletionRequests);
+  } catch (error) {
+    console.error("Error fetching deletion requests:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch deletion requests" });
+  }
+};
+
+exports.handleDeletionRequest = async (req, res) => {
+  try {
+    const { action } = req.body;
+    const estId = req.params.id;
+
+    if (action === "approve") {
+      // 1. Delete associated reviews
+      await Review.deleteMany({ establishmentId: estId });
+      // 2. Delete the establishment
+      await Establishment.findByIdAndDelete(estId);
+
+      res.json({ success: true, message: "Establishment deleted successfully." });
+    } else if (action === "reject") {
+      await Establishment.findByIdAndUpdate(estId, { deletionRequested: false });
+      res.json({ success: true, message: "Deletion request rejected." });
+    } else {
+      res.status(400).json({ success: false, message: "Invalid action." });
+    }
+  } catch (error) {
+    console.error("Error handling deletion request:", error);
+    res.status(500).json({ success: false, message: "Failed to handle deletion request" });
+  }
+};
