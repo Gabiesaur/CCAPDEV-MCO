@@ -5,9 +5,6 @@ const { upload } = require("../config/cloudinary");
 
 router.post("/login", authController.login);
 router.post("/register", upload.single("avatar"), authController.register);
-router.post(
-  "/apply",
-  require("../controllers/establishmentController").applyEstablishment,
-);
+router.post("/apply", authController.apply);
 
 module.exports = router;
