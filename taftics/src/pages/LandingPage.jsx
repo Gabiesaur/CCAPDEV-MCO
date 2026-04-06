@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Search, Star, MapPin, ThumbsUp, ThumbsDown } from "lucide-react";
 
@@ -6,18 +6,6 @@ import EstablishmentCardSmall from "../components/landing/EstablishmentCardSmall
 
 const LandingPage = () => {
   const navigate = useNavigate();
-  const categories = [
-    "Any",
-    "School Supplies",
-    "Laundry",
-    "Groceries",
-    "Dorms/Condos",
-    "Repairs",
-    "Printing",
-    "Fitness",
-    "Food",
-    "Coffee",
-  ];
 
   const getRelativeDate = (dateString) => {
     if (!dateString) return "";
@@ -37,10 +25,24 @@ const LandingPage = () => {
   };
 
   // 1. NEW: State to hold top rated establishments and loading status
+  const [establishments, setEstablishments] = useState([]);
   const [topRatedEstablishments, setTopRatedEstablishments] = useState([]);
   const [showcaseReviews, setShowcaseReviews] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
+
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(
+      establishments
+        .map((establishment) => String(establishment?.category || "").trim())
+        .filter(Boolean),
+    );
+
+    return [
+      "Any",
+      ...Array.from(uniqueCategories).sort((a, b) => a.localeCompare(b)),
+    ];
+  }, [establishments]);
 
   const handleSearchSubmit = (event) => {
     event.preventDefault();
@@ -55,6 +57,7 @@ const LandingPage = () => {
           `${import.meta.env.VITE_API_URL}/api/establishments`,
         );
         const data = await res.json();
+        setEstablishments(data);
 
         const sortedByRating = [...data].sort(
           (a, b) => (b.rating || 0) - (a.rating || 0),

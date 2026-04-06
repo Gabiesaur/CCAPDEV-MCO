@@ -1,21 +1,8 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 
 import RatingFilter from "../components/browse/RatingFilter";
 import EstablishmentCard from "../components/browse/EstablishmentCard";
-
-const categories = [
-  "Any",
-  "School Supplies",
-  "Laundry",
-  "Groceries",
-  "Dorms/Condos",
-  "Repairs",
-  "Printing",
-  "Fitness",
-  "Food",
-  "Coffee",
-];
 
 const parseTimeToMinutes = (timeLabel) => {
   if (!timeLabel) return null;
@@ -121,13 +108,10 @@ const BrowsePage = () => {
   // 1. Initialize states for each filter group
   const selectedCategoryFromState = location.state?.selectedCategory;
   const selectedSearchFromState = location.state?.searchQuery;
-  const initialCategory = categories.includes(selectedCategoryFromState)
-    ? selectedCategoryFromState
-    : "Any";
   const initialSearchQuery =
     typeof selectedSearchFromState === "string" ? selectedSearchFromState : "";
 
-  const [activeCategory, setActiveCategory] = useState(initialCategory);
+  const [activeCategory, setActiveCategory] = useState("Any");
   const [activeHour, setActiveHour] = useState("Any");
   const [activePrice, setActivePrice] = useState("Any");
   const [searchQuery, setSearchQuery] = useState(initialSearchQuery);
@@ -137,10 +121,28 @@ const BrowsePage = () => {
   const [establishments, setEstablishments] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  const categories = useMemo(() => {
+    const uniqueCategories = new Set(
+      establishments
+        .map((establishment) => String(establishment?.category || "").trim())
+        .filter(Boolean),
+    );
+
+    return [
+      "Any",
+      ...Array.from(uniqueCategories).sort((a, b) => a.localeCompare(b)),
+    ];
+  }, [establishments]);
+
   const hours = ["Any", "Open Now", "24/7"];
   const prices = ["Any", "P", "PP", "PPP"];
 
   useEffect(() => {
+    if (selectedCategoryFromState === "Any") {
+      setActiveCategory("Any");
+      return;
+    }
+
     if (categories.includes(selectedCategoryFromState)) {
       setActiveCategory(selectedCategoryFromState);
     }
