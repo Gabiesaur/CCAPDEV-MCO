@@ -20,6 +20,26 @@ export default function PublicProfilePage({ db, currentUser }) {
   const [toastMessage, setToastMessage] = useState("");
   const [toastIcon, setToastIcon] = useState(null);
 
+  useEffect(() => {
+      if (!publicUser || !publicUser._id) return;
+      setIsLoading(true);
+  
+      // Fetch Review Arrays
+      Promise.all([
+        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/reviews`).then(res => res.json()),
+        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/comments`).then(res => res.json())
+      ])
+        .then(([revData, commentData]) => {
+          setPublicReviews(Array.isArray(revData) ? revData : []);
+          setPublicComments(Array.isArray(commentData) ? commentData : []);
+          setIsLoading(false);
+        })
+        .catch((err) => {
+          console.error("Failed fetching profile tabs data:", err);
+          setIsLoading(false);
+        });
+    }, [publicUser]);
+
   // Dynamic Toast Trigger
   const triggerToast = (message, iconType) => {
     setToastMessage(message);
@@ -62,27 +82,6 @@ export default function PublicProfilePage({ db, currentUser }) {
       </div>
     );
   }
-
-  useEffect(() => {
-      if (!publicUser || !publicUser._id) return;
-      setIsLoading(true);
-  
-      // Fetch Review Arrays
-      Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/reviews`).then(res => res.json()),
-        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/comments`).then(res => res.json())
-      ])
-        .then(([revData, commentData]) => {
-          setPublicReviews(Array.isArray(revData) ? revData : []);
-          setPublicComments(Array.isArray(commentData) ? commentData : []);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error("Failed fetching profile tabs data:", err);
-          setIsLoading(false);
-        });
-    }, [publicUser]);
-  
 
   const TabButton = ({ id, icon: Icon, label }) => (
     <button
