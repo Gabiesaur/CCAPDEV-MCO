@@ -136,10 +136,8 @@ const OwnerAppPage = ({ onApply }) => {
                 </option>
                 <option value="School Supplies">School Supplies</option>
                 <option value="Laundry">Laundry</option>
-                <option value="Groceries">Groceries</option>
                 <option value="Dorms/Condos">Dorms/Condos</option>
-                <option value="Repairs">Repairs</option>
-                <option value="Printing">Printing</option>
+                <option value="Services">Services</option>
                 <option value="Fitness">Fitness</option>
                 <option value="Food">Food</option>
                 <option value="Coffee">Coffee</option>
