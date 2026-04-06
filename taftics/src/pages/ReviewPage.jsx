@@ -1,6 +1,18 @@
-import { useEffect, useState } from 'react';
-import { Link, useNavigate, useParams } from 'react-router-dom';
-import { Star, Send, MapPin, ThumbsUp, ThumbsDown, CheckCircle2, Loader2, Maximize2, X, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useEffect, useState } from "react";
+import { Link, useNavigate, useParams } from "react-router-dom";
+import {
+  Star,
+  Send,
+  MapPin,
+  ThumbsUp,
+  ThumbsDown,
+  CheckCircle2,
+  Loader2,
+  Maximize2,
+  X,
+  ChevronLeft,
+  ChevronRight,
+} from "lucide-react";
 
 const getRelativeDate = (dateString) => {
   if (!dateString) return "";
@@ -21,26 +33,34 @@ const getRelativeDate = (dateString) => {
 
 const getAuthorFromReview = (review) => {
   const userObj = review?.userId || {};
-  const displayName = userObj.name || userObj.username || review?.user || "Unknown User";
+  const displayName =
+    userObj.name || userObj.username || review?.user || "Unknown User";
   const username = userObj.username || review?.username || null;
-  const avatar = userObj.avatar || review?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}`;
+  const avatar =
+    userObj.avatar ||
+    review?.avatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}`;
 
   return { displayName, username, avatar };
 };
 
 const getEntityId = (value) => {
   if (!value) return null;
-  if (typeof value === 'string') return value;
-  if (typeof value === 'object' && value.$oid) return value.$oid;
-  if (typeof value === 'object' && value._id) return value._id;
+  if (typeof value === "string") return value;
+  if (typeof value === "object" && value.$oid) return value.$oid;
+  if (typeof value === "object" && value._id) return value._id;
   return null;
 };
 
 const getAuthorFromComment = (comment) => {
   const userObj = comment?.userId || {};
-  const displayName = userObj.name || userObj.username || comment?.user || "Unknown User";
+  const displayName =
+    userObj.name || userObj.username || comment?.user || "Unknown User";
   const username = userObj.username || comment?.username || null;
-  const avatar = userObj.avatar || comment?.avatar || `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}`;
+  const avatar =
+    userObj.avatar ||
+    comment?.avatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(displayName)}`;
 
   return { displayName, username, avatar };
 };
@@ -53,7 +73,7 @@ const ReviewPage = () => {
   const [review, setReview] = useState(null);
   const [establishment, setEstablishment] = useState(null);
   const [comments, setComments] = useState([]);
-  
+
   // Loading States
   const [isLoading, setIsLoading] = useState(true);
   const [loadingComments, setLoadingComments] = useState(false);
@@ -99,7 +119,9 @@ const ReviewPage = () => {
   const prevImage = (e) => {
     e.stopPropagation();
     if (review?.images?.length) {
-      setCurrentImageIndex((prev) => (prev === 0 ? review.images.length - 1 : prev - 1));
+      setCurrentImageIndex((prev) =>
+        prev === 0 ? review.images.length - 1 : prev - 1,
+      );
     }
   };
 
@@ -111,31 +133,44 @@ const ReviewPage = () => {
       setIsLoading(true);
       try {
         // 1. Fetch the Review
-        const reviewRes = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}`);
+        const reviewRes = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/reviews/${id}`,
+        );
         if (!reviewRes.ok) throw new Error("Review not found");
-        
+
         const reviewData = await reviewRes.json();
         setReview(reviewData);
         setCounts({
           up: reviewData.helpfulVoters?.length ?? reviewData.helpfulVotes ?? 0,
-          down: reviewData.unhelpfulVoters?.length ?? reviewData.unhelpfulVotes ?? 0,
+          down:
+            reviewData.unhelpfulVoters?.length ??
+            reviewData.unhelpfulVotes ??
+            0,
         });
 
         // Restore the current user's existing vote if any
-        const storedUser = sessionStorage.getItem("currentUser") || localStorage.getItem("currentUser");
+        const storedUser =
+          sessionStorage.getItem("currentUser") ||
+          localStorage.getItem("currentUser");
         const currentUser = storedUser ? JSON.parse(storedUser) : null;
         if (currentUser?._id) {
           const uid = currentUser._id.toString();
-          const alreadyHelpful = reviewData.helpfulVoters?.map(id => id.toString()).includes(uid);
-          const alreadyUnhelpful = reviewData.unhelpfulVoters?.map(id => id.toString()).includes(uid);
-          if (alreadyHelpful) setUserVote('up');
-          else if (alreadyUnhelpful) setUserVote('down');
+          const alreadyHelpful = reviewData.helpfulVoters
+            ?.map((id) => id.toString())
+            .includes(uid);
+          const alreadyUnhelpful = reviewData.unhelpfulVoters
+            ?.map((id) => id.toString())
+            .includes(uid);
+          if (alreadyHelpful) setUserVote("up");
+          else if (alreadyUnhelpful) setUserVote("down");
         }
 
         // 2. Safely extract Establishment ID and fetch Establishment details
         const estId = getEntityId(reviewData.establishmentId);
         if (estId) {
-          const estRes = await fetch(`${import.meta.env.VITE_API_URL}/api/establishments/${estId}`);
+          const estRes = await fetch(
+            `${import.meta.env.VITE_API_URL}/api/establishments/${estId}`,
+          );
           if (estRes.ok) {
             const estData = await estRes.json();
             setEstablishment(estData);
@@ -144,28 +179,31 @@ const ReviewPage = () => {
 
         // 3. Fetch the Comments for this review
         setLoadingComments(true);
-        const commentsRes = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/comments`);
+        const commentsRes = await fetch(
+          `${import.meta.env.VITE_API_URL}/api/reviews/${id}/comments`,
+        );
         if (commentsRes.ok) {
           const commentsData = await commentsRes.json();
           const commentsArray = Array.isArray(commentsData) ? commentsData : [];
-          
+
           // Sort: Establishment Owner Priority first, then by Date (Newest)
           const sortedComments = [...commentsArray].sort((a, b) => {
-            const aIsOwner = getEntityId(a?.userId?.ownedEstablishmentId) === estId;
-            const bIsOwner = getEntityId(b?.userId?.ownedEstablishmentId) === estId;
-            
+            const aIsOwner =
+              getEntityId(a?.userId?.ownedEstablishmentId) === estId;
+            const bIsOwner =
+              getEntityId(b?.userId?.ownedEstablishmentId) === estId;
+
             if (aIsOwner && !bIsOwner) return -1;
             if (!aIsOwner && bIsOwner) return 1;
-            
+
             // Secondary sort: Date (Newest first)
             return new Date(b.date) - new Date(a.date);
           });
-          
+
           setComments(sortedComments);
         } else {
           setComments([]);
         }
-
       } catch (error) {
         console.error("Error fetching review data:", error);
         setReview(null);
@@ -179,20 +217,25 @@ const ReviewPage = () => {
   }, [id]);
 
   const handleVote = async (type) => {
-    const storedUser = sessionStorage.getItem("currentUser") || localStorage.getItem("currentUser");
+    const storedUser =
+      sessionStorage.getItem("currentUser") ||
+      localStorage.getItem("currentUser");
     const currentUser = storedUser ? JSON.parse(storedUser) : null;
     if (!currentUser?._id) {
       triggerToast("You must be logged in to vote.");
       return;
     }
 
-    const voteType = type === 'up' ? 'helpful' : 'unhelpful';
+    const voteType = type === "up" ? "helpful" : "unhelpful";
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/vote`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: currentUser._id, type: voteType }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/reviews/${id}/vote`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ userId: currentUser._id, type: voteType }),
+        },
+      );
       const data = await res.json();
       if (!res.ok) {
         triggerToast(data.message || "Failed to submit vote.");
@@ -204,9 +247,13 @@ const ReviewPage = () => {
         down: updatedReview.unhelpfulVoters?.length ?? 0,
       });
       const uid = currentUser._id.toString();
-      const nowHelpful = updatedReview.helpfulVoters?.map(id => id.toString()).includes(uid);
-      const nowUnhelpful = updatedReview.unhelpfulVoters?.map(id => id.toString()).includes(uid);
-      setUserVote(nowHelpful ? 'up' : nowUnhelpful ? 'down' : null);
+      const nowHelpful = updatedReview.helpfulVoters
+        ?.map((id) => id.toString())
+        .includes(uid);
+      const nowUnhelpful = updatedReview.unhelpfulVoters
+        ?.map((id) => id.toString())
+        .includes(uid);
+      setUserVote(nowHelpful ? "up" : nowUnhelpful ? "down" : null);
     } catch (error) {
       triggerToast(`Network error: ${error.message}`);
     }
@@ -216,7 +263,9 @@ const ReviewPage = () => {
     e.preventDefault();
 
     // Get user
-    const storedUser = sessionStorage.getItem("currentUser") || localStorage.getItem("currentUser");
+    const storedUser =
+      sessionStorage.getItem("currentUser") ||
+      localStorage.getItem("currentUser");
     const currentUser = storedUser ? JSON.parse(storedUser) : null;
 
     // Check if logged in
@@ -229,11 +278,17 @@ const ReviewPage = () => {
 
     setIsSubmittingComment(true);
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/reviews/${id}/comments`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ userId: currentUser._id, text: commentText.trim() }),
-      });
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/reviews/${id}/comments`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            userId: currentUser._id,
+            text: commentText.trim(),
+          }),
+        },
+      );
 
       // Check for errors
       let data;
@@ -254,14 +309,16 @@ const ReviewPage = () => {
       setComments((prev) => {
         const updated = [data.comment, ...prev];
         return [...updated].sort((a, b) => {
-          const aIsOwner = getEntityId(a?.userId?.ownedEstablishmentId) === estId;
-          const bIsOwner = getEntityId(b?.userId?.ownedEstablishmentId) === estId;
+          const aIsOwner =
+            getEntityId(a?.userId?.ownedEstablishmentId) === estId;
+          const bIsOwner =
+            getEntityId(b?.userId?.ownedEstablishmentId) === estId;
           if (aIsOwner && !bIsOwner) return -1;
           if (!aIsOwner && bIsOwner) return 1;
           return new Date(b.date) - new Date(a.date);
         });
       });
-      
+
       setCommentText("");
       triggerToast("Comment posted!");
     } catch (error) {
@@ -287,8 +344,12 @@ const ReviewPage = () => {
       <div className="bg-white min-vh-100 d-flex align-items-center justify-content-center">
         <div className="text-center">
           <h1 className="fw-bold fs-3">Review not found</h1>
-          <p className="text-muted mb-4">This review may have been deleted or the URL is incorrect.</p>
-          <Link to="/browse" className="btn btn-success">Back to Browse</Link>
+          <p className="text-muted mb-4">
+            This review may have been deleted or the URL is incorrect.
+          </p>
+          <Link to="/browse" className="btn btn-success">
+            Back to Browse
+          </Link>
         </div>
       </div>
     );
@@ -296,14 +357,17 @@ const ReviewPage = () => {
 
   const author = getAuthorFromReview(review);
   const reviewTitle = review?.title || "Review";
-  const reviewBody = review?.body || review?.content || "No review content available.";
+  const reviewBody =
+    review?.body || review?.content || "No review content available.";
   const reviewDate = getRelativeDate(review?.date || review?.createdAt);
   const reviewRating = Number(review?.rating || 0);
 
   const establishmentName = establishment?.name || "Establishment";
   const establishmentLocation = establishment?.location || "Unknown location";
-  const establishmentImage = establishment?.image || "https://ui-avatars.com/api/?name=Establishment";
-  const establishmentId = getEntityId(establishment?._id) || getEntityId(review?.establishmentId);
+  const establishmentImage =
+    establishment?.image || "https://ui-avatars.com/api/?name=Establishment";
+  const establishmentId =
+    getEntityId(establishment?._id) || getEntityId(review?.establishmentId);
 
   return (
     <div className="bg-white min-vh-100 d-flex flex-column position-relative">
@@ -315,7 +379,14 @@ const ReviewPage = () => {
         </div>
       )}
 
-      <main className="container flex-grow-1" style={{ paddingTop: '80px', paddingBottom: '100px', maxWidth: '800px' }}>
+      <main
+        className="container flex-grow-1"
+        style={{
+          paddingTop: "80px",
+          paddingBottom: "100px",
+          maxWidth: "800px",
+        }}
+      >
         <h1 className="fw-bold fs-2 mb-4">Review</h1>
 
         {/* 1. Main Review Card */}
@@ -324,16 +395,23 @@ const ReviewPage = () => {
             <img
               src={author.avatar}
               className="rounded-circle me-3"
-              style={{ width: "40px", height: "40px", objectFit: 'cover' }}
+              style={{ width: "40px", height: "40px", objectFit: "cover" }}
               alt="User"
             />
             <div className="d-flex flex-column">
               {author.username ? (
-                <Link to={`/profile/${author.username}`} className="fw-bold text-decoration-none text-dark" style={{ marginBottom: '-4px' }}>
+                <Link
+                  to={`/profile/${author.username}`}
+                  className="fw-bold text-decoration-none text-dark"
+                  style={{ marginBottom: "-4px" }}
+                >
                   {author.displayName}
                 </Link>
               ) : (
-                <span className="fw-bold text-dark" style={{ marginBottom: '-4px' }}>
+                <span
+                  className="fw-bold text-dark"
+                  style={{ marginBottom: "-4px" }}
+                >
                   {author.displayName}
                 </span>
               )}
@@ -352,41 +430,74 @@ const ReviewPage = () => {
             ))}
           </div>
 
-          <h1 className="fw-bold text-dark mb-2 fs-4">
-            {reviewTitle}
-          </h1>
+          <h1 className="fw-bold text-dark mb-2 fs-4">{reviewTitle}</h1>
 
-          <p className="text-muted lh-base mb-4" style={{ fontSize: '0.95rem' }}>
+          <p
+            className="text-muted lh-base mb-4"
+            style={{ fontSize: "0.95rem" }}
+          >
             {reviewBody}
           </p>
 
           {/* Images Section */}
           {review?.images && review.images.length > 0 && (
-            <div className="d-flex gap-2 mb-4 overflow-auto pb-2" style={{ scrollbarWidth: 'thin' }}>
+            <div
+              className="d-flex gap-2 mb-4 overflow-auto pb-2"
+              style={{ scrollbarWidth: "thin" }}
+            >
               {review.images.map((imgUrl, idx) => (
-                <div 
-                  key={idx} 
+                <div
+                  key={idx}
                   className="position-relative flex-shrink-0 rounded-4 overflow-hidden"
-                  style={{ width: '120px', height: '120px', cursor: 'pointer' }}
+                  style={{ width: "120px", height: "120px", cursor: "pointer" }}
                   onClick={() => openImageModal(idx)}
                   onMouseEnter={(e) => {
-                    e.currentTarget.querySelector('.expand-indicator').style.opacity = '1';
+                    e.currentTarget.querySelector(
+                      ".expand-indicator",
+                    ).style.opacity = "1";
                   }}
                   onMouseLeave={(e) => {
-                    e.currentTarget.querySelector('.expand-indicator').style.opacity = '0';
+                    e.currentTarget.querySelector(
+                      ".expand-indicator",
+                    ).style.opacity = "0";
                   }}
                 >
-                  <img 
-                    src={imgUrl} 
-                    alt={`Review image ${idx + 1}`} 
+                  <img
+                    src={imgUrl}
+                    alt={`Review image ${idx + 1}`}
                     className="w-100 h-100 object-fit-cover"
                   />
-                  <div 
+                  <div
                     className="expand-indicator position-absolute top-0 start-0 w-100 h-100 bg-dark bg-opacity-50 d-flex align-items-center justify-content-center transition-all"
-                    style={{ opacity: 0, transition: 'opacity 0.2s ease-in-out' }}
+                    style={{
+                      opacity: 0,
+                      transition: "opacity 0.2s ease-in-out",
+                    }}
                   >
                     <Maximize2 className="text-white" size={24} />
                   </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Videos Section */}
+          {review?.videos && review.videos.length > 0 && (
+            <div
+              className="d-flex gap-2 mb-4 overflow-auto pb-2"
+              style={{ scrollbarWidth: "thin" }}
+            >
+              {review.videos.map((vidUrl, idx) => (
+                <div
+                  key={idx}
+                  className="position-relative flex-shrink-0 rounded-4 overflow-hidden"
+                  style={{ width: "240px", height: "135px" }}
+                >
+                  <video
+                    src={vidUrl}
+                    className="w-100 h-100 object-fit-cover"
+                    controls
+                  />
                 </div>
               ))}
             </div>
@@ -403,13 +514,20 @@ const ReviewPage = () => {
               />
               <div className="lh-1">
                 <Link
-                  to={establishmentId ? `/establishment/${establishmentId}` : "/browse"}
+                  to={
+                    establishmentId
+                      ? `/establishment/${establishmentId}`
+                      : "/browse"
+                  }
                   className="fw-bold text-decoration-none text-dark"
                   style={{ fontSize: "0.85rem" }}
                 >
                   {establishmentName}
                 </Link>
-                <div className="text-muted d-flex align-items-center gap-1 mt-1" style={{ fontSize: "0.7rem" }}>
+                <div
+                  className="text-muted d-flex align-items-center gap-1 mt-1"
+                  style={{ fontSize: "0.7rem" }}
+                >
                   <MapPin size={10} /> {establishmentLocation}
                 </div>
               </div>
@@ -419,19 +537,25 @@ const ReviewPage = () => {
             <div className="d-flex gap-3 align-items-center px-2">
               <button
                 className="btn p-0 border-0 shadow-none d-flex align-items-center gap-2 transition-all"
-                onClick={() => handleVote('up')}
-                style={{ color: userVote === 'up' ? '#48a868' : '#adb5bd' }}
+                onClick={() => handleVote("up")}
+                style={{ color: userVote === "up" ? "#48a868" : "#adb5bd" }}
               >
-                <ThumbsUp size={24} fill={userVote === 'up' ? '#48a868' : 'none'} />
+                <ThumbsUp
+                  size={24}
+                  fill={userVote === "up" ? "#48a868" : "none"}
+                />
                 <span className="fw-bold small">{counts.up}</span>
               </button>
 
               <button
                 className="btn p-0 border-0 shadow-none d-flex align-items-center gap-2 transition-all"
-                onClick={() => handleVote('down')}
-                style={{ color: userVote === 'down' ? '#dc3545' : '#adb5bd' }}
+                onClick={() => handleVote("down")}
+                style={{ color: userVote === "down" ? "#dc3545" : "#adb5bd" }}
               >
-                <ThumbsDown size={24} fill={userVote === 'down' ? '#dc3545' : 'none'} />
+                <ThumbsDown
+                  size={24}
+                  fill={userVote === "down" ? "#dc3545" : "none"}
+                />
                 <span className="fw-bold small">{counts.down}</span>
               </button>
             </div>
@@ -439,54 +563,84 @@ const ReviewPage = () => {
         </div>
 
         {/* 2. Comments Section */}
-        <div style={{ marginTop: '48px' }}>
+        <div style={{ marginTop: "48px" }}>
           <h1 className="fs-3 fw-bold mb-4">Comments</h1>
           <div className="mb-5 ps-1">
             {loadingComments ? (
               <div className="d-flex align-items-center gap-2 text-muted">
-                 <Loader2 size={16} className="spin" /> Loading comments...
+                <Loader2 size={16} className="spin" /> Loading comments...
               </div>
             ) : comments.length === 0 ? (
               <p className="text-muted mb-0">No comments yet.</p>
             ) : (
               comments.map((comment, index) => {
-                const commentId = getEntityId(comment?._id) || comment?.id || `${id}-comment-${index}`;
+                const commentId =
+                  getEntityId(comment?._id) ||
+                  comment?.id ||
+                  `${id}-comment-${index}`;
                 const commentAuthor = getAuthorFromComment(comment);
                 const commentDate = getRelativeDate(comment?.date);
 
                 // Check if commenter owns the establishment this review belongs to
-                const commentUserOwnedEst = getEntityId(comment?.userId?.ownedEstablishmentId);
+                const commentUserOwnedEst = getEntityId(
+                  comment?.userId?.ownedEstablishmentId,
+                );
                 const reviewEstId = getEntityId(review?.establishmentId);
-                const isOwner = !!(commentUserOwnedEst && reviewEstId && commentUserOwnedEst === reviewEstId);
+                const isOwner = !!(
+                  commentUserOwnedEst &&
+                  reviewEstId &&
+                  commentUserOwnedEst === reviewEstId
+                );
 
                 return (
-                  <div key={commentId} className={`mb-4 p-4 rounded-4 shadow-sm ${isOwner ? 'border border-success bg-dlsu-light' : 'bg-light'}`}>
+                  <div
+                    key={commentId}
+                    className={`mb-4 p-4 rounded-4 shadow-sm ${isOwner ? "border border-success bg-dlsu-light" : "bg-light"}`}
+                  >
                     <div className="d-flex align-items-center mb-3">
                       <img
                         src={commentAuthor.avatar}
                         className="rounded-circle me-3"
-                        style={{ width: "40px", height: "40px", objectFit: "cover" }}
+                        style={{
+                          width: "40px",
+                          height: "40px",
+                          objectFit: "cover",
+                        }}
                         alt={commentAuthor.displayName}
                       />
                       <div>
                         {commentAuthor.username ? (
-                          <Link to={`/profile/${commentAuthor.username}`} className="text-decoration-none text-dark fw-bold" style={{ marginBottom: '-4px' }}>
+                          <Link
+                            to={`/profile/${commentAuthor.username}`}
+                            className="text-decoration-none text-dark fw-bold"
+                            style={{ marginBottom: "-4px" }}
+                          >
                             {commentAuthor.displayName}
                           </Link>
                         ) : (
-                          <div className="text-dark fw-bold" style={{ marginBottom: '-4px' }}>
+                          <div
+                            className="text-dark fw-bold"
+                            style={{ marginBottom: "-4px" }}
+                          >
                             {commentAuthor.displayName}
                           </div>
                         )}
                         {isOwner && (
                           <span
                             className="badge rounded-pill fw-bold me-1 mt-1 d-inline-block bg-dlsu-light text-dlsu-dark border"
-                            style={{ fontSize: '9px', textTransform: 'uppercase', letterSpacing: '0.5px', padding: '3px 7px' }}
+                            style={{
+                              fontSize: "9px",
+                              textTransform: "uppercase",
+                              letterSpacing: "0.5px",
+                              padding: "3px 7px",
+                            }}
                           >
                             Establishment Owner
                           </span>
                         )}
-                        <small className="text-muted d-block">{commentDate}</small>
+                        <small className="text-muted d-block">
+                          {commentDate}
+                        </small>
                       </div>
                     </div>
 
@@ -502,7 +656,7 @@ const ReviewPage = () => {
               type="text"
               className="form-control border-0 bg-light rounded-4 py-3 px-4 fs-6 shadow-sm"
               placeholder="Leave a comment"
-              style={{ paddingRight: '60px' }}
+              style={{ paddingRight: "60px" }}
               value={commentText}
               onChange={(e) => setCommentText(e.target.value)}
               disabled={isSubmittingComment}
@@ -513,7 +667,11 @@ const ReviewPage = () => {
               className="btn position-absolute top-50 end-0 translate-middle-y me-2 text-success shadow-none"
               disabled={isSubmittingComment || !commentText.trim()}
             >
-              {isSubmittingComment ? <Loader2 size={20} className="spin" /> : <Send size={20} />}
+              {isSubmittingComment ? (
+                <Loader2 size={20} className="spin" />
+              ) : (
+                <Send size={20} />
+              )}
             </button>
           </form>
         </div>
@@ -521,42 +679,40 @@ const ReviewPage = () => {
 
       {/* Full Screen Image Modal */}
       {imageModalOpen && review?.images && review.images.length > 0 && (
-        <div 
+        <div
           className="position-fixed top-0 start-0 w-100 h-100 bg-dark bg-opacity-75 d-flex flex-column align-items-center justify-content-center z-3"
           style={{ zIndex: 1050 }}
           onClick={closeImageModal}
         >
           {/* Close Button */}
-          <button 
+          <button
             className="btn btn-dark position-absolute start-0 m-4 rounded-circle p-2 shadow"
             onClick={closeImageModal}
-            style={{ zIndex: 1060, top: '80px' }}
+            style={{ zIndex: 1060, top: "80px" }}
           >
             <X size={24} />
           </button>
 
           {/* Image Container */}
-          <div 
-            className="position-relative w-100 h-100 d-flex align-items-center justify-content-center p-5"
-          >
-            <img 
-              src={review.images[currentImageIndex]} 
-              alt={`Full screen ${currentImageIndex + 1}`} 
+          <div className="position-relative w-100 h-100 d-flex align-items-center justify-content-center p-5">
+            <img
+              src={review.images[currentImageIndex]}
+              alt={`Full screen ${currentImageIndex + 1}`}
               className="max-w-100 max-h-100 object-fit-contain rounded shadow-lg"
-              style={{ maxHeight: '75vh', maxWidth: '75vw' }}
+              style={{ maxHeight: "75vh", maxWidth: "75vw" }}
               onClick={(e) => e.stopPropagation()}
             />
 
             {/* Navigation Buttons (if multiple images) */}
             {review.images.length > 1 && (
               <>
-                <button 
+                <button
                   className="btn btn-dark position-absolute start-0 ms-4 rounded-circle p-2"
                   onClick={prevImage}
                 >
                   <ChevronLeft size={32} />
                 </button>
-                <button 
+                <button
                   className="btn btn-dark position-absolute end-0 me-4 rounded-circle p-2"
                   onClick={nextImage}
                 >
@@ -564,7 +720,7 @@ const ReviewPage = () => {
                 </button>
               </>
             )}
-            
+
             {/* Image Indicator */}
             {review.images.length > 1 && (
               <div className="position-absolute bottom-0 mb-4 text-white p-2 rounded bg-dark bg-opacity-50">

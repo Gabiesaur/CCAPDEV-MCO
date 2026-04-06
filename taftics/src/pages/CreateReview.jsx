@@ -162,10 +162,16 @@ function CreateReview() {
   };
 
   const fileInputRef = React.useRef(null);
+  const videoInputRef = React.useRef(null);
   const [images, setImages] = React.useState([]);
+  const [videos, setVideos] = React.useState([]);
 
   const handleUploadClick = () => {
     fileInputRef.current?.click();
+  };
+
+  const handleVideoUploadClick = () => {
+    videoInputRef.current?.click();
   };
 
   const handleFilesChange = (e) => {
@@ -181,8 +187,30 @@ function CreateReview() {
     e.target.value = null;
   };
 
+  const handleVideoFilesChange = (e) => {
+    const files = Array.from(e.target.files || []).slice(0, 3);
+    const newVideos = files.map((file) => ({
+      file,
+      url: URL.createObjectURL(file),
+    }));
+    setVideos((prev) => {
+      const combined = [...prev, ...newVideos];
+      return combined.slice(0, 3);
+    });
+    e.target.value = null;
+  };
+
   const removeImage = (index) => {
     setImages((prev) => {
+      const copy = prev.slice();
+      URL.revokeObjectURL(copy[index].url);
+      copy.splice(index, 1);
+      return copy;
+    });
+  };
+
+  const removeVideo = (index) => {
+    setVideos((prev) => {
       const copy = prev.slice();
       URL.revokeObjectURL(copy[index].url);
       copy.splice(index, 1);
@@ -246,6 +274,11 @@ function CreateReview() {
     // Append each selected image file
     images.forEach((imgObj) => {
       formData.append("images", imgObj.file);
+    });
+
+    // Append each selected video file
+    videos.forEach((vidObj) => {
+      formData.append("videos", vidObj.file);
     });
 
     try {
@@ -488,6 +521,58 @@ function CreateReview() {
                           padding: 0,
                         }}
                         onClick={() => removeImage(i)}
+                      >
+                        ×
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <p className="mt-4 fw-bold small opacity-75">MEDIA (VIDEOS)</p>
+              <div className="mb-3">
+                <input
+                  type="file"
+                  accept="video/*"
+                  multiple
+                  ref={videoInputRef}
+                  onChange={handleVideoFilesChange}
+                  style={{ display: "none" }}
+                />
+                <button
+                  type="button"
+                  className="btn btn-outline-primary rounded-pill px-4 btn-sm mb-2"
+                  onClick={handleVideoUploadClick}
+                >
+                  Upload Videos
+                </button>
+                <div className="d-flex flex-wrap gap-2 mt-2">
+                  {videos.map((vid, i) => (
+                    <div
+                      key={i}
+                      className="position-relative"
+                      style={{ width: 160, height: 90 }}
+                    >
+                      <video
+                        src={vid.url}
+                        style={{
+                          width: "100%",
+                          height: "100%",
+                          objectFit: "cover",
+                          borderRadius: 12,
+                        }}
+                        controls
+                      />
+                      <button
+                        type="button"
+                        className="btn btn-sm btn-danger position-absolute rounded-circle shadow"
+                        style={{
+                          top: -8,
+                          right: -8,
+                          width: 24,
+                          height: 24,
+                          padding: 0,
+                        }}
+                        onClick={() => removeVideo(i)}
                       >
                         ×
                       </button>

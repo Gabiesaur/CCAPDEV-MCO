@@ -17,9 +17,20 @@ const storage = new CloudinaryStorage({
   },
 });
 
+const videoStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: "taftics/videos",
+    allowed_formats: ["mp4", "mov", "avi", "mkv", "webm"],
+    resource_type: "video",
+  },
+});
+
 const upload = multer({ storage });
+const videoUpload = multer({ storage: videoStorage });
 
 module.exports = {
   cloudinary,
   upload,
+  videoUpload,
 };

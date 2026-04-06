@@ -1,5 +1,54 @@
 const Review = require("../models/Review");
 const Comment = require("../models/Comment");
+const { cloudinary } = require("../config/cloudinary");
+const multer = require("multer");
+const { CloudinaryStorage } = require("multer-storage-cloudinary");
+
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: (req, file) => {
+    // Determine storage parameters based on file field name
+    if (file.fieldname === "videos") {
+      return {
+        folder: "taftics/videos",
+        allowed_formats: ["mp4", "mov", "avi", "mkv", "webm"],
+        resource_type: "video",
+      };
+    } else {
+      return {
+        folder: "taftics",
+        allowed_formats: ["jpg", "jpeg", "png", "webp"],
+        transformation: [{ width: 800, crop: "limit" }],
+      };
+    }
+  },
+});
+
+const upload = multer({ 
+  storage,
+  limits: {
+    fileSize: 50 * 1024 * 1024, // 50MB limit per file
+  }
+});
+
+const uploadFields = upload.fields([
+  { name: "images", maxCount: 6 },
+  { name: "videos", maxCount: 3 },
+]);
+
+exports.uploadReviewMedia = (req, res, next) => {
+  uploadFields(req, res, (err) => {
+    if (err) {
+      console.error("Upload error:", err);
+      return res.status(400).json({
+        success: false,
+        message: "Upload failed: " + err.message,
+      });
+    }
+    console.log("Files uploaded successfully:", req.files);
+    next();
+  });
+};
 
 exports.createReview = async (req, res) => {
   console.log("req.body:", req.body);
@@ -9,11 +58,17 @@ exports.createReview = async (req, res) => {
 
     // 1. Process images uploaded by multer + Cloudinary middleware
     let imageUrls = [];
-    if (req.files && req.files.length > 0) {
-      imageUrls = req.files.map((file) => file.path);
+    if (req.files && req.files.images && req.files.images.length > 0) {
+      imageUrls = req.files.images.map((file) => file.path);
     }
 
-    // 2. Save to Database
+    // 2. Process videos uploaded by multer + Cloudinary middleware
+    let videoUrls = [];
+    if (req.files && req.files.videos && req.files.videos.length > 0) {
+      videoUrls = req.files.videos.map((file) => file.path);
+    }
+
+    // 3. Save to Database
     const newReview = new Review({
       userId,
       establishmentId,
@@ -21,6 +76,7 @@ exports.createReview = async (req, res) => {
       title,
       body,
       images: imageUrls,
+      videos: videoUrls,
       date: new Date(),
     });
 
@@ -35,7 +91,8 @@ exports.createReview = async (req, res) => {
 
 exports.updateReview = async (req, res) => {
   try {
-    const { rating, title, body, comment, existingImages } = req.body;
+    const { rating, title, body, comment, existingImages, existingVideos } =
+      req.body;
     const reviewText = body || comment;
 
     // 1. Find existing review
@@ -47,7 +104,7 @@ exports.updateReview = async (req, res) => {
     }
     const newRating = Number(rating);
 
-    // 3. Process Images
+    // 2. Process Images
     let imageUrls = [];
     if (existingImages) {
       imageUrls = Array.isArray(existingImages)
@@ -55,10 +112,23 @@ exports.updateReview = async (req, res) => {
         : [existingImages];
     }
 
-    if (req.files && req.files.length > 0) {
-      imageUrls.push(...req.files.map((file) => file.path));
+    if (req.files && req.files.images && req.files.images.length > 0) {
+      imageUrls.push(...req.files.images.map((file) => file.path));
     }
     existingReview.images = imageUrls;
+
+    // 3. Process Videos
+    let videoUrls = [];
+    if (existingVideos) {
+      videoUrls = Array.isArray(existingVideos)
+        ? existingVideos
+        : [existingVideos];
+    }
+
+    if (req.files && req.files.videos && req.files.videos.length > 0) {
+      videoUrls.push(...req.files.videos.map((file) => file.path));
+    }
+    existingReview.videos = videoUrls;
 
     // 4. Update the review
     existingReview.rating = newRating;
