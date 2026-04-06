@@ -183,6 +183,32 @@
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
+.styled-input.input-error {
+  border: 1px solid #d93025;
+  background-color: #fff2f2;
+}
+
+.input-error-text {
+  margin-top: 6px;
+  padding-left: 6px;
+  color: #b42318;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+
+.form-submit-error {
+  width: 100%;
+  margin: 0 0 18px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #f0b5b2;
+  background: #fff3f2;
+  color: #8b1e1a;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: center;
+}
+
 select.styled-input {
   appearance: none;
   -webkit-appearance: none;
@@ -218,6 +244,11 @@ select.styled-input {
 
 .primary-btn:hover {
   opacity: 0.8;
+}
+
+.primary-btn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .primary-btn.full-width {
