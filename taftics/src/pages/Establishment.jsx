@@ -5,7 +5,37 @@ import addressIcon from "../assets/address.png";
 import EstablishmentGallery from "../components/establishment/EstablishmentGallery";
 import EstablishmentReviews from "../components/establishment/EstablishmentReviews";
 
-// ❌ REMOVED: import { ESTABLISHMENTS, REVIEWS, USERS } from "../data/mockData";
+const parseTimeToMinutes = (timeLabel) => {
+  if (!timeLabel) return null;
+  const normalized = String(timeLabel).trim().toUpperCase();
+  const match = normalized.match(/^(\d{1,2}):(\d{2})\s*(AM|PM)$/);
+  if (!match) return null;
+  let hours = Number(match[1]);
+  const minutes = Number(match[2]);
+  const period = match[3];
+  if (Number.isNaN(hours) || Number.isNaN(minutes) || minutes < 0 || minutes > 59 || hours < 1 || hours > 12) return null;
+  if (hours === 12) hours = 0;
+  if (period === 'PM') hours += 12;
+  return hours * 60 + minutes;
+};
+
+const getHoursState = (businessHours) => {
+  if (!businessHours) return { isOpenNow: false, is24x7: false };
+  const normalized = String(businessHours).trim();
+  if (normalized.toLowerCase() === '24/7') return { isOpenNow: true, is24x7: true };
+  const parts = normalized.split('-').map((p) => p.trim());
+  if (parts.length !== 2) return { isOpenNow: false, is24x7: false };
+  const openMinutes = parseTimeToMinutes(parts[0]);
+  const closeMinutes = parseTimeToMinutes(parts[1]);
+  if (openMinutes == null || closeMinutes == null) return { isOpenNow: false, is24x7: false };
+  const now = new Date();
+  const currentMinutes = now.getHours() * 60 + now.getMinutes();
+  let isOpenNow = false;
+  if (openMinutes === closeMinutes) isOpenNow = true;
+  else if (openMinutes < closeMinutes) isOpenNow = currentMinutes >= openMinutes && currentMinutes < closeMinutes;
+  else isOpenNow = currentMinutes >= openMinutes || currentMinutes < closeMinutes;
+  return { isOpenNow, is24x7: false };
+};
 
 function Establishment() {
     const { id } = useParams(); // This will now be the MongoDB _id (e.g., "65f00...")
@@ -255,17 +285,23 @@ function Establishment() {
                                 style={{ width: "100%", minHeight: "500px" }}
                             >
                                 <div className="d-flex flex-row align-items-center mb-3">
-                                    <div
-                                        className="rating-box p-1 d-flex align-items-center justify-content-center"
-                                        style={{ width: "70px", height: "30px" }}
-                                    >
-                                        <p
-                                            className="mb-0 text-center fw-bold"
-                                            style={{ color: "#00441B" }}
-                                        >
-                                            OPEN
-                                        </p>
-                                    </div>
+                                    {(() => {
+                                        const { isOpenNow, is24x7 } = getHoursState(establishment.businessHours);
+                                        const isOpen = isOpenNow || is24x7;
+                                        return (
+                                            <div
+                                                className="rating-box p-1 d-flex align-items-center justify-content-center"
+                                                style={{ width: '70px', height: '30px', background: isOpen ? undefined : '#f8d7da' }}
+                                            >
+                                                <p
+                                                    className="mb-0 text-center fw-bold"
+                                                    style={{ color: isOpen ? '#00441B' : '#842029' }}
+                                                >
+                                                    {isOpen ? 'OPEN' : 'CLOSED'}
+                                                </p>
+                                            </div>
+                                        );
+                                    })()}
                                     <p
                                         className="mb-0 ms-1 fw-bold"
                                         style={{ color: "#444646", fontSize: "16px" }}
