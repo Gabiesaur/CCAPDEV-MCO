@@ -33,6 +33,9 @@ const AdminDashboard = ({ user }) => {
   const [deletionList, setDeletionList] = useState([]);
   const [selectedDeletionEst, setSelectedDeletionEst] = useState(null);
 
+  // --- SEARCH STATE ---
+  const [searchTerm, setSearchTerm] = useState("");
+
   // --- FORM STATE: OWNER CREATION ---
   const [ownerForm, setOwnerForm] = useState({
     username: "",
@@ -324,7 +327,13 @@ const AdminDashboard = ({ user }) => {
               </div>
               <div className="input-group" style={{ width: "300px" }}>
                 <span className="input-group-text bg-white border-end-0 rounded-start-pill"><Search size={16} /></span>
-                <input type="text" className="form-control border-start-0 rounded-end-pill" placeholder="Search users..." />
+                <input 
+                  type="text" 
+                  className="form-control border-start-0 rounded-end-pill" 
+                  placeholder="Search users..." 
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
               </div>
             </div>
             <div className="table-responsive">
@@ -338,7 +347,7 @@ const AdminDashboard = ({ user }) => {
                   </tr>
                 </thead>
                 <tbody>
-                  {userList.map((u) => (
+                  {userList.filter(u => (u.name?.toLowerCase().includes(searchTerm.toLowerCase()) || u.username?.toLowerCase().includes(searchTerm.toLowerCase()))).map((u) => (
                     <tr key={u._id}>
                       <td className="px-4 py-3">
                         <div className="d-flex align-items-center gap-3">
