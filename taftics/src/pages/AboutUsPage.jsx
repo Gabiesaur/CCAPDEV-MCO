@@ -1,5 +1,5 @@
 import React from "react";
-import { Target, Users, ShieldCheck } from "lucide-react";
+import { Target, Users, ShieldCheck, Library, Database } from "lucide-react";
 
 export default function AboutUsPage() {
   return (
@@ -129,7 +129,80 @@ export default function AboutUsPage() {
             </div>
           </div>
         </div>
-      </div>
+
+        {/* Technologies & Libraries Section */}
+        <div className="mt-5 pt-5 border-top">
+          <h3 className="fw-bold text-dlsu-dark mb-4 text-center">
+            Technologies & Libraries
+          </h3>
+          <div className="row g-4">
+            {/* Frontend Libraries */}
+            <div className="col-md-6">
+              <div className="p-4 bg-light rounded-4 h-100 border">
+                <div className="d-flex align-items-center mb-3">
+                  <Library className="text-dlsu-primary me-2" size={24} />
+                  <h5 className="fw-bold text-dlsu-dark mb-0">
+                    Frontend Dependencies
+                  </h5>
+                </div>
+                <ul className="list-unstyled d-flex flex-wrap gap-2">
+                  {[
+                    "react",
+                    "react-dom",
+                    "react-router-dom",
+                    "bootstrap",
+                    "lucide-react",
+                    "draft-js",
+                    "vite",
+                    "eslint",
+                  ].map((lib) => (
+                    <li
+                      key={lib}
+                      className="badge bg-white text-dlsu-dark border px-3 py-2 fw-medium"
+                    >
+                      {lib}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            {/* Backend Libraries */}
+            <div className="col-md-6">
+              <div className="p-4 bg-light rounded-4 h-100 border">
+                <div className="d-flex align-items-center mb-3">
+                  <Database className="text-dlsu-primary me-2" size={24} />
+                  <h5 className="fw-bold text-dlsu-dark mb-0">
+                    Backend Dependencies
+                  </h5>
+                </div>
+                <ul className="list-unstyled d-flex flex-wrap gap-2">
+                  {[
+                    "express",
+                    "mongodb",
+                    "mongoose",
+                    "bcrypt",
+                    "cloudinary",
+                    "multer",
+                    "multer-storage-cloudinary",
+                    "cors",
+                    "dotenv",
+                    "hbs",
+                    "path",
+                  ].map((lib) => (
+                    <li
+                      key={lib}
+                      className="badge bg-white text-dlsu-dark border px-3 py-2 fw-medium"
+                    >
+                      {lib}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+       </div>
     </div>
   );
 }
