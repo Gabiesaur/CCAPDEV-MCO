@@ -36,7 +36,7 @@ const getHoursState = (businessHours) => {
   if (!businessHours) return { isOpenNow: false, is24x7: false };
 
   const normalized = String(businessHours).trim();
-  if (normalized.toLowerCase() === "24/7") {
+  if (normalized.toLowerCase().includes("24/7")) {
     return { isOpenNow: true, is24x7: true };
   }
 
