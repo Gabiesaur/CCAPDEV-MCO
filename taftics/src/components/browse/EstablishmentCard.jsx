@@ -32,7 +32,7 @@ const getOpenStatusFromBusinessHours = (businessHours) => {
     return { label: "Hours unavailable", isOpen: false, known: false };
 
   const normalized = String(businessHours).trim();
-  if (normalized.toLowerCase() === "24/7") {
+  if (normalized.toLowerCase().includes("24/7")) {
     return { label: "Open", isOpen: true, known: true };
   }
 
