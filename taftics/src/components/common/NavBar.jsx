@@ -28,6 +28,19 @@ function NavBar({ user, onLogoutClick }) {
     navigate("/browse", { state: { searchQuery: searchQuery.trim() } });
   };
 
+  const handleSearchChange = (event) => {
+    const nextQuery = event.target.value;
+    setSearchQuery(nextQuery);
+
+    // Keep Browse results in sync with navbar input while the user types.
+    if (location.pathname === "/browse") {
+      navigate("/browse", {
+        replace: true,
+        state: { ...(location.state || {}), searchQuery: nextQuery },
+      });
+    }
+  };
+
   useEffect(() => {
     if (
       location.pathname === "/browse" &&
@@ -75,7 +88,7 @@ function NavBar({ user, onLogoutClick }) {
                   className="form-control bg-light border-0 rounded-end-3 py-2 fs-6"
                   placeholder="Search Taftics..."
                   value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={handleSearchChange}
                   style={{ height: "40px" }}
                 />
               </form>
