@@ -64,6 +64,17 @@ export default function MyProfilePage({ user, setUser }) {
     if (!user || !user._id) return;
     setIsLoading(true);
 
+    // Refresh the user object itself to get the latest Helpful/Contributions counts
+    fetch(`${import.meta.env.VITE_API_URL}/api/users/${user.username}`)
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.user && setUser) {
+          setUser(data.user);
+          localStorage.setItem("currentUser", JSON.stringify(data.user));
+        }
+      })
+      .catch((err) => console.error("Failed to refresh user stats:", err));
+
     // Fetch Review Arrays
     Promise.all([
       fetch(
@@ -94,7 +105,7 @@ export default function MyProfilePage({ user, setUser }) {
         console.error("Failed fetching profile tabs data:", err);
         setIsLoading(false);
       });
-  }, [user]);
+  }, [user._id, user.username]); // More specific dependencies
 
   // Tab Button Helper
   const TabButton = ({ id, icon: Icon, label }) => (

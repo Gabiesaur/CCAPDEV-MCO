@@ -12,7 +12,8 @@ export default function PublicProfilePage({ db, currentUser }) {
   const navigate = useNavigate(); // Added navigate hook
   const [activeTab, setActiveTab] = useState("reviews");
 
-  // Toast State
+  // User Stats & Review Data
+  const [publicUser, setPublicUser] = useState(null);
   const [publicReviews, setPublicReviews] = useState([]);
   const [publicComments, setPublicComments] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,28 +35,41 @@ export default function PublicProfilePage({ db, currentUser }) {
     setTimeout(() => setShowToast(false), 3000);
   };
 
-  // 1. Find the User
-  const publicUser = db.find((u) => u.username === username);
 
   useEffect(() => {
-      if (!publicUser || !publicUser._id) return;
-      setIsLoading(true);
-  
-      // Fetch Review Arrays
-      Promise.all([
-        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/reviews`).then(res => res.json()),
-        fetch(`${import.meta.env.VITE_API_URL}/api/users/${publicUser._id}/comments`).then(res => res.json())
-      ])
-        .then(([revData, commentData]) => {
-          setPublicReviews(Array.isArray(revData) ? revData : []);
-          setPublicComments(Array.isArray(commentData) ? commentData : []);
-          setIsLoading(false);
-        })
-        .catch((err) => {
-          console.error("Failed fetching profile tabs data:", err);
-          setIsLoading(false);
-        });
-    }, [publicUser]);
+    if (!username) return;
+    setIsLoading(true);
+
+    // Fetch the specific user data first to get fresh stats
+    fetch(`${import.meta.env.VITE_API_URL}/api/users/${username}`)
+      .then((res) => res.json())
+      .then((userData) => {
+        if (userData.success) {
+          setPublicUser(userData.user);
+
+          // Once we have the user ID, fetch their reviews and comments
+          return Promise.all([
+            fetch(
+              `${import.meta.env.VITE_API_URL}/api/users/${userData.user._id}/reviews`,
+            ).then((res) => res.json()),
+            fetch(
+              `${import.meta.env.VITE_API_URL}/api/users/${userData.user._id}/comments`,
+            ).then((res) => res.json()),
+          ]);
+        } else {
+          throw new Error("User not found");
+        }
+      })
+      .then(([revData, commentData]) => {
+        setPublicReviews(Array.isArray(revData) ? revData : []);
+        setPublicComments(Array.isArray(commentData) ? commentData : []);
+        setIsLoading(false);
+      })
+      .catch((err) => {
+        console.error("Failed fetching profile data:", err);
+        setIsLoading(false);
+      });
+  }, [username]);
 
   if (currentUser && currentUser.username === username) {
     return <Navigate to="/profile/me" replace />;
