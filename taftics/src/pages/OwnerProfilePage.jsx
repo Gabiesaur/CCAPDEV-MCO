@@ -90,6 +90,7 @@ export default function OwnerProfilePage({ user, setUser }) {
     startTime: "07:00",
     endTime: "19:00",
     location: "",
+    description: "",
   });
 
   useEffect(() => {
@@ -151,6 +152,7 @@ export default function OwnerProfilePage({ user, setUser }) {
           startTime: sTime,
           endTime: eTime,
           location: estData.location || "",
+          description: estData.description || "",
         });
         setLoading(false);
       })
@@ -534,6 +536,34 @@ export default function OwnerProfilePage({ user, setUser }) {
                         ) : (
                           <div className="form-control bg-light text-muted border-0 py-2">
                             {establishment.location || "Not Specified"}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Description Field */}
+                      <div className="col-12">
+                        <label className="form-label small fw-bold text-muted">
+                          Store Description (About Us)
+                        </label>
+                        {isEditingStore ? (
+                          <textarea
+                            className="form-control"
+                            rows="4"
+                            placeholder="Tell students what your place is all about..."
+                            value={storeForm.description}
+                            onChange={(e) =>
+                              setStoreForm({
+                                ...storeForm,
+                                description: e.target.value,
+                              })
+                            }
+                          ></textarea>
+                        ) : (
+                          <div
+                            className="form-control bg-light text-muted border-0 py-2 text-wrap text-break"
+                            style={{ minHeight: "100px" }}
+                          >
+                            {establishment.description || "No description set."}
                           </div>
                         )}
                       </div>

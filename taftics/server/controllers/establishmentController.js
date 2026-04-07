@@ -103,7 +103,7 @@ exports.getEstablishmentReviews = async (req, res) => {
 
 exports.updateEstablishment = async (req, res) => {
   try {
-    const { name, category, startTime, endTime, location } = req.body;
+    const { name, category, startTime, endTime, location, description } = req.body;
 
     const formatTime = (timeStr) => {
       if (!timeStr) return "";
@@ -120,7 +120,7 @@ exports.updateEstablishment = async (req, res) => {
 
     const establishment = await Establishment.findByIdAndUpdate(
       req.params.id,
-      { name, category, businessHours: formattedHours, location },
+      { name, category, businessHours: formattedHours, location, description },
       { new: true },
     );
 
