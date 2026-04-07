@@ -84,7 +84,7 @@ export default function EstablishmentReviews({
     const rating = Number(r.rating || 0);
 
     return (
-      (maxRating === 0 || rating <= maxRating) &&
+      (maxRating === 0 || rating == maxRating) &&
       (title.includes(query) ||
         bodyText.includes(query) ||
         authorName.includes(query))
@@ -486,7 +486,7 @@ export default function EstablishmentReviews({
                     paddingRight: "4px",
                   }}
                 >
-                  Up to {maxRating || 1} Stars
+                  {maxRating || 1} Stars
                 </span>
                 <button
                   className="btn btn-link btn-sm p-0 text-muted text-decoration-none"
@@ -568,40 +568,40 @@ export default function EstablishmentReviews({
                         (currentUser &&
                           (rev.userId?._id === currentUser._id ||
                             rev.userId === currentUser._id))) && (
-                        <div className="position-relative">
-                          <button
-                            className="btn btn-sm btn-link text-muted p-0"
-                            onClick={(e) => toggleMenu(e, rev._id || rev.id)}
-                          >
-                            <MoreVertical size={16} />
-                          </button>
-
-                          {openMenuId === (rev._id || rev.id) && (
-                            <div
-                              className="position-absolute bg-white shadow-sm rounded border p-1"
-                              style={{
-                                top: "100%",
-                                right: 0,
-                                zIndex: 10,
-                                minWidth: "120px",
-                              }}
+                          <div className="position-relative">
+                            <button
+                              className="btn btn-sm btn-link text-muted p-0"
+                              onClick={(e) => toggleMenu(e, rev._id || rev.id)}
                             >
-                              <button
-                                className="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 mb-1"
-                                onClick={() => handleEditClick(rev)}
+                              <MoreVertical size={16} />
+                            </button>
+
+                            {openMenuId === (rev._id || rev.id) && (
+                              <div
+                                className="position-absolute bg-white shadow-sm rounded border p-1"
+                                style={{
+                                  top: "100%",
+                                  right: 0,
+                                  zIndex: 10,
+                                  minWidth: "120px",
+                                }}
                               >
-                                <Edit size={14} /> Edit
-                              </button>
-                              <button
-                                className="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 text-danger"
-                                onClick={() => handleDelete(rev._id || rev.id)}
-                              >
-                                <Trash2 size={14} /> Delete
-                              </button>
-                            </div>
-                          )}
-                        </div>
-                      )}
+                                <button
+                                  className="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 mb-1"
+                                  onClick={() => handleEditClick(rev)}
+                                >
+                                  <Edit size={14} /> Edit
+                                </button>
+                                <button
+                                  className="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 text-danger"
+                                  onClick={() => handleDelete(rev._id || rev.id)}
+                                >
+                                  <Trash2 size={14} /> Delete
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        )}
                     </div>
                   </div>
 
@@ -680,7 +680,7 @@ export default function EstablishmentReviews({
                       style={{
                         color:
                           currentUser &&
-                          rev.helpfulVoters?.includes(currentUser._id)
+                            rev.helpfulVoters?.includes(currentUser._id)
                             ? "#41AB5D"
                             : "#9ca3af",
                       }}
@@ -696,7 +696,7 @@ export default function EstablishmentReviews({
                       style={{
                         color:
                           currentUser &&
-                          rev.unhelpfulVoters?.includes(currentUser._id)
+                            rev.unhelpfulVoters?.includes(currentUser._id)
                             ? "#41AB5D"
                             : "#9ca3af",
                       }}
