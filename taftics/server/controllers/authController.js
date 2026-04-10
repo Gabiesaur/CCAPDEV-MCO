@@ -42,8 +42,13 @@ exports.login = async (req, res) => {
       // Session cookie (expires when browser closes)
       req.session.cookie.expires = false; 
     }
-
-    res.json({ success: true, user: sessionUser });
+    req.session.save((err) => {
+      if (err) {
+        console.error("Session save error:", err);
+        return res.status(500).json({ success: false, message: "Server error during login" });
+      }
+      res.json({ success: true, user: sessionUser });
+    });
   } catch (error) {
     res.status(500).json({ success: false, message: "Server error" });
   }
