@@ -28,6 +28,7 @@ exports.login = async (req, res) => {
     const sessionUser = {
       _id: user._id, username: user.username, name: user.name, email: user.email,
       idSeries: user.idSeries, bio: user.bio, avatar: user.avatar, 
+      ownedEstablishmentId: user.ownedEstablishmentId,
       isAdmin: user.isAdmin, helpfulCount: user.helpfulCount, contributions: user.contributions
     };
 
