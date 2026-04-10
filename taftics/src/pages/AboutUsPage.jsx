@@ -1,6 +1,34 @@
 import React from "react";
 import { Target, Users, ShieldCheck, Library, Database } from "lucide-react";
 
+const frontendLibs = [
+  { name: "react", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" },
+  { name: "react-dom", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/react/react-original.svg" },
+  { name: "react-router-dom", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/reactrouter/reactrouter-original.svg" },
+  { name: "bootstrap", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/bootstrap/bootstrap-original.svg" },
+  { name: "lucide-react", icon: null },
+  { name: "draft-js", icon: null },
+  { name: "vite", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/vitejs/vitejs-original.svg" },
+  { name: "eslint", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/eslint/eslint-original.svg" },
+];
+
+const backendLibs = [
+  { name: "express", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/express/express-original.svg" },
+  { name: "mongodb", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" },
+  { name: "mongoose", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongoose/mongoose-original.svg" },
+  { name: "bcrypt", icon: null },
+  { name: "cloudinary", icon: null },
+  { name: "multer", icon: null },
+  { name: "multer-storage-cloudinary", icon: null },
+  { name: "cors", icon: null },
+  { name: "dotenv", icon: null },
+  { name: "hbs", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/handlebars/handlebars-original.svg" },
+  { name: "path", icon: null },
+  { name: "express-session", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/express/express-original.svg" },
+  { name: "connect-mongo", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/mongodb/mongodb-original.svg" },
+  { name: "cookie-parser", icon: "https://cdn.jsdelivr.net/gh/devicons/devicon@latest/icons/express/express-original.svg" },
+];
+
 export default function AboutUsPage() {
   return (
     <div className="min-vh-100 bg-white font-overpass">
@@ -146,21 +174,19 @@ export default function AboutUsPage() {
                   </h5>
                 </div>
                 <ul className="list-unstyled d-flex flex-wrap gap-2">
-                  {[
-                    "react",
-                    "react-dom",
-                    "react-router-dom",
-                    "bootstrap",
-                    "lucide-react",
-                    "draft-js",
-                    "vite",
-                    "eslint",
-                  ].map((lib) => (
+                  {frontendLibs.map((lib) => (
                     <li
-                      key={lib}
-                      className="badge bg-white text-dlsu-dark border px-3 py-2 fw-medium"
+                      key={lib.name}
+                      className="badge bg-white text-dlsu-dark border px-3 py-2 fw-medium d-flex align-items-center gap-2"
                     >
-                      {lib}
+                      {lib.icon && (
+                        <img 
+                          src={lib.icon} 
+                          alt={`${lib.name} logo`} 
+                          style={{ width: "16px", height: "16px" }} 
+                        />
+                      )}
+                      {lib.name}
                     </li>
                   ))}
                 </ul>
@@ -177,24 +203,19 @@ export default function AboutUsPage() {
                   </h5>
                 </div>
                 <ul className="list-unstyled d-flex flex-wrap gap-2">
-                  {[
-                    "express",
-                    "mongodb",
-                    "mongoose",
-                    "bcrypt",
-                    "cloudinary",
-                    "multer",
-                    "multer-storage-cloudinary",
-                    "cors",
-                    "dotenv",
-                    "hbs",
-                    "path",
-                  ].map((lib) => (
+                  {backendLibs.map((lib) => (
                     <li
-                      key={lib}
-                      className="badge bg-white text-dlsu-dark border px-3 py-2 fw-medium"
+                      key={lib.name}
+                      className="badge bg-white text-dlsu-dark border px-3 py-2 fw-medium d-flex align-items-center gap-2"
                     >
-                      {lib}
+                      {lib.icon && (
+                        <img 
+                          src={lib.icon} 
+                          alt={`${lib.name} logo`} 
+                          style={{ width: "16px", height: "16px" }} 
+                        />
+                      )}
+                      {lib.name}
                     </li>
                   ))}
                 </ul>
