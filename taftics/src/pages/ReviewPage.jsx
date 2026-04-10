@@ -12,7 +12,11 @@ import {
   X,
   ChevronLeft,
   ChevronRight,
+  MoreVertical,
+  Edit,
+  Trash2,
 } from "lucide-react";
+import ReviewEditModal from "../components/establishment/ReviewEditModal";
 
 const getRelativeDate = (dateString) => {
   if (!dateString) return "";
@@ -99,6 +103,16 @@ const ReviewPage = () => {
   // Image Modal State
   const [imageModalOpen, setImageModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+
+  // Edit Menu State
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+
+  useEffect(() => {
+    const handleClickOutside = () => setIsMenuOpen(false);
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
 
   const openImageModal = (index) => {
     setCurrentImageIndex(index);
@@ -369,8 +383,109 @@ const ReviewPage = () => {
   const establishmentId =
     getEntityId(establishment?._id) || getEntityId(review?.establishmentId);
 
+  const storedUser =
+    sessionStorage.getItem("currentUser") ||
+    localStorage.getItem("currentUser");
+  const currentUser = storedUser ? JSON.parse(storedUser) : null;
+  const currentUserId = currentUser?._id;
+  const reviewOwnerId = getEntityId(review?.userId) || review?.user;
+  const isOwnReview = review?.isOwnReview || (currentUserId && currentUserId === reviewOwnerId);
+
+  const handleEditClick = () => {
+    setIsEditModalOpen(true);
+    setIsMenuOpen(false);
+  };
+
+  const handleSaveEdit = async (updatedReview) => {
+    try {
+      const reviewId = updatedReview._id || updatedReview.id;
+
+      const formData = new FormData();
+      formData.append("rating", updatedReview.rating);
+      formData.append("title", updatedReview.title);
+      formData.append("body", updatedReview.body || updatedReview.comment);
+
+      if (updatedReview.existingImages) {
+        updatedReview.existingImages.forEach((url) =>
+          formData.append("existingImages", url),
+        );
+      }
+      if (updatedReview.newImages) {
+        updatedReview.newImages.forEach((img) =>
+          formData.append("images", img.file),
+        );
+      }
+
+      if (updatedReview.existingVideos) {
+        updatedReview.existingVideos.forEach((url) =>
+          formData.append("existingVideos", url),
+        );
+      }
+      if (updatedReview.newVideos) {
+        updatedReview.newVideos.forEach((vid) =>
+          formData.append("videos", vid.file),
+        );
+      }
+
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/reviews/${reviewId}`,
+        {
+          method: "PUT",
+          body: formData,
+        },
+      );
+
+      const data = await res.json();
+      if (data.success) {
+        const finalReview = data.review
+          ? { ...updatedReview, ...data.review }
+          : updatedReview;
+        
+        setReview({ ...review, ...finalReview, isEdited: true });
+        triggerToast("Review updated successfully!");
+      } else {
+        triggerToast(data.message || "Failed to update review");
+      }
+    } catch (error) {
+      console.error("Failed to update review:", error);
+      triggerToast("Failed to connect to server");
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      const res = await fetch(
+        `${import.meta.env.VITE_API_URL}/api/reviews/${id}`,
+        { method: "DELETE" }
+      );
+      const data = await res.json();
+
+      if (data.success) {
+        triggerToast("Review deleted successfully!");
+        setTimeout(() => {
+          navigate(establishmentId ? `/establishment/${establishmentId}` : "/browse");
+        }, 1500);
+      } else {
+        triggerToast(data.message || "Failed to delete review");
+      }
+    } catch (error) {
+      console.error("Failed to delete review:", error);
+      triggerToast("Failed to connect to server");
+    }
+  };
+
   return (
     <div className="bg-white min-vh-100 d-flex flex-column position-relative">
+      {/* Edit Modal */}
+      {isEditModalOpen && (
+        <ReviewEditModal
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          review={review}
+          onSave={handleSaveEdit}
+        />
+      )}
+
       {/* Toast Notification */}
       {showToast && (
         <div className="toast-success-custom fw-bold" style={{ zIndex: 9999 }}>
@@ -391,32 +506,75 @@ const ReviewPage = () => {
 
         {/* 1. Main Review Card */}
         <div className="bg-light p-4 rounded-5 shadow-sm text-start mb-5 border-0">
-          <div className="d-flex align-items-center mb-3">
-            <img
-              src={author.avatar}
-              className="rounded-circle me-3"
-              style={{ width: "40px", height: "40px", objectFit: "cover" }}
-              alt="User"
-            />
-            <div className="d-flex flex-column">
-              {author.username ? (
-                <Link
-                  to={`/profile/${author.username}`}
-                  className="fw-bold text-decoration-none text-dark"
-                  style={{ marginBottom: "-4px" }}
-                >
-                  {author.displayName}
-                </Link>
-              ) : (
-                <span
-                  className="fw-bold text-dark"
-                  style={{ marginBottom: "-4px" }}
-                >
-                  {author.displayName}
-                </span>
-              )}
-              <small className="text-muted">{reviewDate}</small>
+          <div className="d-flex justify-content-between align-items-start mb-3">
+            <div className="d-flex align-items-center">
+              <img
+                src={author.avatar}
+                className="rounded-circle me-3"
+                style={{ width: "40px", height: "40px", objectFit: "cover" }}
+                alt="User"
+              />
+              <div className="d-flex flex-column">
+                {author.username ? (
+                  <Link
+                    to={`/profile/${author.username}`}
+                    className="fw-bold text-decoration-none text-dark"
+                    style={{ marginBottom: "-4px" }}
+                  >
+                    {author.displayName}
+                  </Link>
+                ) : (
+                  <span
+                    className="fw-bold text-dark"
+                    style={{ marginBottom: "-4px" }}
+                  >
+                    {author.displayName}
+                  </span>
+                )}
+                <div className="d-flex align-items-center gap-2">
+                  <small className="text-muted">{reviewDate}</small>
+                  {review?.isEdited && (
+                    <small className="text-muted" style={{ fontSize: "10px" }}>
+                      (edited)
+                    </small>
+                  )}
+                </div>
+              </div>
             </div>
+
+            {/* Menu Container */}
+            {isOwnReview && (
+              <div className="position-relative">
+                <button
+                  className="btn btn-sm btn-link text-muted p-0 shadow-none"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsMenuOpen(!isMenuOpen);
+                  }}
+                >
+                  <MoreVertical size={20} />
+                </button>
+                {isMenuOpen && (
+                  <div
+                    className="position-absolute bg-white shadow-sm rounded border p-1"
+                    style={{ top: "100%", right: 0, zIndex: 10, minWidth: "120px" }}
+                  >
+                    <button
+                      className="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 mb-1"
+                      onClick={handleEditClick}
+                    >
+                      <Edit size={14} /> Edit
+                    </button>
+                    <button
+                      className="btn btn-sm btn-light w-100 text-start d-flex align-items-center gap-2 text-danger"
+                      onClick={handleDelete}
+                    >
+                      <Trash2 size={14} /> Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <div className="d-flex gap-1 mb-3">
