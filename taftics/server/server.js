@@ -24,6 +24,7 @@ app.use(session({
   secret: process.env.SESSION_SECRET || 'super_secret_taftics_key',
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   store: MongoStore.create({
     mongoUrl: process.env.MONGO_URI,
     collectionName: 'sessions' // Sessions will be saved in your DB here
