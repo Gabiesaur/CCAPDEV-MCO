@@ -5,89 +5,66 @@ const Establishment = require("../models/Establishment");
 exports.login = async (req, res) => {
   const loginIdentifier = req.body.username || req.body.email;
   const password = req.body.password;
+  const rememberMe = req.body.rememberMe; // Capture the rememberMe flag
 
   if (!loginIdentifier || !password) {
-    return res
-      .status(400)
-      .json({ success: false, message: "Please provide credentials" });
+    return res.status(400).json({ success: false, message: "Please provide credentials" });
   }
 
   try {
-    // 1. Find the user and calculate their stats dynamically using aggregation
     const users = await User.aggregate([
-      {
-        // Match by EITHER username OR email
-        $match: {
-          $or: [{ username: loginIdentifier }, { email: loginIdentifier }],
-        },
-      },
-      {
-        // Join with the reviews collection to find all reviews by this user
-        $lookup: {
-          from: "reviews",
-          localField: "_id",
-          foreignField: "userId",
-          as: "userReviews",
-        },
-      },
-      {
-        // Calculate the dynamic stats based on the joined reviews
-        $addFields: {
-          contributions: { $size: "$userReviews" },
-          helpfulCount: {
-            $reduce: {
-              input: "$userReviews",
-              initialValue: 0,
-              in: {
-                $add: [
-                  "$$value",
-                  { $size: { $ifNull: ["$$this.helpfulVoters", []] } },
-                ],
-              },
-            },
-          },
-        },
-      },
+      { $match: { $or: [{ username: loginIdentifier }, { email: loginIdentifier }] } },
+      { $lookup: { from: "reviews", localField: "_id", foreignField: "userId", as: "userReviews" } },
+      { $addFields: { contributions: { $size: "$userReviews" }, helpfulCount: { $reduce: { input: "$userReviews", initialValue: 0, in: { $add: ["$$value", { $size: { $ifNull: ["$$this.helpfulVoters", []] } }] } } } } }
     ]);
 
-    // Since aggregation returns an array, grab the first (and only) matched user
     const user = users[0];
+    if (!user) return res.status(401).json({ success: false, message: "Invalid credentials" });
 
-    match = await bcrypt.compare(password, user.password);
-    // 2. Check if user exists AND password matches
-    if (!user || !match) {
-      return res
-        .status(401)
-        .json({
-          success: false,
-          message: "Invalid username/email or password",
-        });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) return res.status(401).json({ success: false, message: "Invalid credentials" });
+
+    // 1. Construct the user object to save in the session
+    const sessionUser = {
+      _id: user._id, username: user.username, name: user.name, email: user.email,
+      idSeries: user.idSeries, bio: user.bio, avatar: user.avatar, 
+      isAdmin: user.isAdmin, helpfulCount: user.helpfulCount, contributions: user.contributions
+    };
+
+    // 2. Save to session
+    req.session.user = sessionUser;
+
+    // 3. Handle "Remember Me"
+    if (rememberMe) {
+      // Set cookie to expire in 21 days
+      req.session.cookie.maxAge = 21 * 24 * 60 * 60 * 1000; 
+    } else {
+      // Session cookie (expires when browser closes)
+      req.session.cookie.expires = false; 
     }
 
-    // 3. Success! Send the user data back to React (omitting the password!)
-    res.json({
-      success: true,
-      user: {
-        _id: user._id,
-        username: user.username,
-        name: user.name,
-        email: user.email,
-        idSeries: user.idSeries,
-        bio: user.bio,
-        followers: user.followers,
-        helpfulCount: user.helpfulCount,
-        contributions: user.contributions,
-        avatar: user.avatar,
-        ownedEstablishmentId: user.ownedEstablishmentId,
-        isAdmin: user.isAdmin,
-      },
-    });
+    res.json({ success: true, user: sessionUser });
   } catch (error) {
-    console.error("Login error:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Server error during login" });
+    res.status(500).json({ success: false, message: "Server error" });
   }
+};
+
+// NEW: Endpoint for React to check if a user is already logged in on refresh
+exports.checkSession = (req, res) => {
+  if (req.session && req.session.user) {
+    res.json({ success: true, user: req.session.user });
+  } else {
+    res.json({ success: false, user: null });
+  }
+};
+
+// NEW: Endpoint to destroy the session
+exports.logout = (req, res) => {
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ success: false, message: "Could not log out." });
+    res.clearCookie('connect.sid'); // Clear the cookie from the browser
+    res.json({ success: true, message: "Logged out successfully" });
+  });
 };
 
 var count_salt = 10;
@@ -124,27 +101,27 @@ exports.register = async (req, res) => {
 
     await newUser.save();
 
-    // 4. Send success response and auto-login the user
+    const sessionUser = {
+      _id: newUser._id, username: newUser.username, email: newUser.email,
+      name: newUser.name, idSeries: newUser.idSeries, avatar: newUser.avatar,
+      ownedEstablishmentId: newUser.ownedEstablishmentId, isAdmin: newUser.isAdmin,
+      helpfulCount: 0, contributions: 0
+    };
+
+    // 2. Save to session to auto-login the user
+    req.session.user = sessionUser;
+
+    // 3. Set as a standard session (expires when the browser closes)
+    // This perfectly simulates a login without the "Remember Me" box checked
+    req.session.cookie.expires = false; 
+    
     res.status(201).json({
       success: true,
-      user: {
-        _id: newUser._id,
-        username: newUser.username,
-        email: newUser.email,
-        name: newUser.name,
-        idSeries: newUser.idSeries,
-        avatar: newUser.avatar,
-        ownedEstablishmentId: newUser.ownedEstablishmentId,
-        isAdmin: newUser.isAdmin,
-        helpfulCount: 0,
-        contributions: 0,
-      },
+      user: sessionUser
     });
   } catch (error) {
     console.error("Registration error:", error);
-    res
-      .status(500)
-      .json({ success: false, message: "Server error during registration." });
+    res.status(500).json({ success: false, message: "Server error during registration." });
   }
 };
 

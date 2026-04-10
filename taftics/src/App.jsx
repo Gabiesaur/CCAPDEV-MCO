@@ -37,27 +37,29 @@ function ScrollToTop() {
 }
 
 function App() {
-  // --- GLOBAL STATE ---
-  // Check BOTH storages so user stays logged in correctly
-  const [user, setUser] = useState(() => {
-    const savedLocal = localStorage.getItem("currentUser");
-    const savedSession = sessionStorage.getItem("currentUser");
-    
-    if (savedSession) return JSON.parse(savedSession);
-    if (savedLocal) return JSON.parse(savedLocal);
-    
-    return null;
-  });
-
-  // Local state for all users
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true); // Added loading state
   const [dbUsers, setDbUsers] = useState([]);
 
-  // Fetch all users on mount
+  // --- 1. SESSION CHECK ON MOUNT ---
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/api/users`)
-      .then(res => res.json())
-      .then(data => setDbUsers(data))
-      .catch(err => console.error("Error fetching users:", err));
+    const fetchSession = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
+          method: "GET",
+          credentials: "include", // CRITICAL: Sends the cookie
+        });
+        const data = await response.json();
+        if (data.success && data.user) {
+          setUser(data.user);
+        }
+      } catch (error) {
+        console.error("Session check failed", error);
+      } finally {
+        setLoading(false); // Stop loading regardless of outcome
+      }
+    };
+    fetchSession();
   }, []);
 
   // --- AUTHENTICATION FUNCTIONS ---
@@ -65,36 +67,31 @@ function App() {
   const login = async (username, password, rememberMe) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include", // CRITICAL: Tells browser to save the incoming cookie
+        body: JSON.stringify({ username, password, rememberMe }),
       });
-
-      if (response.ok) {
-        const userData = await response.json();
-        setUser(userData.user);
-
-        if (rememberMe) {
-          localStorage.setItem("currentUser", JSON.stringify(userData.user));
-        } else {
-          sessionStorage.setItem("currentUser", JSON.stringify(userData.user));
-        }
-
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        return { success: false, message: errorData.message || "Invalid username or password" };
+      const data = await response.json();
+      if (data.success) {
+        setUser(data.user);
       }
+      return data;
     } catch (error) {
-      console.error("Login error:", error);
-      return { success: false, message: "Server error. Please try again later." };
+      return { success: false, message: "Network error" };
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("currentUser");
-    sessionStorage.removeItem("currentUser");
+  const logout = async () => {
+    try {
+      await fetch(`${import.meta.env.VITE_API_URL}/api/logout`, {
+        method: "POST",
+        credentials: "include",
+      });
+      setUser(null);
+    } catch (error) {
+      console.error("Logout failed", error);
+    }
   };
 
   const register = async (formData) => {
@@ -102,6 +99,7 @@ function App() {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: "include", // <-- CRITICAL: Tells the browser to save the session cookie
         body: JSON.stringify(formData)
       });
 
@@ -109,8 +107,7 @@ function App() {
 
       if (data.success) {
         // Auto-login the user after successful registration
-        setUser(data.user);
-        sessionStorage.setItem("currentUser", JSON.stringify(data.user));
+        setUser(data.user); 
         return { success: true };
       } else {
         return { success: false, message: data.message };
@@ -141,6 +138,8 @@ function App() {
       return { success: false, message: "Network error. Is the server running?" };
     }
   };
+
+  if (loading) return <div>Loading...</div>;
 
   // --- ROUTING ---
   return (

@@ -12,7 +12,10 @@
   "dependencies": {
     "bcrypt": "^6.0.0",
     "bootstrap": "^5.3.8",
+    "connect-mongo": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "draft-js": "^0.11.7",
+    "express-session": "^1.19.0",
     "lucide-react": "^0.563.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
