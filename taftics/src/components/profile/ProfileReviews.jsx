@@ -77,7 +77,48 @@ export default function ProfileReviews({ review }) {
       <Link to={`/review/${review._id}`} className="text-decoration-none">
         <h5 className="fw-bold text-dlsu-dark mb-2 hover-underline">{review.title}</h5>
       </Link>
-      <p className="text-secondary small mb-3">{review.body}</p>
+      <p className="text-secondary small mb-3">{review.body || review.comment}</p>
+
+      {/* Render Images if available */}
+      {review.images && review.images.length > 0 && (
+        <div className="d-flex flex-wrap gap-2 mb-3">
+          {review.images.map((imgUrl, i) => (
+            <div key={i} style={{ width: "80px", height: "80px" }}>
+              <img
+                src={imgUrl}
+                alt={`review-img-${i}`}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Render Videos if available */}
+      {review.videos && review.videos.length > 0 && (
+        <div className="d-flex flex-wrap gap-2 mb-3">
+          {review.videos.map((vidUrl, i) => (
+            <div key={i} style={{ width: "160px", height: "90px" }}>
+              <video
+                src={vidUrl}
+                style={{
+                  width: "100%",
+                  height: "100%",
+                  objectFit: "cover",
+                  borderRadius: "8px",
+                }}
+                controls
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
 
       {/* Establishment */}
       <Link
