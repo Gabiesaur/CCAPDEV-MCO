@@ -38,28 +38,36 @@ function ScrollToTop() {
 
 function App() {
   const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true); // Added loading state
+  const [loadingSession, setLoadingSession] = useState(true); // Added to prevent flickering on reload
   const [dbUsers, setDbUsers] = useState([]);
 
-  // --- 1. SESSION CHECK ON MOUNT ---
   useEffect(() => {
-    const fetchSession = async () => {
+    fetch(`${import.meta.env.VITE_API_URL}/api/users`)
+      .then(res => res.json())
+      .then(data => setDbUsers(data))
+      .catch(err => console.error("Error fetching users:", err));
+  }, []);
+
+  useEffect(() => {
+    const checkSession = async () => {
       try {
+        // Change the URL to wherever you routed exports.checkSession
         const response = await fetch(`${import.meta.env.VITE_API_URL}/api/me`, {
           method: "GET",
-          credentials: "include", // CRITICAL: Sends the cookie
+          credentials: "include", // CRITICAL: Sends the secure cookie to the backend
         });
         const data = await response.json();
+        
         if (data.success && data.user) {
           setUser(data.user);
         }
       } catch (error) {
         console.error("Session check failed", error);
       } finally {
-        setLoading(false); // Stop loading regardless of outcome
+        setLoadingSession(false);
       }
     };
-    fetchSession();
+    checkSession();
   }, []);
 
   // --- AUTHENTICATION FUNCTIONS ---
@@ -67,25 +75,31 @@ function App() {
   const login = async (username, password, rememberMe) => {
     try {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include", // CRITICAL: Tells browser to save the incoming cookie
-        body: JSON.stringify({ username, password, rememberMe }),
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: "include",
+        body: JSON.stringify({ username, password, rememberMe }) 
       });
-      const data = await response.json();
-      if (data.success) {
-        setUser(data.user);
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUser(userData.user);
+        // We no longer use localStorage/sessionStorage here! The cookie handles it.
+        return { success: true };
+      } else {
+        const errorData = await response.json();
+        return { success: false, message: errorData.message || "Invalid username or password" };
       }
-      return data;
     } catch (error) {
-      return { success: false, message: "Network error" };
+      console.error("Login error:", error);
+      return { success: false, message: "Server error. Please try again later." };
     }
   };
 
   const logout = async () => {
     try {
       await fetch(`${import.meta.env.VITE_API_URL}/api/logout`, {
-        method: "POST",
+        method: 'POST',
         credentials: "include",
       });
       setUser(null);
@@ -99,15 +113,15 @@ function App() {
       const response = await fetch(`${import.meta.env.VITE_API_URL}/api/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: "include", // <-- CRITICAL: Tells the browser to save the session cookie
+        credentials: "include", // CRITICAL: Tells browser to accept the auto-login cookie
         body: JSON.stringify(formData)
       });
 
       const data = await response.json();
 
       if (data.success) {
-        // Auto-login the user after successful registration
-        setUser(data.user); 
+        setUser(data.user);
+        // Removed sessionStorage!
         return { success: true };
       } else {
         return { success: false, message: data.message };
@@ -139,7 +153,9 @@ function App() {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loadingSession) {
+    return <div style={{ height: '100vh', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>Loading...</div>; 
+  }
 
   // --- ROUTING ---
   return (
