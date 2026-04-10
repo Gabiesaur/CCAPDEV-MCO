@@ -20,6 +20,7 @@ app.use(cookieParser());
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ extended: true, limit: "50mb" }));
 app.use(express.static("public"));
+app.set('trust proxy', 1);
 app.use(session({
   secret: process.env.SESSION_SECRET || 'super_secret_taftics_key',
   resave: false,
@@ -32,6 +33,7 @@ app.use(session({
   cookie: {
     secure: process.env.NODE_ENV === 'production', // true if using https
     httpOnly: true, // Prevents XSS attacks from reading the cookie
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
     maxAge: 1000 * 60 * 60 * 24 // Default 1 day (we will override this for remember me)
   }
 }));
